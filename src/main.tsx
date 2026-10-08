@@ -17,7 +17,7 @@ createRoot(rootEl).render(
   <StrictMode>
     <ErrorBoundary>
       {envResult.ok ? (
-        <Providers>
+        <Providers env={envResult.env}>
           <RouterProvider router={router} />
         </Providers>
       ) : (
