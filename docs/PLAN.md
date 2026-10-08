@@ -80,7 +80,7 @@ The applied migrations (`supabase/migrations`) differ from the original design b
 - **Storage:** path `<owner_id>/<yyyy>/<file>`; both buckets accept png/jpeg/webp (`assets` 2 MB, `bills` 3 MB). Bill files are immutable (no UPDATE/DELETE policy); asset files can be replaced/removed.
 - **Built RPCs:** `init_settings`, `upsert_product`, `trash_product`/`restore_product`, `trash_variant`/`restore_variant`, `create_order`, `update_order`, `suggest_customers`, `set_order_status`, `set_payment`, `trash_order`/`restore_order`, `rollback_order`, `next_order_no`, `next_bill_no`, `compute_order_total`, `ping`. Order RPCs take the expected `version_no` and raise SQLSTATE `SB409` when stale.
 - **DB tests without Docker:** `bash scripts/test-db-linked.sh` runs every pgTAP file on the linked project inside a transaction that always rolls back.
-- **Environments:** one hosted Supabase project is used for development (no local Docker). pgTAP files are run by pasting them into the SQL editor until Docker works.
+- **Environments:** one hosted Supabase project is used for development (no local Docker). pgTAP files run on it via `scripts/test-db-linked.sh` (always rolled back) until Docker works.
 
 ### 3.1 `settings` (exactly one row per owner)
 
