@@ -25,6 +25,18 @@ const routes: RouteObject[] = [
         lazy: lazyPage(() => import('../features/orders/OrdersPage'), 'OrdersPage'),
       },
       {
+        path: 'orders/new',
+        lazy: lazyPage(() => import('../features/orders/OrderPages'), 'OrderNewPage'),
+      },
+      {
+        path: 'orders/:id',
+        lazy: lazyPage(() => import('../features/orders/OrderPages'), 'OrderDetailPage'),
+      },
+      {
+        path: 'orders/:id/edit',
+        lazy: lazyPage(() => import('../features/orders/OrderPages'), 'OrderEditPage'),
+      },
+      {
         path: 'delivery',
         lazy: lazyPage(() => import('../features/delivery/DeliveryPage'), 'DeliveryPage'),
       },

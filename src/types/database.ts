@@ -152,6 +152,47 @@ export type Database = {
           },
         ]
       }
+      order_versions: {
+        Row: {
+          created_at: string
+          id: string
+          order_id: string
+          owner_id: string
+          reason: string
+          snapshot: Json
+          summary: string | null
+          version_no: number
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          order_id: string
+          owner_id?: string
+          reason: string
+          snapshot: Json
+          summary?: string | null
+          version_no: number
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          order_id?: string
+          owner_id?: string
+          reason?: string
+          snapshot?: Json
+          summary?: string | null
+          version_no?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "order_versions_order_id_fkey"
+            columns: ["order_id"]
+            isOneToOne: false
+            referencedRelation: "orders"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       orders: {
         Row: {
           bill_no: number | null
@@ -175,6 +216,7 @@ export type Database = {
           status: Database["public"]["Enums"]["order_status"]
           total: number
           updated_at: string
+          version_no: number
         }
         Insert: {
           bill_no?: number | null
@@ -198,6 +240,7 @@ export type Database = {
           status?: Database["public"]["Enums"]["order_status"]
           total?: number
           updated_at?: string
+          version_no?: number
         }
         Update: {
           bill_no?: number | null
@@ -221,6 +264,7 @@ export type Database = {
           status?: Database["public"]["Enums"]["order_status"]
           total?: number
           updated_at?: string
+          version_no?: number
         }
         Relationships: []
       }
@@ -369,9 +413,43 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      check_order_rules: { Args: { p_order: string }; Returns: undefined }
       compute_order_total: {
         Args: { p_discount: number; p_order: string }
         Returns: number
+      }
+      create_order: {
+        Args: { p: Json }
+        Returns: {
+          bill_no: number | null
+          cancelled_at: string | null
+          created_at: string
+          customer_name: string
+          customer_phone: string | null
+          deleted_at: string | null
+          delivered_at: string | null
+          discount: number
+          due_date: string | null
+          id: string
+          notes: string | null
+          order_date: string
+          order_no: number
+          owner_id: string
+          paid_at: string | null
+          payment_mode: Database["public"]["Enums"]["payment_mode"] | null
+          payment_status: Database["public"]["Enums"]["payment_status"]
+          ready_at: string | null
+          status: Database["public"]["Enums"]["order_status"]
+          total: number
+          updated_at: string
+          version_no: number
+        }
+        SetofOptions: {
+          from: "*"
+          to: "orders"
+          isOneToOne: true
+          isSetofReturn: false
+        }
       }
       init_settings: {
         Args: never
@@ -402,11 +480,62 @@ export type Database = {
       }
       next_bill_no: { Args: never; Returns: number }
       next_order_no: { Args: never; Returns: number }
+      normalize_phone: { Args: { p: string }; Returns: string }
+      order_snapshot: { Args: { p_order: string }; Returns: Json }
       ping: { Args: never; Returns: number }
+      record_order_version: {
+        Args: { p_order: string; p_reason: string; p_summary: string }
+        Returns: undefined
+      }
+      replace_order_items: {
+        Args: { p_items: Json; p_order: string }
+        Returns: undefined
+      }
       restore_product: { Args: { p_id: string }; Returns: undefined }
       restore_variant: { Args: { p_id: string }; Returns: undefined }
+      suggest_customers: {
+        Args: { p_limit?: number; p_q: string }
+        Returns: {
+          customer_name: string
+          customer_phone: string
+          last_order_date: string
+        }[]
+      }
       trash_product: { Args: { p_id: string }; Returns: undefined }
       trash_variant: { Args: { p_id: string }; Returns: undefined }
+      update_order: {
+        Args: { p: Json; p_id: string; p_version: number }
+        Returns: {
+          bill_no: number | null
+          cancelled_at: string | null
+          created_at: string
+          customer_name: string
+          customer_phone: string | null
+          deleted_at: string | null
+          delivered_at: string | null
+          discount: number
+          due_date: string | null
+          id: string
+          notes: string | null
+          order_date: string
+          order_no: number
+          owner_id: string
+          paid_at: string | null
+          payment_mode: Database["public"]["Enums"]["payment_mode"] | null
+          payment_status: Database["public"]["Enums"]["payment_status"]
+          ready_at: string | null
+          status: Database["public"]["Enums"]["order_status"]
+          total: number
+          updated_at: string
+          version_no: number
+        }
+        SetofOptions: {
+          from: "*"
+          to: "orders"
+          isOneToOne: true
+          isSetofReturn: false
+        }
+      }
       upsert_product: { Args: { p: Json }; Returns: Json }
     }
     Enums: {
