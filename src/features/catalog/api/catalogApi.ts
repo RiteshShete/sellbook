@@ -53,3 +53,13 @@ export async function trashVariant(client: SupabaseClient, id: string): Promise<
   const { error } = await client.rpc('trash_variant', { p_id: id })
   throwIfError(error)
 }
+
+export async function restoreProduct(client: SupabaseClient, id: string): Promise<void> {
+  const { error } = await client.rpc('restore_product', { p_id: id })
+  throwIfError(error)
+}
+
+export async function restoreVariant(client: SupabaseClient, id: string): Promise<void> {
+  const { error } = await client.rpc('restore_variant', { p_id: id })
+  throwIfError(error)
+}

@@ -1,6 +1,6 @@
 import { useMutation, useQueryClient, type UseMutationResult } from '@tanstack/react-query'
 import { toast } from '../../../components/ui'
-import { queryKeys } from '../../../lib/queryKeys'
+import { invalidateOrders } from '../../../lib/invalidate'
 import { useAuth } from '../../auth/useAuth'
 import { setOrderStatus, setPayment } from '../api/ordersApi'
 import { moveMessage, paymentLabel, type PaymentState } from '../pipeline'
@@ -44,7 +44,7 @@ export function useSetStatus() {
       })
     },
     onError: (e) => toast.error(e.message),
-    onSettled: () => queryClient.invalidateQueries({ queryKey: queryKeys.orders.all }),
+    onSettled: () => invalidateOrders(queryClient),
   })
   return m
 }
@@ -68,7 +68,7 @@ export function useSetPayment() {
       })
     },
     onError: (e) => toast.error(e.message),
-    onSettled: () => queryClient.invalidateQueries({ queryKey: queryKeys.orders.all }),
+    onSettled: () => invalidateOrders(queryClient),
   })
   return m
 }

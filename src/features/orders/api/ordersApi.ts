@@ -1,6 +1,7 @@
 import type { SupabaseClient } from '@supabase/supabase-js'
 import { z } from 'zod'
 import { throwIfError } from '../../../lib/dbError'
+import { VersionSchema, type Version } from '../history'
 import type { PaymentState } from '../pipeline'
 import {
   CustomerSuggestionSchema,
@@ -122,4 +123,41 @@ export async function suggestCustomers(
   const { data, error } = await client.rpc('suggest_customers', { p_q: q, p_limit: 6 })
   throwIfError(error)
   return z.array(CustomerSuggestionSchema).parse(data)
+}
+
+export async function fetchVersions(client: SupabaseClient, orderId: string): Promise<Version[]> {
+  const { data, error } = await client
+    .from('order_versions')
+    .select('version_no, reason, summary, created_at, snapshot')
+    .eq('order_id', orderId)
+    .order('version_no', { ascending: false })
+  throwIfError(error)
+  return z.array(VersionSchema).parse(data)
+}
+
+export async function rollbackOrder(
+  client: SupabaseClient,
+  id: string,
+  target: number,
+  version: number,
+): Promise<Order> {
+  const { data, error } = await client.rpc('rollback_order', {
+    p_id: id,
+    p_target: target,
+    p_version: version,
+  })
+  throwIfError(error)
+  return OrderSchema.parse(data)
+}
+
+export async function trashOrder(client: SupabaseClient, id: string): Promise<Order> {
+  const { data, error } = await client.rpc('trash_order', { p_id: id })
+  throwIfError(error)
+  return OrderSchema.parse(data)
+}
+
+export async function restoreOrder(client: SupabaseClient, id: string): Promise<Order> {
+  const { data, error } = await client.rpc('restore_order', { p_id: id })
+  throwIfError(error)
+  return OrderSchema.parse(data)
 }

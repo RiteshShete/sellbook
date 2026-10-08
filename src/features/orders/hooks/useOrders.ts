@@ -1,5 +1,6 @@
 import { keepPreviousData, useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { toast } from '../../../components/ui'
+import { invalidateOrders } from '../../../lib/invalidate'
 import { queryKeys } from '../../../lib/queryKeys'
 import { useAuth } from '../../auth/useAuth'
 import {
@@ -43,7 +44,7 @@ export function useCreateOrder() {
   return useMutation({
     mutationFn: (p: OrderPayload) => createOrder(client, p),
     onSuccess: () => {
-      void queryClient.invalidateQueries({ queryKey: queryKeys.orders.all })
+      void invalidateOrders(queryClient)
       void queryClient.invalidateQueries({ queryKey: ['customers'] })
     },
     onError: (e: Error) => toast.error(e.message),
@@ -57,7 +58,7 @@ export function useUpdateOrder(id: string) {
     mutationFn: ({ p, version }: { p: OrderPayload; version: number }) =>
       updateOrder(client, id, p, version),
     // Success or a stale-version failure: either way the cached order is out of date.
-    onSettled: () => queryClient.invalidateQueries({ queryKey: queryKeys.orders.all }),
+    onSettled: () => invalidateOrders(queryClient),
     onError: (e: Error) => toast.error(e.message),
   })
 }

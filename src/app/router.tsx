@@ -33,6 +33,14 @@ const routes: RouteObject[] = [
         lazy: lazyPage(() => import('../features/orders/OrderPages'), 'OrderDetailPage'),
       },
       {
+        path: 'orders/:id/history',
+        lazy: lazyPage(() => import('../features/orders/OrderHistoryPage'), 'OrderHistoryPage'),
+      },
+      {
+        path: 'activity',
+        lazy: lazyPage(() => import('../features/settings/ActivityPage'), 'ActivityPage'),
+      },
+      {
         path: 'orders/:id/edit',
         lazy: lazyPage(() => import('../features/orders/OrderPages'), 'OrderEditPage'),
       },
