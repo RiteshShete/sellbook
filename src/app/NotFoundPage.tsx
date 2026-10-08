@@ -1,0 +1,22 @@
+import { Link } from 'react-router-dom'
+import { EmptyState } from '../components/ui'
+import { Page } from './Page'
+
+export function NotFoundPage() {
+  return (
+    <Page title="Not found">
+      <EmptyState
+        title="Page not found"
+        description="That address doesn't exist."
+        action={
+          <Link
+            to="/orders"
+            className="inline-flex min-h-11 items-center rounded-xl bg-primary px-4 font-medium text-primary-fg"
+          >
+            Go to Orders
+          </Link>
+        }
+      />
+    </Page>
+  )
+}
