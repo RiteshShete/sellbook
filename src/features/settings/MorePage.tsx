@@ -8,6 +8,7 @@ import { useAuth } from '../auth/useAuth'
 const LINKS = [
   { to: '/settings', label: 'Settings' },
   { to: '/trash', label: 'Trash' },
+  { to: '/activity', label: 'Activity' },
 ]
 
 export function MorePage() {

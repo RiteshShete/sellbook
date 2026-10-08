@@ -6,8 +6,14 @@ export const queryKeys = {
     all: ['orders'] as const,
     list: (tab: string, search: string) => ['orders', 'list', tab, search] as const,
     detail: (id: string) => ['orders', 'detail', id] as const,
+    versions: (id: string) => ['orders', 'versions', id] as const,
   },
   customers: (q: string) => ['customers', q] as const,
+  trash: {
+    all: ['trash'] as const,
+    tab: (tab: string) => ['trash', tab] as const,
+  },
+  activity: (entity: string) => ['activity', entity] as const,
   products: {
     all: ['products'] as const,
     list: () => ['products', 'list'] as const,

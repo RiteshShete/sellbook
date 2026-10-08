@@ -33,6 +33,42 @@ export type Database = {
   }
   public: {
     Tables: {
+      audit_log: {
+        Row: {
+          action: string
+          after: Json | null
+          before: Json | null
+          created_at: string
+          entity: string
+          entity_id: string | null
+          id: number
+          owner_id: string
+          summary: string
+        }
+        Insert: {
+          action: string
+          after?: Json | null
+          before?: Json | null
+          created_at?: string
+          entity: string
+          entity_id?: string | null
+          id?: never
+          owner_id?: string
+          summary: string
+        }
+        Update: {
+          action?: string
+          after?: Json | null
+          before?: Json | null
+          created_at?: string
+          entity?: string
+          entity_id?: string | null
+          id?: never
+          owner_id?: string
+          summary?: string
+        }
+        Relationships: []
+      }
       bills: {
         Row: {
           bill_no: number
@@ -489,8 +525,76 @@ export type Database = {
         Args: { p_items: Json; p_order: string }
         Returns: undefined
       }
+      restore_order: {
+        Args: { p_id: string }
+        Returns: {
+          bill_no: number | null
+          cancelled_at: string | null
+          cancelled_from: Database['public']['Enums']['order_status'] | null
+          created_at: string
+          customer_name: string
+          customer_phone: string | null
+          deleted_at: string | null
+          delivered_at: string | null
+          discount: number
+          due_date: string | null
+          id: string
+          notes: string | null
+          order_date: string
+          order_no: number
+          owner_id: string
+          paid_at: string | null
+          payment_mode: Database['public']['Enums']['payment_mode'] | null
+          payment_status: Database['public']['Enums']['payment_status']
+          ready_at: string | null
+          status: Database['public']['Enums']['order_status']
+          total: number
+          updated_at: string
+          version_no: number
+        }
+        SetofOptions: {
+          from: '*'
+          to: 'orders'
+          isOneToOne: true
+          isSetofReturn: false
+        }
+      }
       restore_product: { Args: { p_id: string }; Returns: undefined }
       restore_variant: { Args: { p_id: string }; Returns: undefined }
+      rollback_order: {
+        Args: { p_id: string; p_target: number; p_version: number }
+        Returns: {
+          bill_no: number | null
+          cancelled_at: string | null
+          cancelled_from: Database['public']['Enums']['order_status'] | null
+          created_at: string
+          customer_name: string
+          customer_phone: string | null
+          deleted_at: string | null
+          delivered_at: string | null
+          discount: number
+          due_date: string | null
+          id: string
+          notes: string | null
+          order_date: string
+          order_no: number
+          owner_id: string
+          paid_at: string | null
+          payment_mode: Database['public']['Enums']['payment_mode'] | null
+          payment_status: Database['public']['Enums']['payment_status']
+          ready_at: string | null
+          status: Database['public']['Enums']['order_status']
+          total: number
+          updated_at: string
+          version_no: number
+        }
+        SetofOptions: {
+          from: '*'
+          to: 'orders'
+          isOneToOne: true
+          isSetofReturn: false
+        }
+      }
       set_order_status: {
         Args: {
           p_id: string
@@ -575,6 +679,40 @@ export type Database = {
           customer_phone: string
           last_order_date: string
         }[]
+      }
+      trash_order: {
+        Args: { p_id: string }
+        Returns: {
+          bill_no: number | null
+          cancelled_at: string | null
+          cancelled_from: Database['public']['Enums']['order_status'] | null
+          created_at: string
+          customer_name: string
+          customer_phone: string | null
+          deleted_at: string | null
+          delivered_at: string | null
+          discount: number
+          due_date: string | null
+          id: string
+          notes: string | null
+          order_date: string
+          order_no: number
+          owner_id: string
+          paid_at: string | null
+          payment_mode: Database['public']['Enums']['payment_mode'] | null
+          payment_status: Database['public']['Enums']['payment_status']
+          ready_at: string | null
+          status: Database['public']['Enums']['order_status']
+          total: number
+          updated_at: string
+          version_no: number
+        }
+        SetofOptions: {
+          from: '*'
+          to: 'orders'
+          isOneToOne: true
+          isSetofReturn: false
+        }
       }
       trash_product: { Args: { p_id: string }; Returns: undefined }
       trash_variant: { Args: { p_id: string }; Returns: undefined }

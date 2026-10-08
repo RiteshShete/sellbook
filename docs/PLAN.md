@@ -76,9 +76,10 @@ The applied migrations (`supabase/migrations`) differ from the original design b
 - **orders:** `order_no` per-owner number (default `next_order_no()`, advisory-locked). `bill_no integer` (display = prefix + number) instead of `bill_seq`/`bill_number`. `customer_phone` nullable, stored as digits with country code (`919876543210`, see `lib/phone.ts`). `total` maintained by triggers from items and discount (B3). Status/payment timestamps maintained by the `orders_apply_timestamps` trigger. Not built yet, added when needed: `version_no` (M3), `cancelled_from` (M4), `content_hash` (M6). No `subtotal` column.
 - **order_items:** extra `cost_price` snapshot; quantity 1..100000; no `product_id`.
 - **bills:** `bill_no`, `revision`, `image_path`, `total_at_generation`, `items_hash`, `generated_at`.
-- **order_versions** (M3) and **audit_log** (M5): not built yet.
+- **order_versions** (M3): insert-only, full snapshot per version; `version_no` on orders. **audit_log** (M5): insert-only; order rows written by `record_order_version`, catalog/settings rows by the `audit_row_change` trigger (no-op updates skipped). `orders.cancelled_from` added in M4.
 - **Storage:** path `<owner_id>/<yyyy>/<file>`; both buckets accept png/jpeg/webp (`assets` 2 MB, `bills` 3 MB). Bill files are immutable (no UPDATE/DELETE policy); asset files can be replaced/removed.
-- **Built RPCs:** `init_settings`, `upsert_product`, `trash_product`/`restore_product`, `trash_variant`/`restore_variant`, `next_order_no`, `next_bill_no`, `compute_order_total`, `ping`.
+- **Built RPCs:** `init_settings`, `upsert_product`, `trash_product`/`restore_product`, `trash_variant`/`restore_variant`, `create_order`, `update_order`, `suggest_customers`, `set_order_status`, `set_payment`, `trash_order`/`restore_order`, `rollback_order`, `next_order_no`, `next_bill_no`, `compute_order_total`, `ping`. Order RPCs take the expected `version_no` and raise SQLSTATE `SB409` when stale.
+- **DB tests without Docker:** `bash scripts/test-db-linked.sh` runs every pgTAP file on the linked project inside a transaction that always rolls back.
 - **Environments:** one hosted Supabase project is used for development (no local Docker). pgTAP files are run by pasting them into the SQL editor until Docker works.
 
 ### 3.1 `settings` (exactly one row per owner)

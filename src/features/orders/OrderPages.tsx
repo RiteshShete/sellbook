@@ -4,6 +4,7 @@ import { Page } from '../../app/Page'
 import { EmptyState, ErrorState, Skeleton } from '../../components/ui'
 import { OrderActions } from './components/OrderActions'
 import { OrderForm } from './components/OrderForm'
+import { OrderMoreActions } from './components/OrderMoreActions'
 import { OrderSummary } from './components/OrderSummary'
 import { useOrder } from './hooks/useOrders'
 import type { OrderWithItems } from './schemas'
@@ -71,6 +72,7 @@ export function OrderDetailPage() {
           <div className="flex flex-col gap-4">
             <OrderSummary order={o} />
             <OrderActions order={o} />
+            <OrderMoreActions order={o} />
           </div>
         </Page>
       )}
