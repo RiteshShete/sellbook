@@ -1,6 +1,7 @@
 import type { SupabaseClient } from '@supabase/supabase-js'
 import { z } from 'zod'
 import { throwIfError } from '../../../lib/dbError'
+import type { PaymentState } from '../pipeline'
 import {
   CustomerSuggestionSchema,
   OrderListRowSchema,
@@ -40,7 +41,7 @@ export async function fetchOrders(
 ): Promise<OrderListRow[]> {
   let query = client
     .from('orders')
-    .select('*, order_items (quantity)')
+    .select('*, order_items (quantity, product_name, variant_name, position)')
     .is('deleted_at', null)
     .order('created_at', { ascending: false })
     .limit(LIST_LIMIT)
@@ -79,6 +80,37 @@ export async function updateOrder(
   version: number,
 ): Promise<Order> {
   const { data, error } = await client.rpc('update_order', { p_id: id, p, p_version: version })
+  throwIfError(error)
+  return OrderSchema.parse(data)
+}
+
+export async function setOrderStatus(
+  client: SupabaseClient,
+  id: string,
+  status: OrderStatus,
+  version: number,
+): Promise<Order> {
+  const { data, error } = await client.rpc('set_order_status', {
+    p_id: id,
+    p_status: status,
+    p_version: version,
+  })
+  throwIfError(error)
+  return OrderSchema.parse(data)
+}
+
+export async function setPayment(
+  client: SupabaseClient,
+  id: string,
+  payment: PaymentState,
+  version: number,
+): Promise<Order> {
+  const { data, error } = await client.rpc('set_payment', {
+    p_id: id,
+    p_status: payment.payment_status,
+    p_mode: payment.payment_mode,
+    p_version: version,
+  })
   throwIfError(error)
   return OrderSchema.parse(data)
 }

@@ -1,16 +1,10 @@
-export type Json =
-  | string
-  | number
-  | boolean
-  | null
-  | { [key: string]: Json | undefined }
-  | Json[]
+export type Json = string | number | boolean | null | { [key: string]: Json | undefined } | Json[]
 
 export type Database = {
   // Allows to automatically instantiate createClient with right options
   // instead of createClient<Database, { PostgrestVersion: 'XX' }>(URL, KEY)
   __InternalSupabase: {
-    PostgrestVersion: "14.18"
+    PostgrestVersion: '14.18'
   }
   graphql_public: {
     Tables: {
@@ -81,11 +75,11 @@ export type Database = {
         }
         Relationships: [
           {
-            foreignKeyName: "bills_order_id_fkey"
-            columns: ["order_id"]
+            foreignKeyName: 'bills_order_id_fkey'
+            columns: ['order_id']
             isOneToOne: false
-            referencedRelation: "orders"
-            referencedColumns: ["id"]
+            referencedRelation: 'orders'
+            referencedColumns: ['id']
           },
         ]
       }
@@ -137,18 +131,18 @@ export type Database = {
         }
         Relationships: [
           {
-            foreignKeyName: "order_items_order_id_fkey"
-            columns: ["order_id"]
+            foreignKeyName: 'order_items_order_id_fkey'
+            columns: ['order_id']
             isOneToOne: false
-            referencedRelation: "orders"
-            referencedColumns: ["id"]
+            referencedRelation: 'orders'
+            referencedColumns: ['id']
           },
           {
-            foreignKeyName: "order_items_variant_id_fkey"
-            columns: ["variant_id"]
+            foreignKeyName: 'order_items_variant_id_fkey'
+            columns: ['variant_id']
             isOneToOne: false
-            referencedRelation: "variants"
-            referencedColumns: ["id"]
+            referencedRelation: 'variants'
+            referencedColumns: ['id']
           },
         ]
       }
@@ -185,11 +179,11 @@ export type Database = {
         }
         Relationships: [
           {
-            foreignKeyName: "order_versions_order_id_fkey"
-            columns: ["order_id"]
+            foreignKeyName: 'order_versions_order_id_fkey'
+            columns: ['order_id']
             isOneToOne: false
-            referencedRelation: "orders"
-            referencedColumns: ["id"]
+            referencedRelation: 'orders'
+            referencedColumns: ['id']
           },
         ]
       }
@@ -197,6 +191,7 @@ export type Database = {
         Row: {
           bill_no: number | null
           cancelled_at: string | null
+          cancelled_from: Database['public']['Enums']['order_status'] | null
           created_at: string
           customer_name: string
           customer_phone: string | null
@@ -210,10 +205,10 @@ export type Database = {
           order_no: number
           owner_id: string
           paid_at: string | null
-          payment_mode: Database["public"]["Enums"]["payment_mode"] | null
-          payment_status: Database["public"]["Enums"]["payment_status"]
+          payment_mode: Database['public']['Enums']['payment_mode'] | null
+          payment_status: Database['public']['Enums']['payment_status']
           ready_at: string | null
-          status: Database["public"]["Enums"]["order_status"]
+          status: Database['public']['Enums']['order_status']
           total: number
           updated_at: string
           version_no: number
@@ -221,6 +216,7 @@ export type Database = {
         Insert: {
           bill_no?: number | null
           cancelled_at?: string | null
+          cancelled_from?: Database['public']['Enums']['order_status'] | null
           created_at?: string
           customer_name: string
           customer_phone?: string | null
@@ -234,10 +230,10 @@ export type Database = {
           order_no?: number
           owner_id?: string
           paid_at?: string | null
-          payment_mode?: Database["public"]["Enums"]["payment_mode"] | null
-          payment_status?: Database["public"]["Enums"]["payment_status"]
+          payment_mode?: Database['public']['Enums']['payment_mode'] | null
+          payment_status?: Database['public']['Enums']['payment_status']
           ready_at?: string | null
-          status?: Database["public"]["Enums"]["order_status"]
+          status?: Database['public']['Enums']['order_status']
           total?: number
           updated_at?: string
           version_no?: number
@@ -245,6 +241,7 @@ export type Database = {
         Update: {
           bill_no?: number | null
           cancelled_at?: string | null
+          cancelled_from?: Database['public']['Enums']['order_status'] | null
           created_at?: string
           customer_name?: string
           customer_phone?: string | null
@@ -258,10 +255,10 @@ export type Database = {
           order_no?: number
           owner_id?: string
           paid_at?: string | null
-          payment_mode?: Database["public"]["Enums"]["payment_mode"] | null
-          payment_status?: Database["public"]["Enums"]["payment_status"]
+          payment_mode?: Database['public']['Enums']['payment_mode'] | null
+          payment_status?: Database['public']['Enums']['payment_status']
           ready_at?: string | null
-          status?: Database["public"]["Enums"]["order_status"]
+          status?: Database['public']['Enums']['order_status']
           total?: number
           updated_at?: string
           version_no?: number
@@ -400,11 +397,11 @@ export type Database = {
         }
         Relationships: [
           {
-            foreignKeyName: "variants_product_id_fkey"
-            columns: ["product_id"]
+            foreignKeyName: 'variants_product_id_fkey'
+            columns: ['product_id']
             isOneToOne: false
-            referencedRelation: "products"
-            referencedColumns: ["id"]
+            referencedRelation: 'products'
+            referencedColumns: ['id']
           },
         ]
       }
@@ -423,6 +420,7 @@ export type Database = {
         Returns: {
           bill_no: number | null
           cancelled_at: string | null
+          cancelled_from: Database['public']['Enums']['order_status'] | null
           created_at: string
           customer_name: string
           customer_phone: string | null
@@ -436,17 +434,17 @@ export type Database = {
           order_no: number
           owner_id: string
           paid_at: string | null
-          payment_mode: Database["public"]["Enums"]["payment_mode"] | null
-          payment_status: Database["public"]["Enums"]["payment_status"]
+          payment_mode: Database['public']['Enums']['payment_mode'] | null
+          payment_status: Database['public']['Enums']['payment_status']
           ready_at: string | null
-          status: Database["public"]["Enums"]["order_status"]
+          status: Database['public']['Enums']['order_status']
           total: number
           updated_at: string
           version_no: number
         }
         SetofOptions: {
-          from: "*"
-          to: "orders"
+          from: '*'
+          to: 'orders'
           isOneToOne: true
           isSetofReturn: false
         }
@@ -472,8 +470,8 @@ export type Database = {
           upi_id: string | null
         }
         SetofOptions: {
-          from: "*"
-          to: "settings"
+          from: '*'
+          to: 'settings'
           isOneToOne: true
           isSetofReturn: false
         }
@@ -493,6 +491,83 @@ export type Database = {
       }
       restore_product: { Args: { p_id: string }; Returns: undefined }
       restore_variant: { Args: { p_id: string }; Returns: undefined }
+      set_order_status: {
+        Args: {
+          p_id: string
+          p_status: Database['public']['Enums']['order_status']
+          p_version: number
+        }
+        Returns: {
+          bill_no: number | null
+          cancelled_at: string | null
+          cancelled_from: Database['public']['Enums']['order_status'] | null
+          created_at: string
+          customer_name: string
+          customer_phone: string | null
+          deleted_at: string | null
+          delivered_at: string | null
+          discount: number
+          due_date: string | null
+          id: string
+          notes: string | null
+          order_date: string
+          order_no: number
+          owner_id: string
+          paid_at: string | null
+          payment_mode: Database['public']['Enums']['payment_mode'] | null
+          payment_status: Database['public']['Enums']['payment_status']
+          ready_at: string | null
+          status: Database['public']['Enums']['order_status']
+          total: number
+          updated_at: string
+          version_no: number
+        }
+        SetofOptions: {
+          from: '*'
+          to: 'orders'
+          isOneToOne: true
+          isSetofReturn: false
+        }
+      }
+      set_payment: {
+        Args: {
+          p_id: string
+          p_mode: Database['public']['Enums']['payment_mode']
+          p_status: Database['public']['Enums']['payment_status']
+          p_version: number
+        }
+        Returns: {
+          bill_no: number | null
+          cancelled_at: string | null
+          cancelled_from: Database['public']['Enums']['order_status'] | null
+          created_at: string
+          customer_name: string
+          customer_phone: string | null
+          deleted_at: string | null
+          delivered_at: string | null
+          discount: number
+          due_date: string | null
+          id: string
+          notes: string | null
+          order_date: string
+          order_no: number
+          owner_id: string
+          paid_at: string | null
+          payment_mode: Database['public']['Enums']['payment_mode'] | null
+          payment_status: Database['public']['Enums']['payment_status']
+          ready_at: string | null
+          status: Database['public']['Enums']['order_status']
+          total: number
+          updated_at: string
+          version_no: number
+        }
+        SetofOptions: {
+          from: '*'
+          to: 'orders'
+          isOneToOne: true
+          isSetofReturn: false
+        }
+      }
       suggest_customers: {
         Args: { p_limit?: number; p_q: string }
         Returns: {
@@ -508,6 +583,7 @@ export type Database = {
         Returns: {
           bill_no: number | null
           cancelled_at: string | null
+          cancelled_from: Database['public']['Enums']['order_status'] | null
           created_at: string
           customer_name: string
           customer_phone: string | null
@@ -521,17 +597,17 @@ export type Database = {
           order_no: number
           owner_id: string
           paid_at: string | null
-          payment_mode: Database["public"]["Enums"]["payment_mode"] | null
-          payment_status: Database["public"]["Enums"]["payment_status"]
+          payment_mode: Database['public']['Enums']['payment_mode'] | null
+          payment_status: Database['public']['Enums']['payment_status']
           ready_at: string | null
-          status: Database["public"]["Enums"]["order_status"]
+          status: Database['public']['Enums']['order_status']
           total: number
           updated_at: string
           version_no: number
         }
         SetofOptions: {
-          from: "*"
-          to: "orders"
+          from: '*'
+          to: 'orders'
           isOneToOne: true
           isSetofReturn: false
         }
@@ -539,9 +615,9 @@ export type Database = {
       upsert_product: { Args: { p: Json }; Returns: Json }
     }
     Enums: {
-      order_status: "new" | "ready" | "delivered" | "cancelled"
-      payment_mode: "online" | "cash"
-      payment_status: "pending" | "paid"
+      order_status: 'new' | 'ready' | 'delivered' | 'cancelled'
+      payment_mode: 'online' | 'cash'
+      payment_status: 'pending' | 'paid'
     }
     CompositeTypes: {
       [_ in never]: never
@@ -549,33 +625,31 @@ export type Database = {
   }
 }
 
-type DatabaseWithoutInternals = Omit<Database, "__InternalSupabase">
+type DatabaseWithoutInternals = Omit<Database, '__InternalSupabase'>
 
-type DefaultSchema = DatabaseWithoutInternals[Extract<keyof Database, "public">]
+type DefaultSchema = DatabaseWithoutInternals[Extract<keyof Database, 'public'>]
 
 export type Tables<
   DefaultSchemaTableNameOrOptions extends
-    | keyof (DefaultSchema["Tables"] & DefaultSchema["Views"])
+    | keyof (DefaultSchema['Tables'] & DefaultSchema['Views'])
     | { schema: keyof DatabaseWithoutInternals },
   TableName extends (DefaultSchemaTableNameOrOptions extends {
     schema: keyof DatabaseWithoutInternals
   }
-    ? keyof (DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"] &
-        DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Views"])
+    ? keyof (DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions['schema']]['Tables'] &
+        DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions['schema']]['Views'])
     : never) = never,
 > = DefaultSchemaTableNameOrOptions extends {
   schema: keyof DatabaseWithoutInternals
 }
-  ? (DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"] &
-      DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Views"])[TableName] extends {
+  ? (DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions['schema']]['Tables'] &
+      DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions['schema']]['Views'])[TableName] extends {
       Row: infer R
     }
     ? R
     : never
-  : DefaultSchemaTableNameOrOptions extends keyof (DefaultSchema["Tables"] &
-        DefaultSchema["Views"])
-    ? (DefaultSchema["Tables"] &
-        DefaultSchema["Views"])[DefaultSchemaTableNameOrOptions] extends {
+  : DefaultSchemaTableNameOrOptions extends keyof (DefaultSchema['Tables'] & DefaultSchema['Views'])
+    ? (DefaultSchema['Tables'] & DefaultSchema['Views'])[DefaultSchemaTableNameOrOptions] extends {
         Row: infer R
       }
       ? R
@@ -584,23 +658,22 @@ export type Tables<
 
 export type TablesInsert<
   DefaultSchemaTableNameOrOptions extends
-    | keyof DefaultSchema["Tables"]
-    | { schema: keyof DatabaseWithoutInternals },
+    keyof DefaultSchema['Tables'] | { schema: keyof DatabaseWithoutInternals },
   TableName extends (DefaultSchemaTableNameOrOptions extends {
     schema: keyof DatabaseWithoutInternals
   }
-    ? keyof DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"]
+    ? keyof DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions['schema']]['Tables']
     : never) = never,
 > = DefaultSchemaTableNameOrOptions extends {
   schema: keyof DatabaseWithoutInternals
 }
-  ? DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"][TableName] extends {
+  ? DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions['schema']]['Tables'][TableName] extends {
       Insert: infer I
     }
     ? I
     : never
-  : DefaultSchemaTableNameOrOptions extends keyof DefaultSchema["Tables"]
-    ? DefaultSchema["Tables"][DefaultSchemaTableNameOrOptions] extends {
+  : DefaultSchemaTableNameOrOptions extends keyof DefaultSchema['Tables']
+    ? DefaultSchema['Tables'][DefaultSchemaTableNameOrOptions] extends {
         Insert: infer I
       }
       ? I
@@ -609,23 +682,22 @@ export type TablesInsert<
 
 export type TablesUpdate<
   DefaultSchemaTableNameOrOptions extends
-    | keyof DefaultSchema["Tables"]
-    | { schema: keyof DatabaseWithoutInternals },
+    keyof DefaultSchema['Tables'] | { schema: keyof DatabaseWithoutInternals },
   TableName extends (DefaultSchemaTableNameOrOptions extends {
     schema: keyof DatabaseWithoutInternals
   }
-    ? keyof DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"]
+    ? keyof DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions['schema']]['Tables']
     : never) = never,
 > = DefaultSchemaTableNameOrOptions extends {
   schema: keyof DatabaseWithoutInternals
 }
-  ? DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"][TableName] extends {
+  ? DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions['schema']]['Tables'][TableName] extends {
       Update: infer U
     }
     ? U
     : never
-  : DefaultSchemaTableNameOrOptions extends keyof DefaultSchema["Tables"]
-    ? DefaultSchema["Tables"][DefaultSchemaTableNameOrOptions] extends {
+  : DefaultSchemaTableNameOrOptions extends keyof DefaultSchema['Tables']
+    ? DefaultSchema['Tables'][DefaultSchemaTableNameOrOptions] extends {
         Update: infer U
       }
       ? U
@@ -634,36 +706,34 @@ export type TablesUpdate<
 
 export type Enums<
   DefaultSchemaEnumNameOrOptions extends
-    | keyof DefaultSchema["Enums"]
-    | { schema: keyof DatabaseWithoutInternals },
+    keyof DefaultSchema['Enums'] | { schema: keyof DatabaseWithoutInternals },
   EnumName extends (DefaultSchemaEnumNameOrOptions extends {
     schema: keyof DatabaseWithoutInternals
   }
-    ? keyof DatabaseWithoutInternals[DefaultSchemaEnumNameOrOptions["schema"]]["Enums"]
+    ? keyof DatabaseWithoutInternals[DefaultSchemaEnumNameOrOptions['schema']]['Enums']
     : never) = never,
 > = DefaultSchemaEnumNameOrOptions extends {
   schema: keyof DatabaseWithoutInternals
 }
-  ? DatabaseWithoutInternals[DefaultSchemaEnumNameOrOptions["schema"]]["Enums"][EnumName]
-  : DefaultSchemaEnumNameOrOptions extends keyof DefaultSchema["Enums"]
-    ? DefaultSchema["Enums"][DefaultSchemaEnumNameOrOptions]
+  ? DatabaseWithoutInternals[DefaultSchemaEnumNameOrOptions['schema']]['Enums'][EnumName]
+  : DefaultSchemaEnumNameOrOptions extends keyof DefaultSchema['Enums']
+    ? DefaultSchema['Enums'][DefaultSchemaEnumNameOrOptions]
     : never
 
 export type CompositeTypes<
   PublicCompositeTypeNameOrOptions extends
-    | keyof DefaultSchema["CompositeTypes"]
-    | { schema: keyof DatabaseWithoutInternals },
+    keyof DefaultSchema['CompositeTypes'] | { schema: keyof DatabaseWithoutInternals },
   CompositeTypeName extends (PublicCompositeTypeNameOrOptions extends {
     schema: keyof DatabaseWithoutInternals
   }
-    ? keyof DatabaseWithoutInternals[PublicCompositeTypeNameOrOptions["schema"]]["CompositeTypes"]
+    ? keyof DatabaseWithoutInternals[PublicCompositeTypeNameOrOptions['schema']]['CompositeTypes']
     : never) = never,
 > = PublicCompositeTypeNameOrOptions extends {
   schema: keyof DatabaseWithoutInternals
 }
-  ? DatabaseWithoutInternals[PublicCompositeTypeNameOrOptions["schema"]]["CompositeTypes"][CompositeTypeName]
-  : PublicCompositeTypeNameOrOptions extends keyof DefaultSchema["CompositeTypes"]
-    ? DefaultSchema["CompositeTypes"][PublicCompositeTypeNameOrOptions]
+  ? DatabaseWithoutInternals[PublicCompositeTypeNameOrOptions['schema']]['CompositeTypes'][CompositeTypeName]
+  : PublicCompositeTypeNameOrOptions extends keyof DefaultSchema['CompositeTypes']
+    ? DefaultSchema['CompositeTypes'][PublicCompositeTypeNameOrOptions]
     : never
 
 export const Constants = {
@@ -672,9 +742,9 @@ export const Constants = {
   },
   public: {
     Enums: {
-      order_status: ["new", "ready", "delivered", "cancelled"],
-      payment_mode: ["online", "cash"],
-      payment_status: ["pending", "paid"],
+      order_status: ['new', 'ready', 'delivered', 'cancelled'],
+      payment_mode: ['online', 'cash'],
+      payment_status: ['pending', 'paid'],
     },
   },
 } as const

@@ -2,6 +2,7 @@ import type { ReactNode } from 'react'
 import { Link, useParams } from 'react-router-dom'
 import { Page } from '../../app/Page'
 import { EmptyState, ErrorState, Skeleton } from '../../components/ui'
+import { OrderActions } from './components/OrderActions'
 import { OrderForm } from './components/OrderForm'
 import { OrderSummary } from './components/OrderSummary'
 import { useOrder } from './hooks/useOrders'
@@ -67,7 +68,10 @@ export function OrderDetailPage() {
             </Link>
           }
         >
-          <OrderSummary order={o} />
+          <div className="flex flex-col gap-4">
+            <OrderSummary order={o} />
+            <OrderActions order={o} />
+          </div>
         </Page>
       )}
     />

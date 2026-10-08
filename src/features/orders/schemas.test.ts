@@ -34,6 +34,7 @@ const orderRow = {
   delivered_at: null,
   paid_at: null,
   cancelled_at: null,
+  cancelled_from: null,
 }
 
 const item = (id: string, position: number, price: number, qty: number) => ({
@@ -59,12 +60,16 @@ describe('order row schemas', () => {
     expect(o.items[1]?.line_total).toBe(48050)
   })
 
-  it('counts units on list rows', () => {
+  it('counts units and summarises items in position order on list rows', () => {
     const r = OrderListRowSchema.parse({
       ...orderRow,
-      order_items: [{ quantity: 2 }, { quantity: 3 }],
+      order_items: [
+        { quantity: 3, product_name: 'Cake', variant_name: '1 kg', position: 1 },
+        { quantity: 2, product_name: 'Cookies', variant_name: 'Box', position: 0 },
+      ],
     })
     expect(r.units).toBe(5)
+    expect(r.itemsSummary).toBe('2× Cookies Box, 3× Cake 1 kg')
   })
 
   it('rejects an unknown status', () => {
