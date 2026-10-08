@@ -1,4 +1,5 @@
 import { createBrowserRouter, Navigate, type RouteObject } from 'react-router-dom'
+import { RequireAuth } from '../features/auth/RequireAuth'
 import { AppLayout } from './AppLayout'
 import { NotFoundPage } from './NotFoundPage'
 import { RouteError } from './RouteError'
@@ -11,7 +12,11 @@ function lazyPage<K extends string>(load: () => Promise<Record<K, React.Componen
 const routes: RouteObject[] = [
   {
     path: '/',
-    element: <AppLayout />,
+    element: (
+      <RequireAuth>
+        <AppLayout />
+      </RequireAuth>
+    ),
     errorElement: <RouteError />,
     children: [
       { index: true, element: <Navigate to="/orders" replace /> },
