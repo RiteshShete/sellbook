@@ -36,6 +36,14 @@ const routes: RouteObject[] = [
         path: 'catalog',
         lazy: lazyPage(() => import('../features/catalog/CatalogPage'), 'CatalogPage'),
       },
+      {
+        path: 'catalog/new',
+        lazy: lazyPage(() => import('../features/catalog/ProductEditorPage'), 'ProductEditorPage'),
+      },
+      {
+        path: 'catalog/:productId',
+        lazy: lazyPage(() => import('../features/catalog/ProductEditorPage'), 'ProductEditorPage'),
+      },
       { path: 'more', lazy: lazyPage(() => import('../features/settings/MorePage'), 'MorePage') },
       {
         path: 'settings',

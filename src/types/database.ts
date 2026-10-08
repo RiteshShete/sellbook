@@ -373,9 +373,41 @@ export type Database = {
         Args: { p_discount: number; p_order: string }
         Returns: number
       }
+      init_settings: {
+        Args: never
+        Returns: {
+          bill_footer: string | null
+          bill_prefix: string
+          created_at: string
+          default_country_code: string
+          id: string
+          last_backup_at: string | null
+          logo_path: string | null
+          next_bill_no: number
+          owner_id: string
+          qr_path: string | null
+          shop_address: string
+          shop_name: string
+          shop_phone: string
+          timezone: string
+          updated_at: string
+          upi_id: string | null
+        }
+        SetofOptions: {
+          from: "*"
+          to: "settings"
+          isOneToOne: true
+          isSetofReturn: false
+        }
+      }
       next_bill_no: { Args: never; Returns: number }
       next_order_no: { Args: never; Returns: number }
       ping: { Args: never; Returns: number }
+      restore_product: { Args: { p_id: string }; Returns: undefined }
+      restore_variant: { Args: { p_id: string }; Returns: undefined }
+      trash_product: { Args: { p_id: string }; Returns: undefined }
+      trash_variant: { Args: { p_id: string }; Returns: undefined }
+      upsert_product: { Args: { p: Json }; Returns: Json }
     }
     Enums: {
       order_status: "new" | "ready" | "delivered" | "cancelled"
