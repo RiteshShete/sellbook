@@ -6,6 +6,7 @@ describe('readableDbError', () => {
     expect(readableDbError({ code: '23505', message: 'duplicate key' })).toMatch(/already used/)
     expect(readableDbError({ code: '42501', message: 'permission denied' })).toMatch(/Not allowed/)
     expect(readableDbError({ code: 'PGRST202', message: 'x' })).toMatch(/migration/)
+    expect(readableDbError({ code: 'SB409', message: 'x' })).toMatch(/another device/)
   })
 
   it('maps network failures', () => {

@@ -1,3 +1,6 @@
+/** SQLSTATE raised by order RPCs when the caller's version_no is stale. */
+export const STALE_VERSION = 'SB409'
+
 /** Shape shared by PostgrestError, StorageError and plain Errors. */
 export interface DbErrorLike {
   code?: string
@@ -10,6 +13,9 @@ export function readableDbError(error: DbErrorLike): string {
   const lower = msg.toLowerCase()
   if (error.code === '23505') return 'That name is already used. Pick a different one.'
   if (error.code === '42501') return 'Not allowed. Try signing out and in again.'
+  if (error.code === STALE_VERSION) {
+    return 'This order was changed on another device. The latest version is loaded; check and try again.'
+  }
   if (error.code === '28000' || lower.includes('jwt')) return 'Your session expired. Sign in again.'
   if (error.code === 'PGRST202' || lower.includes('could not find the function')) {
     return 'The database is missing an update. Apply the latest migration (supabase db push).'
