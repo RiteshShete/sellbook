@@ -37,6 +37,7 @@ export const OrderSchema = z.object({
   delivered_at: z.string().nullable(),
   paid_at: z.string().nullable(),
   cancelled_at: z.string().nullable(),
+  cancelled_from: z.enum(ORDER_STATUSES).nullable(),
 })
 export type Order = z.infer<typeof OrderSchema>
 
@@ -60,13 +61,24 @@ export const OrderWithItemsSchema = OrderSchema.extend({
 }))
 export type OrderWithItems = z.infer<typeof OrderWithItemsSchema>
 
-/** List row: the order plus its unit count. */
+/** List row: the order plus its unit count and a one-line "2× Cake 1 kg, …" summary. */
 export const OrderListRowSchema = OrderSchema.extend({
-  order_items: z.array(z.object({ quantity: z.number().int() })),
-}).transform(({ order_items, ...order }) => ({
-  ...order,
-  units: order_items.reduce((n, i) => n + i.quantity, 0),
-}))
+  order_items: z.array(
+    z.object({
+      quantity: z.number().int(),
+      product_name: z.string(),
+      variant_name: z.string(),
+      position: z.number().int(),
+    }),
+  ),
+}).transform(({ order_items, ...order }) => {
+  const items = [...order_items].sort((a, b) => a.position - b.position)
+  return {
+    ...order,
+    units: items.reduce((n, i) => n + i.quantity, 0),
+    itemsSummary: items.map((i) => `${i.quantity}× ${i.product_name} ${i.variant_name}`).join(', '),
+  }
+})
 export type OrderListRow = z.infer<typeof OrderListRowSchema>
 
 export const CustomerSuggestionSchema = z.object({
