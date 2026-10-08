@@ -1,6 +1,6 @@
 # Sellbook — Technical Plan
 
-Status: **DRAFT for owner approval. No application code exists yet.**
+Status: approved; M0–M2 built. **Where this plan and §3.0 "As built" disagree, §3.0 wins** (owner decision, 2026-10-09).
 
 ## 0. Assumptions & open points
 
@@ -64,6 +64,22 @@ src/lib/time.ts          monthKey(), monthLabel(), prevMonthKey() (IST)
 ## 3. Data model
 
 Conventions: every table has `id uuid pk default gen_random_uuid()`, `owner_id uuid not null default auth.uid() references auth.users(id)`, `created_at timestamptz not null default now()`, `updated_at timestamptz not null default now()` (trigger `set_updated_at`). Soft-deletable tables add `deleted_at timestamptz null`. Money = `numeric(12,2)`.
+
+### 3.0 As built (authoritative)
+
+The applied migrations (`supabase/migrations`) differ from the original design below. The built schema is the source of truth; later milestones extend it instead of reshaping it.
+
+- **Security model:** every function is `SECURITY INVOKER` with `set search_path = ''`, so RLS always applies (not `SECURITY DEFINER`). `authenticated` has owner-only SELECT/INSERT/UPDATE policies on every table. DELETE is revoked everywhere except `order_items` (an order edit replaces its item rows). "Orders are written only through RPCs" is a client-code rule, not enforced by policy.
+- **Enums:** `order_status` (new, ready, delivered, cancelled), `payment_status` (pending, paid), `payment_mode` (online, cash).
+- **settings:** own `id` pk + unique `owner_id`. `next_bill_no` (not `next_bill_seq`), `bill_footer` (not `footer_note`), plus `upi_id`, `default_country_code`, `timezone`, `last_backup_at`. `shop_address`/`shop_phone` are `not null default ''`. Bill numbers come from `next_bill_no()`.
+- **products:** no `description`.
+- **orders:** `order_no` per-owner number (default `next_order_no()`, advisory-locked). `bill_no integer` (display = prefix + number) instead of `bill_seq`/`bill_number`. `customer_phone` nullable, stored as digits with country code (`919876543210`, see `lib/phone.ts`). `total` maintained by triggers from items and discount (B3). Status/payment timestamps maintained by the `orders_apply_timestamps` trigger. Not built yet, added when needed: `version_no` (M3), `cancelled_from` (M4), `content_hash` (M6). No `subtotal` column.
+- **order_items:** extra `cost_price` snapshot; quantity 1..100000; no `product_id`.
+- **bills:** `bill_no`, `revision`, `image_path`, `total_at_generation`, `items_hash`, `generated_at`.
+- **order_versions** (M3) and **audit_log** (M5): not built yet.
+- **Storage:** path `<owner_id>/<yyyy>/<file>`; both buckets accept png/jpeg/webp (`assets` 2 MB, `bills` 3 MB). Bill files are immutable (no UPDATE/DELETE policy); asset files can be replaced/removed.
+- **Built RPCs:** `init_settings`, `upsert_product`, `trash_product`/`restore_product`, `trash_variant`/`restore_variant`, `next_order_no`, `next_bill_no`, `compute_order_total`, `ping`.
+- **Environments:** one hosted Supabase project is used for development (no local Docker). pgTAP files are run by pasting them into the SQL editor until Docker works.
 
 ### 3.1 `settings` (exactly one row per owner)
 
