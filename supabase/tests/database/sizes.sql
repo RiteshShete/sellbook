@@ -1,5 +1,5 @@
--- Variant sizes: validation, snapshot on order lines (B8), rollback, fallback for unsnapshotted
--- lines, and grams / ml / pieces totals in prep_list and analytics_month. Rolled back.
+-- Variant sizes: validation, snapshot on order lines (B8), rollback, unsized lines staying
+-- unsized, and grams / ml / pieces totals in prep_list and analytics_month. Rolled back.
 begin;
 create extension if not exists pgtap with schema extensions;
 select plan(25);
@@ -86,13 +86,11 @@ select is((select count(*)::int from public.order_items where order_id = pg_temp
 select is((select size_amount from public.order_items where order_id = pg_temp.id('A') and position = 1), 250.000,
   'rollback restores the 250 g snapshot, not the catalog 300 g');
 
--- Lines saved before sizes existed (no snapshot) fall back to the variant's current size.
-update public.order_items set size_amount = null, size_unit = null
- where order_id = pg_temp.id('A') and variant_id = pg_temp.id('loaf');
+-- B8: a line snapshotted without a size stays unsized when the catalog adds a size later.
 select public.upsert_product(format('{"id":"%s","name":"Bread","variants":[{"id":"%s","name":"Loaf","price":"45","size_amount":"400","size_unit":"g"}]}',
   pg_temp.id('bread'), pg_temp.id('loaf'))::jsonb);
-select is(pg_temp.pp('Bread', 'grams')::numeric, 1600.000, 'unsnapshotted Loaf uses the catalog 400 g: 4 x 400');
-select is(pg_temp.pp('Bread', 'unsized')::int, 0, 'and is no longer unsized');
+select is(pg_temp.pp('Bread', 'grams')::numeric, 0::numeric, 'Loaf ordered unsized: catalog 400 g does not apply');
+select is(pg_temp.pp('Bread', 'unsized')::int, 4, 'still 4 unsized');
 
 -- Analytics: delivered quantity x size per product.
 select public.set_order_status(pg_temp.id('A'), 'ready', (select version_no from public.orders where id = pg_temp.id('A')));
