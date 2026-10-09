@@ -2,6 +2,9 @@ import { describe, expect, it } from 'vitest'
 import {
   formatDate,
   formatDateTime,
+  formatMonth,
+  formatMonthShort,
+  isMonthKey,
   isoMonth,
   monthRange,
   nextMonth,
@@ -87,5 +90,19 @@ describe('formatDate / formatDateTime', () => {
   })
   it('throws on invalid input', () => {
     expect(() => formatDate('nope')).toThrow(RangeError)
+  })
+})
+
+describe('month keys and labels', () => {
+  it('validates YYYY-MM', () => {
+    expect(isMonthKey('2026-10')).toBe(true)
+    expect(isMonthKey('2026-13')).toBe(false)
+    expect(isMonthKey('2026-1')).toBe(false)
+    expect(isMonthKey('')).toBe(false)
+  })
+  it('labels the IST month, not the device month', () => {
+    expect(formatMonth('2026-10')).toBe('October 2026')
+    expect(formatMonth('2027-01')).toBe('January 2027')
+    expect(formatMonthShort('2026-09')).toBe('Sep')
   })
 })

@@ -6,6 +6,7 @@ import { Button, toast } from '../../components/ui'
 import { useAuth } from '../auth/useAuth'
 
 const LINKS = [
+  { to: '/pending', label: 'Pending payments' },
   { to: '/settings', label: 'Settings' },
   { to: '/trash', label: 'Trash' },
   { to: '/activity', label: 'Activity' },

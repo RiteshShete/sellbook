@@ -60,3 +60,18 @@ export function formatDate(value: Date | string): string {
 export function formatDateTime(value: Date | string): string {
   return formatInTimeZone(toDate(value), IST, 'dd MMM yyyy, h:mm a')
 }
+
+/** True for a "YYYY-MM" month key. */
+export function isMonthKey(value: string): boolean {
+  return MONTH_RE.test(value)
+}
+
+/** "2026-10" -> "October 2026" */
+export function formatMonth(month: string): string {
+  return formatInTimeZone(monthRange(month).start, IST, 'MMMM yyyy')
+}
+
+/** "2026-10" -> "Oct" */
+export function formatMonthShort(month: string): string {
+  return formatInTimeZone(monthRange(month).start, IST, 'MMM')
+}
