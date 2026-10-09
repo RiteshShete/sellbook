@@ -18,6 +18,8 @@ const row = {
       name: '1 kg',
       price: 480.5,
       cost_price: '300.00',
+      size_amount: '1000.000',
+      size_unit: 'g',
       sort_order: 1,
       is_active: true,
       deleted_at: null,
@@ -28,6 +30,8 @@ const row = {
       name: '500 g',
       price: '250',
       cost_price: null,
+      size_amount: 500,
+      size_unit: 'g',
       sort_order: 0,
       is_active: false,
       deleted_at: null,
@@ -38,6 +42,8 @@ const row = {
       name: 'Old',
       price: 1,
       cost_price: null,
+      size_amount: null,
+      size_unit: null,
       sort_order: 2,
       is_active: true,
       deleted_at: '2026-10-01T00:00:00Z',
@@ -68,7 +74,13 @@ describe('draftFromProduct', () => {
       cost: '',
       is_active: false,
     })
-    expect(d.variants[1]).toMatchObject({ price: '480.5', cost: '300' })
+    expect(d.variants[1]).toMatchObject({
+      price: '480.5',
+      cost: '300',
+      sizeText: '1',
+      sizeUnit: 'kg',
+    })
+    expect(d.variants[0]).toMatchObject({ sizeText: '500', sizeUnit: 'g' })
   })
 })
 
@@ -77,8 +89,25 @@ describe('validateProductDraft', () => {
     name: ' Cake ',
     is_active: true,
     variants: [
-      { key: 'a', id: V1, name: ' 500 g ', price: '₹1,250.5', cost: '', is_active: true },
-      { key: 'b', name: '1 kg', price: '480', cost: '300.25', is_active: false },
+      {
+        key: 'a',
+        id: V1,
+        name: ' 500 g ',
+        price: '₹1,250.5',
+        cost: '',
+        sizeText: '500',
+        sizeUnit: 'g',
+        is_active: true,
+      },
+      {
+        key: 'b',
+        name: '1 kg',
+        price: '480',
+        cost: '300.25',
+        sizeText: '',
+        sizeUnit: 'g',
+        is_active: false,
+      },
     ],
     ...over,
   })
@@ -92,8 +121,23 @@ describe('validateProductDraft', () => {
         name: 'Cake',
         is_active: true,
         variants: [
-          { id: V1, name: '500 g', price: '1250.50', cost_price: null, is_active: true },
-          { name: '1 kg', price: '480.00', cost_price: '300.25', is_active: false },
+          {
+            id: V1,
+            name: '500 g',
+            price: '1250.50',
+            cost_price: null,
+            size_amount: '500',
+            size_unit: 'g',
+            is_active: true,
+          },
+          {
+            name: '1 kg',
+            price: '480.00',
+            cost_price: '300.25',
+            size_amount: null,
+            size_unit: null,
+            is_active: false,
+          },
         ],
       },
     })
@@ -116,15 +160,35 @@ describe('validateProductDraft', () => {
     const r = validateProductDraft(
       draft({
         variants: [
-          { key: 'a', name: 'Small', price: 'abc', cost: '', is_active: true },
-          { key: 'b', name: 'small', price: '10', cost: '-5', is_active: true },
+          {
+            key: 'a',
+            name: 'Small',
+            price: 'abc',
+            cost: '',
+            sizeText: '',
+            sizeUnit: 'g',
+            is_active: true,
+          },
+          {
+            key: 'b',
+            name: 'small',
+            price: '10',
+            cost: '-5',
+            sizeText: '1.2345',
+            sizeUnit: 'kg',
+            is_active: true,
+          },
         ],
       }),
     )
     expect(r.ok).toBe(false)
     if (!r.ok) {
       expect(r.errors.byVariant.a).toEqual({ price: 'Enter a price' })
-      expect(r.errors.byVariant.b).toEqual({ name: 'Duplicate name', cost: 'Invalid amount' })
+      expect(r.errors.byVariant.b).toEqual({
+        name: 'Duplicate name',
+        cost: 'Invalid amount',
+        size: 'Up to 3 decimals',
+      })
     }
   })
 })

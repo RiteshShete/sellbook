@@ -23,9 +23,32 @@ const month = {
   collected_cash: 40,
   outstanding_total: 930.5,
   outstanding_count: 4,
-  by_product: [{ key: 'p1', name: 'Cake', revenue: 1210, units: 3, orders: 2 }],
+  by_product: [
+    {
+      key: 'p1',
+      name: 'Cake',
+      revenue: 1210,
+      units: 3,
+      orders: 2,
+      grams: '2500.000',
+      ml: 0,
+      pieces: 0,
+      unsized: 0,
+    },
+  ],
   by_variant: [
-    { key: 'v1', product_name: 'Cake', variant_name: '1 kg', revenue: 960, units: 2, orders: 1 },
+    {
+      key: 'v1',
+      product_name: 'Cake',
+      variant_name: '1 kg',
+      revenue: 960,
+      units: 2,
+      orders: 1,
+      grams: 2000,
+      ml: 0,
+      pieces: 0,
+      unsized: 0,
+    },
   ],
   daily: [{ date: '2026-09-01', sales: 900, orders: 1 }],
 }
@@ -38,6 +61,7 @@ describe('MonthAnalyticsSchema', () => {
     expect(a.outstanding_total).toBe(93050)
     expect(a.by_product[0]?.revenue).toBe(121000)
     expect(a.daily[0]?.sales).toBe(90000)
+    expect(a.by_product[0]?.grams).toBe(2500)
   })
   it('rejects a response with a missing field', () => {
     const rest: Record<string, unknown> = { ...month }

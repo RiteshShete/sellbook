@@ -7,6 +7,7 @@ import {
   parseMoneyInput,
   type Paise,
 } from '../../lib/money'
+import { SizeUnitSchema, dbAmount, type SizeUnit } from '../../lib/measure'
 import { normalizePhone } from '../../lib/phone'
 import { dbMoney } from '../../lib/zodMoney'
 
@@ -50,8 +51,23 @@ export const OrderItemSchema = z.object({
   quantity: z.number().int(),
   line_total: dbMoney,
   position: z.number().int(),
+  /** Size snapshot (base units); absent/null on lines saved before sizes existed. */
+  size_amount: dbAmount.nullish(),
+  size_unit: SizeUnitSchema.nullish(),
+  /** The variant's current size, embedded by fetchOrder as the fallback for unsnapshotted lines. */
+  variants: z
+    .object({ size_amount: dbAmount.nullable(), size_unit: SizeUnitSchema.nullable() })
+    .nullish(),
 })
 export type OrderItem = z.infer<typeof OrderItemSchema>
+
+/** A line's size: its own snapshot, else its variant's current size, else null (same as DB). */
+export function itemSize(i: OrderItem): { unit: SizeUnit; amount: number } | null {
+  if (i.size_unit && i.size_amount != null) return { unit: i.size_unit, amount: i.size_amount }
+  const v = i.variants
+  if (v?.size_unit && v.size_amount !== null) return { unit: v.size_unit, amount: v.size_amount }
+  return null
+}
 
 export const OrderWithItemsSchema = OrderSchema.extend({
   order_items: z.array(OrderItemSchema),

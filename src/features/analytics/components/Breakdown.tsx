@@ -1,11 +1,12 @@
 import { useState } from 'react'
 import { SegmentedControl } from '../../../components/ui'
+import { formatTotals, type MeasureTotals } from '../../../lib/measure'
 import { formatINR, type Paise } from '../../../lib/money'
 import type { MonthAnalytics } from '../schemas'
 
 type View = 'product' | 'variant'
 
-interface Row {
+interface Row extends MeasureTotals {
   key: string
   name: string
   units: number
@@ -43,7 +44,7 @@ export function Breakdown({ a }: { a: MonthAnalytics }) {
           <thead className="text-left text-muted">
             <tr>
               <th className="py-1 font-medium">{view === 'product' ? 'Product' : 'Variant'}</th>
-              <th className="py-1 text-right font-medium">Units</th>
+              <th className="py-1 text-right font-medium">Qty</th>
               <th className="py-1 text-right font-medium">Amount</th>
             </tr>
           </thead>
@@ -56,7 +57,13 @@ export function Breakdown({ a }: { a: MonthAnalytics }) {
                     {r.orders} {r.orders === 1 ? 'order' : 'orders'}
                   </span>
                 </td>
-                <td className="py-2 text-right align-top">{r.units}</td>
+                <td className="py-2 text-right align-top">
+                  {r.units}
+                  {/* Delivered weight / volume, e.g. "6.25 kg" (only for variants with a size). */}
+                  <span className="block text-xs text-muted">
+                    {formatTotals({ ...r, unsized: 0 }).join(' + ')}
+                  </span>
+                </td>
                 <td className="py-2 text-right align-top font-medium">{formatINR(r.revenue)}</td>
               </tr>
             ))}

@@ -1,9 +1,10 @@
 import { MessageCircle, Phone } from 'lucide-react'
 import { formatDate } from '../../../lib/dates'
 import { formatPhone } from '../../../lib/format'
+import { formatTotals, sumLines } from '../../../lib/measure'
 import { formatINR } from '../../../lib/money'
 import { toWaMeLink } from '../../../lib/phone'
-import type { OrderWithItems } from '../schemas'
+import { itemSize, type OrderWithItems } from '../schemas'
 import { DueBadge, PaymentBadge, StatusBadge } from './OrderBadges'
 
 const iconLink =
@@ -12,6 +13,10 @@ const iconLink =
 /** Read-only view of an order: customer, dates, items, totals. */
 export function OrderSummary({ order }: { order: OrderWithItems }) {
   const wa = order.customer_phone ? toWaMeLink(order.customer_phone) : null
+  // e.g. "3.25 kg"; lines without a size are left out here (they show as items above).
+  const totals = sumLines(order.items.map((i) => ({ quantity: i.quantity, size: itemSize(i) })))
+  const weight = formatTotals({ ...totals, unsized: 0 }).join(' + ')
+  const weightLabel = totals.ml === 0 && totals.pieces === 0 ? 'Total weight' : 'Total size'
   return (
     <div className="flex flex-col gap-4">
       <div className="flex flex-wrap gap-1.5">
@@ -73,6 +78,12 @@ export function OrderSummary({ order }: { order: OrderWithItems }) {
             <div className="flex justify-between">
               <dt className="text-muted">Discount</dt>
               <dd>− {formatINR(order.discount)}</dd>
+            </div>
+          )}
+          {weight && (
+            <div className="flex justify-between">
+              <dt className="text-muted">{weightLabel}</dt>
+              <dd className="tabular-nums">{weight}</dd>
             </div>
           )}
           <div className="flex justify-between text-base font-semibold">

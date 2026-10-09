@@ -1,5 +1,6 @@
 import { z } from 'zod'
 import { addMoney, type Paise } from '../../lib/money'
+import { measureTotalsShape } from '../../lib/measure'
 import { dbMoney } from '../../lib/zodMoney'
 
 const count = z.number().int()
@@ -17,7 +18,14 @@ export const MonthAnalyticsSchema = z.object({
   outstanding_total: dbMoney,
   outstanding_count: count,
   by_product: z.array(
-    z.object({ key: z.string(), name: z.string(), revenue: dbMoney, units: count, orders: count }),
+    z.object({
+      key: z.string(),
+      name: z.string(),
+      revenue: dbMoney,
+      units: count,
+      orders: count,
+      ...measureTotalsShape,
+    }),
   ),
   by_variant: z.array(
     z.object({
@@ -27,6 +35,7 @@ export const MonthAnalyticsSchema = z.object({
       revenue: dbMoney,
       units: count,
       orders: count,
+      ...measureTotalsShape,
     }),
   ),
   daily: z.array(z.object({ date: z.string(), sales: dbMoney, orders: count })),

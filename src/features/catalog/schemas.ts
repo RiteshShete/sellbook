@@ -1,5 +1,13 @@
 import { z } from 'zod'
 import { fromPaise, paiseToDecimalString, parseMoneyInput, type Paise } from '../../lib/money'
+import {
+  SizeUnitSchema,
+  dbAmount,
+  parseSizeInput,
+  sizeToInput,
+  type InputUnit,
+  type SizeUnit,
+} from '../../lib/measure'
 import { dbMoney, dbMoneyNullable } from '../../lib/zodMoney'
 
 // ---- Rows from the database (prices -> integer paise) ------------------------------------------
@@ -10,6 +18,9 @@ export const VariantSchema = z.object({
   name: z.string(),
   price: dbMoney,
   cost_price: dbMoneyNullable,
+  /** Size in base units (g / ml / pcs), or both null. */
+  size_amount: dbAmount.nullable(),
+  size_unit: SizeUnitSchema.nullable(),
   sort_order: z.number().int(),
   is_active: z.boolean(),
   deleted_at: z.string().nullable(),
@@ -44,6 +55,9 @@ export interface VariantDraft {
   name: string
   price: string
   cost: string
+  /** Size as typed, e.g. "1.25" with unit "kg"; empty = no size. */
+  sizeText: string
+  sizeUnit: InputUnit
   is_active: boolean
 }
 
@@ -62,6 +76,9 @@ export interface UpsertProductPayload {
     name: string
     price: string
     cost_price: string | null
+    /** Always sent, so clearing a size in the editor clears it in the database. */
+    size_amount: string | null
+    size_unit: SizeUnit | null
     is_active: boolean
   }[]
 }
@@ -70,6 +87,7 @@ export interface VariantErrors {
   name?: string
   price?: string
   cost?: string
+  size?: string
 }
 
 export interface ProductErrors {
@@ -87,14 +105,19 @@ export function draftFromProduct(p: Product): ProductDraft {
   return {
     name: p.name,
     is_active: p.is_active,
-    variants: p.variants.map((v) => ({
-      key: v.id,
-      id: v.id,
-      name: v.name,
-      price: paiseText(v.price),
-      cost: v.cost_price === null ? '' : paiseText(v.cost_price),
-      is_active: v.is_active,
-    })),
+    variants: p.variants.map((v) => {
+      const size = sizeToInput(v.size_unit, v.size_amount)
+      return {
+        key: v.id,
+        id: v.id,
+        name: v.name,
+        price: paiseText(v.price),
+        cost: v.cost_price === null ? '' : paiseText(v.cost_price),
+        sizeText: size.text,
+        sizeUnit: size.unit,
+        is_active: v.is_active,
+      }
+    }),
   }
 }
 
@@ -123,13 +146,18 @@ export function validateProductDraft(draft: ProductDraft, id?: string): ProductV
     const cost = v.cost.trim() === '' ? null : parseMoneyInput(v.cost)
     if (v.cost.trim() !== '' && cost === null) e.cost = 'Invalid amount'
 
-    if (e.name || e.price || e.cost) errors.byVariant[v.key] = e
-    else if (price !== null) {
+    const size = parseSizeInput(v.sizeText, v.sizeUnit)
+    if (!size.ok) e.size = size.error
+
+    if (e.name || e.price || e.cost || e.size) errors.byVariant[v.key] = e
+    else if (price !== null && size.ok) {
       variants.push({
         ...(v.id ? { id: v.id } : {}),
         name: vName,
         price: paiseToDecimalString(price),
         cost_price: cost === null ? null : paiseToDecimalString(cost),
+        size_amount: size.size?.size_amount ?? null,
+        size_unit: size.size?.size_unit ?? null,
         is_active: v.is_active,
       })
     }

@@ -1,6 +1,10 @@
 import { Trash2 } from 'lucide-react'
-import { Input, Switch } from '../../../components/ui'
+import { Input, Select, Switch } from '../../../components/ui'
+import { INPUT_UNITS } from '../../../lib/measure'
 import type { VariantDraft, VariantErrors } from '../schemas'
+
+/** Used for the prep list and kg totals; amounts are stored in g / ml / pcs. */
+const UNIT_OPTIONS = INPUT_UNITS.map((u) => ({ value: u, label: u }))
 
 export interface VariantFieldsProps {
   variant: VariantDraft
@@ -47,6 +51,25 @@ export function VariantFields({ variant, errors, onChange, onRemove }: VariantFi
           value={variant.cost}
           onChange={(e) => onChange({ cost: e.target.value })}
           error={errors?.cost}
+        />
+      </div>
+      <div className="grid grid-cols-[1fr_6rem] gap-2">
+        <Input
+          label="Size per unit (optional)"
+          inputMode="decimal"
+          placeholder="e.g. 500, 1.25"
+          value={variant.sizeText}
+          onChange={(e) => onChange({ sizeText: e.target.value })}
+          error={errors?.size}
+        />
+        <Select
+          label="Unit"
+          value={variant.sizeUnit}
+          options={UNIT_OPTIONS}
+          onChange={(e) => {
+            const unit = INPUT_UNITS.find((u) => u === e.target.value)
+            if (unit) onChange({ sizeUnit: unit })
+          }}
         />
       </div>
       <Switch
