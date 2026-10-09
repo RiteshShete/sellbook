@@ -1,4 +1,4 @@
-import { useEffect, type ReactNode } from 'react'
+import { useEffect, useRef, type ReactNode } from 'react'
 
 export interface ModalProps {
   open: boolean
@@ -9,8 +9,13 @@ export interface ModalProps {
   placement?: 'center' | 'bottom'
 }
 
-/** Accessible overlay. Closes on Escape and backdrop tap. */
+/**
+ * Accessible overlay. Closes on Escape and backdrop tap; locks page scroll behind it (iOS drags
+ * the page otherwise) and moves focus into the dialog, returning it on close.
+ */
 export function Modal({ open, onClose, title, children, placement = 'center' }: ModalProps) {
+  const dialogRef = useRef<HTMLDivElement>(null)
+
   useEffect(() => {
     if (!open) return
     const onKey = (e: KeyboardEvent) => {
@@ -20,6 +25,18 @@ export function Modal({ open, onClose, title, children, placement = 'center' }: 
     return () => document.removeEventListener('keydown', onKey)
   }, [open, onClose])
 
+  useEffect(() => {
+    if (!open) return
+    const opener = document.activeElement instanceof HTMLElement ? document.activeElement : null
+    const overflow = document.body.style.overflow
+    document.body.style.overflow = 'hidden'
+    dialogRef.current?.focus()
+    return () => {
+      document.body.style.overflow = overflow
+      opener?.focus()
+    }
+  }, [open])
+
   if (!open) return null
   const bottom = placement === 'bottom'
   return (
@@ -28,11 +45,13 @@ export function Modal({ open, onClose, title, children, placement = 'center' }: 
       onClick={onClose}
     >
       <div
+        ref={dialogRef}
+        tabIndex={-1}
         role="dialog"
         aria-modal="true"
         aria-label={title}
         onClick={(e) => e.stopPropagation()}
-        className={`w-full min-w-0 bg-surface text-text ${bottom ? 'max-h-[85dvh] overflow-y-auto rounded-t-3xl pb-[env(safe-area-inset-bottom)]' : 'max-w-sm rounded-3xl'}`}
+        className={`w-full min-w-0 bg-surface outline-none text-text ${bottom ? 'max-h-[85dvh] overflow-y-auto rounded-t-3xl pb-[env(safe-area-inset-bottom)]' : 'max-w-sm rounded-3xl'}`}
       >
         <div className="flex items-center justify-between gap-2 border-b border-border px-5 py-3">
           <h2 className="text-lg font-semibold">{title}</h2>

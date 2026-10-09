@@ -56,6 +56,11 @@ export function formatDate(value: Date | string): string {
   return formatInTimeZone(toDate(value), IST, 'dd MMM yyyy')
 }
 
+/** "08 Oct" */
+export function formatDayMonth(value: Date | string): string {
+  return formatInTimeZone(toDate(value), IST, 'dd MMM')
+}
+
 /** "08 Oct 2026, 4:05 PM" */
 export function formatDateTime(value: Date | string): string {
   return formatInTimeZone(toDate(value), IST, 'dd MMM yyyy, h:mm a')

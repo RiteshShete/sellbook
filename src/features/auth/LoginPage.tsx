@@ -1,7 +1,7 @@
 import { useMutation } from '@tanstack/react-query'
 import { useState, type FormEvent } from 'react'
 import { Navigate, useLocation } from 'react-router-dom'
-import { Button, Input, Skeleton, toast } from '../../components/ui'
+import { Button, Input, Skeleton } from '../../components/ui'
 import { validateLogin, type LoginErrors } from './schemas'
 import { useAuth } from './useAuth'
 
@@ -24,7 +24,6 @@ export function LoginPage() {
 
   const login = useMutation({
     mutationFn: (v: { email: string; password: string }) => signIn(v.email, v.password),
-    onError: (e: Error) => toast.error(e.message),
   })
 
   if (status === 'loading') {

@@ -1,8 +1,7 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
-import { useEffect, useMemo } from 'react'
-import { toast } from '../../../components/ui'
 import { invalidateOrders } from '../../../lib/invalidate'
 import { queryKeys } from '../../../lib/queryKeys'
+import { useObjectUrl } from '../../../lib/useObjectUrl'
 import { useAuth } from '../../auth/useAuth'
 import type { Settings } from '../../settings/schemas'
 import { downloadBillImage, fetchBillState } from '../api/billsApi'
@@ -27,11 +26,7 @@ export function useBillImage(path: string | null) {
     staleTime: Infinity,
     gcTime: 30 * 60_000,
   })
-  const url = useMemo(
-    () => (query.data ? URL.createObjectURL(query.data) : undefined),
-    [query.data],
-  )
-  useEffect(() => () => (url ? URL.revokeObjectURL(url) : undefined), [url])
+  const url = useObjectUrl(query.data)
   return { blob: query.data, url, isLoading: query.isLoading, error: query.error }
 }
 
@@ -47,6 +42,5 @@ export function useGenerateBill(orderId: string) {
       void queryClient.invalidateQueries({ queryKey: queryKeys.settings })
     },
     onSettled: () => invalidateOrders(queryClient),
-    onError: (e: Error) => toast.error(e.message),
   })
 }

@@ -33,12 +33,12 @@ function phoneCell(phone: string | null): string {
  * The month's delivered orders as CSV (same set as Sales). Amounts are plain decimals
  * ("900.00") so spreadsheets can add them up; ₹ is only in the headers.
  */
-export function buildOrdersCsv(rows: ExportRow[], billPrefix: string): string {
+export function buildOrdersCsv(rows: ExportRow[], fallbackPrefix: string): string {
   return toCsv([
     HEADER,
     ...rows.map((r) => [
       r.order_no,
-      r.bill_no === null ? '' : formatBillNo(billPrefix, r.bill_no),
+      r.bill_no === null ? '' : formatBillNo(r.bill_prefix ?? fallbackPrefix, r.bill_no),
       r.order_date,
       istDay(r.delivered_at),
       r.customer_name,

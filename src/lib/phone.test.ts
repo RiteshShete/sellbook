@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { normalizePhone, toWaMeLink } from './phone'
+import { normalizePhone, toNationalPhone, toTelLink, toWaMeLink } from './phone'
 
 describe('normalizePhone', () => {
   it('adds 91 to 10-digit numbers', () => {
@@ -40,5 +40,15 @@ describe('toWaMeLink', () => {
   })
   it('returns null for an invalid phone', () => {
     expect(toWaMeLink('123')).toBeNull()
+  })
+})
+
+describe('toNationalPhone / toTelLink', () => {
+  it('drops the country code for the form and builds a tel: link', () => {
+    expect(toNationalPhone('919876543210')).toBe('9876543210')
+    expect(toTelLink('919876543210')).toBe('tel:+919876543210')
+  })
+  it('leaves an unexpected value readable', () => {
+    expect(toNationalPhone('123')).toBe('123')
   })
 })

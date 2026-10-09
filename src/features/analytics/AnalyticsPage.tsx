@@ -20,7 +20,7 @@ export function AnalyticsPage() {
   const month = isMonthKey(asked) && asked <= latest ? asked : latest
   const prevMonth = previousMonth(month)
 
-  const current = useMonthAnalytics(month)
+  const current = useMonthAnalytics(month, { keepPrevious: true })
   const previous = useMonthAnalytics(prevMonth)
   const settings = useSettings()
   const exportCsv = useExportCsv()
@@ -57,10 +57,13 @@ export function AnalyticsPage() {
         ) : current.isError ? (
           <ErrorState error={current.error} onRetry={() => void current.refetch()} />
         ) : (
-          <>
+          <div
+            className={`flex flex-col gap-4 transition-opacity ${current.isPlaceholderData ? 'opacity-50' : ''}`}
+            aria-busy={current.isPlaceholderData}
+          >
             <KpiGrid
               current={current.data}
-              previous={previous.data}
+              previous={current.isPlaceholderData ? undefined : previous.data}
               previousLabel={formatMonthShort(prevMonth)}
             />
             {previous.isError && (
@@ -92,7 +95,7 @@ export function AnalyticsPage() {
                 <Breakdown a={current.data} />
               </>
             )}
-          </>
+          </div>
         )}
       </div>
     </Page>

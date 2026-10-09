@@ -16,7 +16,7 @@ const TABS: { value: TrashTab; label: string }[] = [
 export function TrashPage() {
   const [tab, setTab] = useState<TrashTab>('orders')
   const list = useTrashList(tab)
-  const restore = useRestore(tab)
+  const restore = useRestore()
 
   return (
     <Page title="Trash">
@@ -49,7 +49,7 @@ export function TrashPage() {
                 <Button
                   variant="secondary"
                   disabled={restore.isPending}
-                  onClick={() => restore.mutate(row)}
+                  onClick={() => restore.mutate({ tab, row })}
                 >
                   Restore
                 </Button>

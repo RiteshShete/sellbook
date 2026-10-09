@@ -1,4 +1,4 @@
-import type { FormEvent } from 'react'
+import type { FormEvent, ReactNode } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { Page } from '../../../app/Page'
 import { Button, Input, Textarea, toast } from '../../../components/ui'
@@ -10,8 +10,8 @@ import { CustomerFields } from './CustomerFields'
 import { ItemPicker } from './ItemPicker'
 import { LineItems } from './LineItems'
 
-/** New order (no `order`) or edit of an existing one. */
-export function OrderForm({ order }: { order?: OrderWithItems }) {
+/** New order (no `order`) or edit of an existing one. `notice` shows above the fields. */
+export function OrderForm({ order, notice }: { order?: OrderWithItems; notice?: ReactNode }) {
   const navigate = useNavigate()
   const form = useOrderDraft(order ? draftFromOrder(order) : undefined)
   const create = useCreateOrder()
@@ -44,6 +44,7 @@ export function OrderForm({ order }: { order?: OrderWithItems }) {
   return (
     <Page title={order ? `Edit order #${order.order_no}` : 'New order'}>
       <form onSubmit={onSubmit} noValidate className="flex flex-col gap-4">
+        {notice}
         <CustomerFields form={form} />
         <div className="grid grid-cols-2 gap-2">
           <Input

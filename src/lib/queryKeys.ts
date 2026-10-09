@@ -14,12 +14,18 @@ export const queryKeys = {
   },
   /** Bill PNGs are immutable per path, so they are cached forever. */
   billImage: (path: string) => ['billImage', path] as const,
-  customers: (q: string) => ['customers', q] as const,
+  customers: {
+    all: ['customers'] as const,
+    search: (q: string) => ['customers', q] as const,
+  },
   trash: {
     all: ['trash'] as const,
     tab: (tab: string) => ['trash', tab] as const,
   },
-  activity: (entity: string) => ['activity', entity] as const,
+  activity: {
+    all: ['activity'] as const,
+    list: (entity: string) => ['activity', entity] as const,
+  },
   analytics: {
     all: ['analytics'] as const,
     month: (month: string) => ['analytics', 'month', month] as const,

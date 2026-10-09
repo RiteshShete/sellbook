@@ -5,7 +5,7 @@ export function Toast() {
   return (
     <SonnerToaster
       position="top-center"
-      theme="system"
+      theme="light"
       offset={{ top: 'calc(env(safe-area-inset-top) + 8px)' }}
       closeButton
     />

@@ -1,24 +1,22 @@
 import { Badge } from '../../../components/ui'
-import { formatDate, todayIST } from '../../../lib/dates'
+import { formatDayMonth, todayIST } from '../../../lib/dates'
+import { STATUS_LABEL, paymentLabel, paymentState } from '../pipeline'
 import type { Order, OrderStatus } from '../schemas'
 
-const STATUS: Record<
-  OrderStatus,
-  { label: string; tone: 'info' | 'warning' | 'success' | 'neutral' }
-> = {
-  new: { label: 'New', tone: 'info' },
-  ready: { label: 'Ready', tone: 'warning' },
-  delivered: { label: 'Delivered', tone: 'success' },
-  cancelled: { label: 'Cancelled', tone: 'neutral' },
+const STATUS_TONE: Record<OrderStatus, 'info' | 'warning' | 'success' | 'neutral'> = {
+  new: 'info',
+  ready: 'warning',
+  delivered: 'success',
+  cancelled: 'neutral',
 }
 
 export function StatusBadge({ status }: { status: OrderStatus }) {
-  return <Badge tone={STATUS[status].tone}>{STATUS[status].label}</Badge>
+  return <Badge tone={STATUS_TONE[status]}>{STATUS_LABEL[status]}</Badge>
 }
 
 export function PaymentBadge({ order }: { order: Pick<Order, 'payment_status' | 'payment_mode'> }) {
-  if (order.payment_status === 'pending') return <Badge tone="danger">Unpaid</Badge>
-  return <Badge tone="success">Paid · {order.payment_mode === 'cash' ? 'Cash' : 'Online'}</Badge>
+  const p = paymentState(order)
+  return <Badge tone={p.payment_status === 'paid' ? 'success' : 'danger'}>{paymentLabel(p)}</Badge>
 }
 
 /** "Overdue" / "Due today" / "Due 12 Oct" for open orders; nothing once delivered or cancelled. */
@@ -32,5 +30,5 @@ export function DueBadge({
   if (!order.due_date || order.status === 'delivered' || order.status === 'cancelled') return null
   if (order.due_date < today) return <Badge tone="danger">Overdue</Badge>
   if (order.due_date === today) return <Badge tone="warning">Due today</Badge>
-  return <Badge>Due {formatDate(order.due_date).slice(0, 6)}</Badge>
+  return <Badge>Due {formatDayMonth(order.due_date)}</Badge>
 }

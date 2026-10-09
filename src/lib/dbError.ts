@@ -1,3 +1,5 @@
+import { ZodError } from 'zod'
+
 /** SQLSTATE raised by order RPCs when the caller's version_no is stale. */
 export const STALE_VERSION = 'SB409'
 
@@ -28,6 +30,16 @@ export function readableDbError(error: DbErrorLike): string {
   }
   // Our own RPC messages ("product not found", "restore the product first") are already readable.
   return msg.charAt(0).toUpperCase() + msg.slice(1)
+}
+
+/**
+ * Message for any thrown value. A ZodError means the server sent data this app version does not
+ * understand; its raw message is a JSON issue list, so show a sentence instead.
+ */
+export function errorMessage(e: unknown): string {
+  if (e instanceof ZodError) return 'Unexpected data from the server. Reload or update the app.'
+  if (e instanceof Error && e.message) return e.message
+  return 'Something went wrong. Try again.'
 }
 
 /** Throws a readable Error when a Supabase call returned one. */

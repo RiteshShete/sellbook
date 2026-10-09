@@ -38,7 +38,7 @@ export async function generateBill(
     }
     const data: BillData = {
       source,
-      billNo: formatBillNo(settings.bill_prefix, source.bill_no),
+      billNo: formatBillNo(source.bill_prefix ?? settings.bill_prefix, source.bill_no),
       date: formatDate(todayIST()),
       shop: {
         name: settings.shop_name,

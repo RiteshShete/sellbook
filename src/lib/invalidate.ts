@@ -8,15 +8,19 @@ export function invalidateOrders(qc: QueryClient) {
     qc.invalidateQueries({ queryKey: queryKeys.analytics.all }),
     qc.invalidateQueries({ queryKey: queryKeys.pending }),
     qc.invalidateQueries({ queryKey: queryKeys.trash.all }),
-    qc.invalidateQueries({ queryKey: ['activity'] }),
+    qc.invalidateQueries({ queryKey: queryKeys.activity.all }),
   ])
 }
 
-/** After anything that changes the catalog. */
+/**
+ * After anything that changes the catalog. Orders too: the prep list sorts by catalog order and
+ * reads variant sizes, and order details embed the variant.
+ */
 export function invalidateCatalog(qc: QueryClient) {
   return Promise.all([
     qc.invalidateQueries({ queryKey: queryKeys.products.all }),
+    qc.invalidateQueries({ queryKey: queryKeys.orders.all }),
     qc.invalidateQueries({ queryKey: queryKeys.trash.all }),
-    qc.invalidateQueries({ queryKey: ['activity'] }),
+    qc.invalidateQueries({ queryKey: queryKeys.activity.all }),
   ])
 }

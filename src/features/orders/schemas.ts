@@ -1,14 +1,13 @@
 import { z } from 'zod'
 import {
   addMoney,
-  fromPaise,
   multiplyMoney,
   paiseToDecimalString,
   parseMoneyInput,
   type Paise,
 } from '../../lib/money'
 import { SizeUnitSchema, dbAmount, type SizeUnit } from '../../lib/measure'
-import { normalizePhone } from '../../lib/phone'
+import { normalizePhone, toNationalPhone } from '../../lib/phone'
 import { dbMoney } from '../../lib/zodMoney'
 
 // ---- Rows from the database ----------------------------------------------------------------------
@@ -32,6 +31,11 @@ export const OrderSchema = z.object({
   discount: dbMoney,
   total: dbMoney,
   bill_no: z.number().int().nullable(),
+  /**
+   * Prefix snapshotted with bill_no (B6), so a later Settings change never relabels a bill.
+   * Nullish until migration 20261014100000 is applied; readers then fall back to Settings.
+   */
+  bill_prefix: z.string().nullish(),
   version_no: z.number().int(),
   created_at: z.string(),
   ready_at: z.string().nullable(),
@@ -51,22 +55,15 @@ export const OrderItemSchema = z.object({
   quantity: z.number().int(),
   line_total: dbMoney,
   position: z.number().int(),
-  /** Size snapshot (base units); absent/null on lines saved before sizes existed. */
+  /** Size snapshot (base units); null when the variant had no size when ordered (B8). */
   size_amount: dbAmount.nullish(),
   size_unit: SizeUnitSchema.nullish(),
-  /** The variant's current size, embedded by fetchOrder as the fallback for unsnapshotted lines. */
-  variants: z
-    .object({ size_amount: dbAmount.nullable(), size_unit: SizeUnitSchema.nullable() })
-    .nullish(),
 })
 export type OrderItem = z.infer<typeof OrderItemSchema>
 
-/** A line's size: its own snapshot, else its variant's current size, else null (same as DB). */
+/** A line's own size snapshot, or null. Never the catalog's current size (B8; same as DB). */
 export function itemSize(i: OrderItem): { unit: SizeUnit; amount: number } | null {
-  if (i.size_unit && i.size_amount != null) return { unit: i.size_unit, amount: i.size_amount }
-  const v = i.variants
-  if (v?.size_unit && v.size_amount !== null) return { unit: v.size_unit, amount: v.size_amount }
-  return null
+  return i.size_unit && i.size_amount != null ? { unit: i.size_unit, amount: i.size_amount } : null
 }
 
 export const OrderWithItemsSchema = OrderSchema.extend({
@@ -153,11 +150,12 @@ export const MAX_QTY = 100000
 export function draftFromOrder(o: OrderWithItems): OrderDraft {
   return {
     customer_name: o.customer_name,
-    customer_phone: o.customer_phone ? o.customer_phone.slice(2) : '',
+    customer_phone: o.customer_phone ? toNationalPhone(o.customer_phone) : '',
     order_date: o.order_date,
     due_date: o.due_date ?? '',
     notes: o.notes ?? '',
-    discount: o.discount === 0 ? '' : String(fromPaise(o.discount)),
+    // Exact decimal text, trailing zeros trimmed: "30.50" -> "30.5", "300.00" -> "300".
+    discount: o.discount === 0 ? '' : paiseToDecimalString(o.discount).replace(/\.?0+$/, ''),
     lines: o.items.map((i) => ({
       key: i.id,
       id: i.id,

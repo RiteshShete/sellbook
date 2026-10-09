@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest'
-import { readableDbError, throwIfError } from './dbError'
+import { z } from 'zod'
+import { errorMessage, readableDbError, throwIfError } from './dbError'
 
 describe('readableDbError', () => {
   it('maps known Postgres / PostgREST codes', () => {
@@ -24,5 +25,17 @@ describe('throwIfError', () => {
   it('does nothing for null and throws a readable Error otherwise', () => {
     expect(() => throwIfError(null)).not.toThrow()
     expect(() => throwIfError({ code: '23505', message: 'dup' })).toThrow(/already used/)
+  })
+})
+
+describe('errorMessage', () => {
+  it('hides a ZodError issue list behind a sentence', () => {
+    const parsed = z.object({ a: z.number() }).safeParse({ a: 'x' })
+    expect(parsed.success).toBe(false)
+    if (!parsed.success) expect(errorMessage(parsed.error)).toMatch(/Unexpected data/)
+  })
+  it('keeps readable Error messages and covers non-errors', () => {
+    expect(errorMessage(new Error('Product not found'))).toBe('Product not found')
+    expect(errorMessage('boom')).toBe('Something went wrong. Try again.')
   })
 })

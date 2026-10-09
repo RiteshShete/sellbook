@@ -1,5 +1,4 @@
 import { keepPreviousData, useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
-import { toast } from '../../../components/ui'
 import { invalidateOrders } from '../../../lib/invalidate'
 import { queryKeys } from '../../../lib/queryKeys'
 import { useAuth } from '../../auth/useAuth'
@@ -31,7 +30,7 @@ export function useCustomerSuggestions(q: string) {
   const { client } = useAuth()
   const term = q.trim()
   return useQuery({
-    queryKey: queryKeys.customers(term),
+    queryKey: queryKeys.customers.search(term),
     queryFn: () => suggestCustomers(client, term),
     enabled: term.length >= 2,
     staleTime: 60_000,
@@ -45,9 +44,8 @@ export function useCreateOrder() {
     mutationFn: (p: OrderPayload) => createOrder(client, p),
     onSuccess: () => {
       void invalidateOrders(queryClient)
-      void queryClient.invalidateQueries({ queryKey: ['customers'] })
+      void queryClient.invalidateQueries({ queryKey: queryKeys.customers.all })
     },
-    onError: (e: Error) => toast.error(e.message),
   })
 }
 
@@ -58,7 +56,11 @@ export function useUpdateOrder(id: string) {
     mutationFn: ({ p, version }: { p: OrderPayload; version: number }) =>
       updateOrder(client, id, p, version),
     // Success or a stale-version failure: either way the cached order is out of date.
-    onSettled: () => invalidateOrders(queryClient),
-    onError: (e: Error) => toast.error(e.message),
+    onSettled: () =>
+      Promise.all([
+        invalidateOrders(queryClient),
+        // A renamed customer or new phone should show up in autocomplete straight away.
+        queryClient.invalidateQueries({ queryKey: queryKeys.customers.all }),
+      ]),
   })
 }

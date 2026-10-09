@@ -1,4 +1,5 @@
-import type { OrderStatus } from './schemas'
+import type { OrderTab } from './api/ordersApi'
+import { ORDER_STATUSES, type OrderStatus } from './schemas'
 
 export const STATUS_LABEL: Record<OrderStatus, string> = {
   new: 'New',
@@ -6,6 +7,14 @@ export const STATUS_LABEL: Record<OrderStatus, string> = {
   delivered: 'Delivered',
   cancelled: 'Cancelled',
 }
+
+/** Order list tabs: one per status, then All. */
+export const ORDER_TABS: { value: OrderTab; label: string }[] = [
+  ...ORDER_STATUSES.map((s) => ({ value: s, label: STATUS_LABEL[s] })),
+  { value: 'all', label: 'All' },
+]
+
+export const isOrderTab = (v: string | null): v is OrderTab => ORDER_TABS.some((t) => t.value === v)
 
 export interface StatusMove {
   to: OrderStatus

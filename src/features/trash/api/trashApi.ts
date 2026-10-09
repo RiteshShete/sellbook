@@ -1,6 +1,7 @@
 import type { SupabaseClient } from '@supabase/supabase-js'
 import { z } from 'zod'
 import { throwIfError } from '../../../lib/dbError'
+import { pluralize } from '../../../lib/format'
 import { dbMoney } from '../../../lib/zodMoney'
 
 export type TrashTab = 'orders' | 'products' | 'variants'
@@ -75,7 +76,7 @@ export async function fetchTrash(client: SupabaseClient, tab: TrashTab): Promise
         return {
           id: p.id,
           title: p.name,
-          detail: `Product · ${n} variant${n === 1 ? '' : 's'} come back with it`,
+          detail: `Product · ${pluralize(n, 'variant')} come back with it`,
           deleted_at: p.deleted_at,
           amount: null,
         }

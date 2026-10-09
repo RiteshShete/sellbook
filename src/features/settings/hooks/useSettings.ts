@@ -1,7 +1,7 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
-import { useEffect, useMemo } from 'react'
 import { toast } from '../../../components/ui'
 import { queryKeys } from '../../../lib/queryKeys'
+import { useObjectUrl } from '../../../lib/useObjectUrl'
 import { useAuth } from '../../auth/useAuth'
 import {
   downloadAsset,
@@ -25,7 +25,6 @@ export function useUpdateSettings() {
     mutationFn: ({ id, patch }: { id: string; patch: SettingsPatch }) =>
       updateSettings(client, id, patch),
     onSuccess: (s) => queryClient.setQueryData(queryKeys.settings, s),
-    onError: (e: Error) => toast.error(e.message),
   })
 }
 
@@ -39,7 +38,6 @@ export function useAssetChange(kind: AssetKind) {
       queryClient.setQueryData(queryKeys.settings, settings)
       if (oldFileLeft) toast.warning('Saved, but the old image could not be deleted from storage.')
     },
-    onError: (e: Error) => toast.error(e.message),
   })
 }
 
@@ -53,10 +51,6 @@ export function useAssetUrl(path: string | null) {
     enabled: path !== null,
     staleTime: Infinity, // paths are unique per upload, so content never changes
   })
-  const url = useMemo(
-    () => (query.data ? URL.createObjectURL(query.data) : undefined),
-    [query.data],
-  )
-  useEffect(() => () => (url ? URL.revokeObjectURL(url) : undefined), [url])
+  const url = useObjectUrl(query.data)
   return { url, isLoading: query.isLoading, error: query.error, refetch: query.refetch }
 }

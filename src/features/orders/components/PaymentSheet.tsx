@@ -1,7 +1,7 @@
 import { Check } from 'lucide-react'
 import { BottomSheet } from '../../../components/ui'
 import { formatINR } from '../../../lib/money'
-import { useSetPayment } from '../hooks/useOrderActions'
+import { useOrderBusy, useSetPayment } from '../hooks/useOrderActions'
 import { paymentLabel, paymentState, type PaymentState } from '../pipeline'
 import type { Order } from '../schemas'
 
@@ -23,6 +23,7 @@ export interface PaymentSheetProps {
 /** Mark paid (online / cash) or back to not paid. The app never verifies payments. */
 export function PaymentSheet({ order, open, onClose }: PaymentSheetProps) {
   const setPayment = useSetPayment()
+  const busy = useOrderBusy(order.id)
   const current = paymentState(order)
 
   function choose(to: PaymentState) {
@@ -41,11 +42,11 @@ export function PaymentSheet({ order, open, onClose }: PaymentSheetProps) {
               <button
                 type="button"
                 onClick={() => choose(o)}
-                disabled={setPayment.isPending}
+                disabled={busy}
                 aria-pressed={selected}
                 className={`flex min-h-12 w-full items-center justify-between rounded-xl border px-4 text-left font-medium ${selected ? 'border-text bg-surface-strong' : 'border-border bg-surface'}`}
               >
-                {o.payment_status === 'paid' ? paymentLabel(o) : 'Not paid yet'}
+                {paymentLabel(o)}
                 {selected && <Check className="h-5 w-5 text-primary" />}
               </button>
             </li>
