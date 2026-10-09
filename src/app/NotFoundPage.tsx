@@ -11,7 +11,7 @@ export function NotFoundPage() {
         action={
           <Link
             to="/orders"
-            className="inline-flex min-h-11 items-center rounded-xl bg-primary px-4 font-medium text-primary-fg"
+            className="inline-flex min-h-11 items-center rounded-xl bg-primary px-5 text-sm font-semibold text-primary-fg"
           >
             Go to Orders
           </Link>

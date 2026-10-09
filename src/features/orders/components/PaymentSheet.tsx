@@ -43,7 +43,7 @@ export function PaymentSheet({ order, open, onClose }: PaymentSheetProps) {
                 onClick={() => choose(o)}
                 disabled={setPayment.isPending}
                 aria-pressed={selected}
-                className={`flex min-h-12 w-full items-center justify-between rounded-xl border px-4 text-left font-medium ${selected ? 'border-primary bg-primary/10' : 'border-border bg-surface'}`}
+                className={`flex min-h-12 w-full items-center justify-between rounded-xl border px-4 text-left font-medium ${selected ? 'border-text bg-surface-strong' : 'border-border bg-surface'}`}
               >
                 {o.payment_status === 'paid' ? paymentLabel(o) : 'Not paid yet'}
                 {selected && <Check className="h-5 w-5 text-primary" />}

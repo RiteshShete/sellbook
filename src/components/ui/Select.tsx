@@ -24,7 +24,7 @@ export function Select({ label, options, error, className = '', id, ...rest }: S
       <select
         id={selectId}
         aria-invalid={error ? true : undefined}
-        className={`min-h-11 w-full min-w-0 rounded-xl border bg-surface px-3 text-text outline-none focus:border-primary ${error ? 'border-danger' : 'border-border'} ${className}`}
+        className={`min-h-11 w-full min-w-0 rounded-xl border bg-surface px-4 text-text outline-none focus:border-text focus:ring-1 focus:ring-text ${error ? 'border-danger' : 'border-border'} ${className}`}
         {...rest}
       >
         {options.map((o) => (

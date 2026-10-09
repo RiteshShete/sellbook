@@ -52,7 +52,7 @@ export function BillCard({ order }: { order: OrderWithItems }) {
         {!s.qr_path && (
           <p className="text-sm text-muted">
             Tip: add your payment QR in{' '}
-            <Link to="/settings" className="font-medium text-primary">
+            <Link to="/settings" className="font-medium underline underline-offset-4">
               Settings
             </Link>{' '}
             so the bill shows “Scan to pay”.

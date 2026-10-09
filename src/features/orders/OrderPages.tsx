@@ -42,7 +42,7 @@ function WithOrder({ title, render }: { title: string; render: (o: OrderWithItem
           title="Order not found"
           description="It may have been moved to Trash."
           action={
-            <Link to="/orders" className="font-medium text-primary">
+            <Link to="/orders" className="font-medium underline underline-offset-4">
               Back to Orders
             </Link>
           }

@@ -22,10 +22,13 @@ export function TabBar() {
             <NavLink
               to={to}
               className={({ isActive }) =>
-                `flex min-h-14 flex-col items-center justify-center gap-0.5 text-xs font-medium ${isActive ? 'text-primary' : 'text-muted'}`
+                `group flex min-h-14 flex-col items-center justify-center gap-0.5 text-xs font-medium ${isActive ? 'text-text' : 'text-muted'}`
               }
             >
-              <Icon className="h-5 w-5" />
+              {/* Active tab: a cream pill behind the icon (docs/DESIGN.md category-tab-active). */}
+              <span className="flex h-7 w-12 items-center justify-center rounded-full group-aria-[current=page]:bg-surface-strong">
+                <Icon className="h-5 w-5" />
+              </span>
               <span className="truncate">{label}</span>
             </NavLink>
           </li>

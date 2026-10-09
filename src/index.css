@@ -1,52 +1,90 @@
 @import 'tailwindcss';
 
-/* Theme tokens: light by default, dark follows the system setting. */
+/*
+ * Theme tokens from docs/DESIGN.md (warm cream "Clay" system). Light only, by design:
+ * the spec is cream throughout, so the app does not switch to a dark theme.
+ */
 :root {
-  --bg: #f8fafc;
-  --surface: #ffffff;
-  --surface-2: #f1f5f9;
-  --text: #0f172a;
-  --muted: #64748b;
-  --border: #e2e8f0;
-  --primary: #4f46e5;
-  --primary-fg: #ffffff;
-  --danger: #dc2626;
-  --success: #16a34a;
-  --warning: #d97706;
-  color-scheme: light;
-}
+  /* Surfaces */
+  --canvas: #fffaf0;
+  --surface-soft: #faf5e8;
+  --surface-card: #f5f0e0;
+  --surface-strong: #ebe6d6;
+  --hairline: #e5e5e5;
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --bg: #0b1120;
-    --surface: #111a2e;
-    --surface-2: #1b2640;
-    --text: #e5e9f2;
-    --muted: #94a3b8;
-    --border: #243049;
-    --primary: #818cf8;
-    --primary-fg: #0b1120;
-    --danger: #f87171;
-    --success: #4ade80;
-    --warning: #fbbf24;
-    color-scheme: dark;
-  }
+  /* Text */
+  --ink: #0a0a0a;
+  --body: #3a3a3a;
+  --muted: #6a6a6a;
+  --muted-soft: #9a9a9a;
+
+  /* Actions */
+  --primary: #0a0a0a;
+  --primary-active: #1f1f1f;
+  --primary-disabled: #e5e5e5;
+  --on-primary: #ffffff;
+
+  /* Brand card colours */
+  --pink: #ff4d8b;
+  --teal: #1a3a3a;
+  --lavender: #b8a4ed;
+  --peach: #ffb084;
+  --ochre: #e8b94a;
+  --mint: #a4d4c5;
+  --coral: #ff6b5a;
+
+  /*
+   * Semantic. The spec's #ef4444 / #22c55e / #f59e0b are too light for text on cream
+   * (under 4.5:1), so text uses the darker steps of the same hues.
+   */
+  --danger: #dc2626;
+  --success: #15803d;
+  --warning: #b45309;
+
+  /* Chart series: deep lavender + brand pink, validated for colour-blind separation on canvas. */
+  --chart-1: #7b61d9;
+  --chart-2: #ff4d8b;
+
+  /* Aliases used across the app */
+  --bg: var(--canvas);
+  --surface: var(--canvas);
+  --surface-2: var(--surface-card);
+  --text: var(--ink);
+  --border: var(--hairline);
+  --primary-fg: var(--on-primary);
+  color-scheme: light;
 }
 
 @theme inline {
   --color-bg: var(--bg);
   --color-surface: var(--surface);
   --color-surface-2: var(--surface-2);
+  --color-surface-soft: var(--surface-soft);
+  --color-surface-strong: var(--surface-strong);
   --color-text: var(--text);
+  --color-body: var(--body);
   --color-muted: var(--muted);
+  --color-muted-soft: var(--muted-soft);
   --color-border: var(--border);
   --color-primary: var(--primary);
+  --color-primary-active: var(--primary-active);
+  --color-primary-disabled: var(--primary-disabled);
   --color-primary-fg: var(--primary-fg);
   --color-danger: var(--danger);
   --color-success: var(--success);
   --color-warning: var(--warning);
+  --color-pink: var(--pink);
+  --color-teal: var(--teal);
+  --color-lavender: var(--lavender);
+  --color-peach: var(--peach);
+  --color-ochre: var(--ochre);
+  --color-mint: var(--mint);
+  --color-coral: var(--coral);
+  --color-chart-1: var(--chart-1);
+  --color-chart-2: var(--chart-2);
+  /* Inter everywhere (self-hosted, see main.tsx); the spec's display face is not public. */
   --font-sans:
-    system-ui, -apple-system, 'Segoe UI', Roboto, 'Noto Sans', 'Helvetica Neue', Arial, sans-serif;
+    Inter, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Noto Sans', Arial, sans-serif;
 }
 
 html,
@@ -82,4 +120,10 @@ input,
 select,
 textarea {
   font-size: 16px;
+}
+
+/* Display headings: Inter 500 with tight tracking, standing in for the spec's display face. */
+.font-display {
+  font-weight: 500;
+  letter-spacing: -0.02em;
 }

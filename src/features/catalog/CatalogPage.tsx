@@ -7,7 +7,7 @@ import { useProducts } from './hooks/useCatalog'
 import type { Product } from './schemas'
 
 const linkBtn =
-  'inline-flex min-h-11 items-center gap-1 rounded-xl bg-primary px-4 font-medium text-primary-fg'
+  'inline-flex min-h-11 items-center gap-1 rounded-xl bg-primary px-5 text-sm font-semibold text-primary-fg'
 
 function variantSummary(p: Product): string {
   if (p.variants.length === 0) return 'No variants yet'

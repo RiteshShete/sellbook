@@ -27,7 +27,7 @@ export function ItemPicker({ onPick }: { onPick: (v: PickedVariant) => void }) {
     return (
       <p className="rounded-xl bg-surface-2 p-3 text-sm text-muted">
         No active products.{' '}
-        <Link to="/catalog/new" className="font-medium text-primary">
+        <Link to="/catalog/new" className="font-medium underline underline-offset-4">
           Add one in Catalog
         </Link>
       </p>

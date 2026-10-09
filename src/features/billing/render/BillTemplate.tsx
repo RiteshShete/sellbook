@@ -22,11 +22,11 @@ export interface BillData {
   qr: string | null
 }
 
-const muted = 'text-[#6b7180]'
-const line = 'border-[#e6e8ee]'
+const muted = 'text-[#6a6a6a]'
+const line = 'border-[#e5e5e5]'
 
 /**
- * The bill image, styled as a pass card: payment QR on top, details and amount below.
+ * The bill image, styled per docs/DESIGN.md (cream card, teal total): payment QR on top, details and amount below.
  * Fixed width and fixed light colours (never theme tokens); rendered off-screen at 2x.
  */
 export function BillTemplate({ data }: { data: BillData }) {
@@ -35,15 +35,15 @@ export function BillTemplate({ data }: { data: BillData }) {
   return (
     <div
       style={{ width: BILL_WIDTH, fontFamily: BILL_FONT }}
-      className="bg-[#f1f2f5] p-5 text-[15px] leading-snug text-[#14161c] [font-variant-numeric:tabular-nums]"
+      className="bg-[#f5f0e0] p-5 text-[15px] leading-snug text-[#0a0a0a] [font-variant-numeric:tabular-nums]"
     >
-      <div className="overflow-hidden rounded-[28px] bg-white shadow-[0_1px_3px_rgba(0,0,0,0.08)]">
+      <div className="overflow-hidden rounded-[24px] bg-[#fffaf0]">
         <header className="flex items-center gap-3 px-6 pt-6 pb-4">
           {data.logo && (
             <img src={data.logo} alt="" className="h-12 w-12 rounded-xl object-contain" />
           )}
           <div className="min-w-0 flex-1">
-            <p className="text-[20px] font-bold">{shop.name || 'Bill'}</p>
+            <p className="text-[20px] font-semibold">{shop.name || 'Bill'}</p>
             {shop.phone && <p className={`text-[13px] ${muted}`}>Ph: {shop.phone}</p>}
           </div>
           <div className="text-right text-[13px]">
@@ -52,11 +52,11 @@ export function BillTemplate({ data }: { data: BillData }) {
           </div>
         </header>
 
-        <section className="mx-4 flex flex-col items-center gap-3 rounded-[22px] bg-[#f5f6f8] px-5 py-5">
+        <section className="mx-4 flex flex-col items-center gap-3 rounded-[16px] bg-[#faf5e8] px-5 py-5">
           <p className={`self-stretch text-[13px] ${muted}`}>
-            Order <span className="font-semibold text-[#14161c]">#{o.order_no}</span>
+            Order <span className="font-semibold text-[#0a0a0a]">#{o.order_no}</span>
             <span className="px-2">|</span>
-            Date <span className="font-semibold text-[#14161c]">{data.date}</span>
+            Date <span className="font-semibold text-[#0a0a0a]">{data.date}</span>
           </p>
           {data.qr ? (
             // White quiet zone around the code keeps it scannable.
@@ -64,7 +64,7 @@ export function BillTemplate({ data }: { data: BillData }) {
               <img src={data.qr} alt="" className="h-56 w-56 object-contain" />
             </div>
           ) : null}
-          <p className="rounded-full bg-[#e3f6e8] px-4 py-1.5 text-[15px] font-semibold text-[#1a7f3c]">
+          <p className="rounded-full bg-[#a4d4c5] px-4 py-1.5 text-[15px] font-semibold text-[#0a0a0a]">
             {data.qr ? 'Scan to pay' : 'Amount due'} <span className="px-1">|</span>{' '}
             {formatINR(o.total)}
           </p>
@@ -81,7 +81,7 @@ export function BillTemplate({ data }: { data: BillData }) {
               <p className={`text-[13px] ${muted}`}>{formatPhone(o.customer_phone)}</p>
             )}
           </div>
-          <span className="h-fit shrink-0 rounded-lg bg-[#f1f2f5] px-2.5 py-1 text-[13px] font-medium">
+          <span className="h-fit shrink-0 rounded-lg bg-[#f5f0e0] px-2.5 py-1 text-[13px] font-medium">
             {o.items.length} {o.items.length === 1 ? 'item' : 'items'}
           </span>
         </section>
@@ -107,9 +107,9 @@ export function BillTemplate({ data }: { data: BillData }) {
               <Row label="Discount" value={`− ${formatINR(o.discount)}`} />
             </>
           )}
-          <div className="mt-2 flex items-center justify-between rounded-2xl bg-[#14161c] px-4 py-3 text-white">
+          <div className="mt-2 flex items-center justify-between rounded-2xl bg-[#1a3a3a] px-4 py-3 text-white">
             <dt className="text-[15px]">Total amount</dt>
-            <dd className="text-[22px] font-bold">{formatINR(o.total)}</dd>
+            <dd className="text-[22px] font-semibold">{formatINR(o.total)}</dd>
           </div>
         </dl>
 

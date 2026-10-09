@@ -24,7 +24,7 @@ export function DeliveryPage() {
           title="Nothing to deliver"
           description="Orders you mark ready show up here."
           action={
-            <Link to="/orders?tab=new" className="font-medium text-primary">
+            <Link to="/orders?tab=new" className="font-medium underline underline-offset-4">
               See new orders
             </Link>
           }

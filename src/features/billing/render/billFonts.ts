@@ -1,10 +1,10 @@
 import latin400 from '@fontsource/inter/files/inter-latin-400-normal.woff2?url'
 import latin600 from '@fontsource/inter/files/inter-latin-600-normal.woff2?url'
-import latin700 from '@fontsource/inter/files/inter-latin-700-normal.woff2?url'
+import latin500 from '@fontsource/inter/files/inter-latin-500-normal.woff2?url'
 // latin-ext carries the ₹ glyph (U+20B9).
 import ext400 from '@fontsource/inter/files/inter-latin-ext-400-normal.woff2?url'
 import ext600 from '@fontsource/inter/files/inter-latin-ext-600-normal.woff2?url'
-import ext700 from '@fontsource/inter/files/inter-latin-ext-700-normal.woff2?url'
+import ext500 from '@fontsource/inter/files/inter-latin-ext-500-normal.woff2?url'
 
 /** Own family name, so the bill never depends on the app's system font stack. */
 const FAMILY = 'Sellbook Bill'
@@ -16,10 +16,10 @@ const LATIN_EXT = 'U+0100-024F,U+20A0-20C0'
 const FACES = [
   { weight: 400, url: latin400, range: LATIN },
   { weight: 600, url: latin600, range: LATIN },
-  { weight: 700, url: latin700, range: LATIN },
+  { weight: 500, url: latin500, range: LATIN },
   { weight: 400, url: ext400, range: LATIN_EXT },
   { weight: 600, url: ext600, range: LATIN_EXT },
-  { weight: 700, url: ext700, range: LATIN_EXT },
+  { weight: 500, url: ext500, range: LATIN_EXT },
 ]
 
 export function blobToDataUrl(blob: Blob): Promise<string> {
@@ -57,7 +57,7 @@ export function billFontCss(): Promise<string> {
     style.textContent = css
     document.head.appendChild(style)
     await Promise.all(
-      [400, 600, 700].map((w) => document.fonts.load(`${w} 16px '${FAMILY}'`, 'Bill ₹0')),
+      [400, 500, 600].map((w) => document.fonts.load(`${w} 16px '${FAMILY}'`, 'Bill ₹0')),
     )
     return css
   })().catch((e: unknown) => {
