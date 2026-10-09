@@ -35,7 +35,7 @@ function Row({ row }: { row: AuditRow }) {
   )
   return (
     <li className="px-4 py-3">
-      {row.entity === 'order' && row.entity_id ? (
+      {(row.entity === 'order' || row.entity === 'bill') && row.entity_id ? (
         <Link to={`/orders/${row.entity_id}`} className="block">
           {text}
         </Link>

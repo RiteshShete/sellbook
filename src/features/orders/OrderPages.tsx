@@ -2,6 +2,7 @@ import type { ReactNode } from 'react'
 import { Link, useParams } from 'react-router-dom'
 import { Page } from '../../app/Page'
 import { EmptyState, ErrorState, Skeleton } from '../../components/ui'
+import { BillCard } from '../billing/components/BillCard'
 import { OrderActions } from './components/OrderActions'
 import { OrderForm } from './components/OrderForm'
 import { OrderMoreActions } from './components/OrderMoreActions'
@@ -72,6 +73,7 @@ export function OrderDetailPage() {
           <div className="flex flex-col gap-4">
             <OrderSummary order={o} />
             <OrderActions order={o} />
+            <BillCard order={o} />
             <OrderMoreActions order={o} />
           </div>
         </Page>
