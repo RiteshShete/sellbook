@@ -446,6 +446,7 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      bill_content_hash: { Args: { p_order: string }; Returns: string }
       check_order_rules: { Args: { p_order: string }; Returns: undefined }
       compute_order_total: {
         Args: { p_discount: number; p_order: string }
@@ -521,10 +522,33 @@ export type Database = {
         Args: { p_order: string; p_reason: string; p_summary: string }
         Returns: undefined
       }
+      register_bill_revision: {
+        Args: { p_hash: string; p_order: string; p_path: string }
+        Returns: {
+          bill_no: number
+          created_at: string
+          generated_at: string
+          id: string
+          image_path: string
+          items_hash: string
+          order_id: string
+          owner_id: string
+          revision: number
+          total_at_generation: number
+          updated_at: string
+        }
+        SetofOptions: {
+          from: '*'
+          to: 'bills'
+          isOneToOne: true
+          isSetofReturn: false
+        }
+      }
       replace_order_items: {
         Args: { p_items: Json; p_order: string }
         Returns: undefined
       }
+      reserve_bill_number: { Args: { p_order: string }; Returns: Json }
       restore_order: {
         Args: { p_id: string }
         Returns: {
