@@ -61,11 +61,15 @@ describe('sizeToInput', () => {
     expect(sizeToInput('g', 250)).toEqual({ text: '250', unit: 'g' })
     expect(sizeToInput('ml', 2000)).toEqual({ text: '2', unit: 'L' })
     expect(sizeToInput('pcs', 6)).toEqual({ text: '6', unit: 'pcs' })
+    // Fractions of a gram / ml stay in g / ml so the text parses back.
+    expect(sizeToInput('g', 1000.5)).toEqual({ text: '1000.5', unit: 'g' })
+    expect(sizeToInput('ml', 1500.25)).toEqual({ text: '1500.25', unit: 'ml' })
   })
   it('round-trips through parseSizeInput', () => {
     for (const [unit, amount] of [
       ['g', 1250],
       ['g', 333],
+      ['g', 1250.5],
       ['ml', 1500],
       ['pcs', 12],
     ] as const) {

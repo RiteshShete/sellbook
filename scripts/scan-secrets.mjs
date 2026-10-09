@@ -18,9 +18,15 @@ const EXTS = new Set([
   '.env',
   '.html',
   '.md',
+  '.sh',
+  '.cjs',
+  '.jsx',
+  '.txt',
 ])
 const JWT = /eyJ[A-Za-z0-9_-]{10,}\.[A-Za-z0-9_-]{10,}\.[A-Za-z0-9_-]{10,}/g
 const SERVICE = /service_role/i
+// Supabase's newer secret API keys are not JWTs: sb_secret_...
+const SB_SECRET = /sb_secret_[A-Za-z0-9_-]{10,}/
 
 function git(args) {
   return execFileSync('git', args, { encoding: 'utf8' }).split('\n').filter(Boolean)
@@ -45,6 +51,7 @@ for (const p of git(['ls-files', '--cached', '--others', '--exclude-standard']))
   const text = readFileSync(p, 'utf8')
   if (text.match(JWT)) hits.push(`${p}: JWT-shaped token`)
   if (SERVICE.test(text)) hits.push(`${p}: mentions service_role`)
+  if (SB_SECRET.test(text)) hits.push(`${p}: contains an sb_secret_ key`)
 }
 
 // 2. Git-ignored local env files: the anon key is fine, a service_role key is not.
@@ -52,6 +59,7 @@ for (const p of git(['ls-files', '--others', '--ignored', '--exclude-standard', 
   if (!basename(p).startsWith('.env') || !existsSync(p)) continue
   const text = readFileSync(p, 'utf8')
   if (SERVICE.test(text)) hits.push(`${p}: mentions service_role`)
+  if (SB_SECRET.test(text)) hits.push(`${p}: contains an sb_secret_ key`)
   for (const token of text.match(JWT) ?? []) {
     if (jwtRole(token) === 'service_role') hits.push(`${p}: contains a service_role JWT`)
   }

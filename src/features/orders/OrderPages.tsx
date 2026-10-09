@@ -1,7 +1,7 @@
-import type { ReactNode } from 'react'
+import { useState, type ReactNode } from 'react'
 import { Link, useParams } from 'react-router-dom'
 import { Page } from '../../app/Page'
-import { EmptyState, ErrorState, Skeleton } from '../../components/ui'
+import { Button, EmptyState, ErrorState, Skeleton } from '../../components/ui'
 import { BillCard } from '../billing/components/BillCard'
 import { OrderActions } from './components/OrderActions'
 import { OrderForm } from './components/OrderForm'
@@ -82,12 +82,25 @@ export function OrderDetailPage() {
   )
 }
 
+/**
+ * Edits the order as it was when editing began. If it is saved elsewhere meanwhile (refetch,
+ * realtime), the typed changes stay and a notice offers to reload; saving the old version would
+ * fail with SB409 anyway.
+ */
+function EditOrder({ order }: { order: OrderWithItems }) {
+  const [base, setBase] = useState(order)
+  const notice =
+    order.version_no !== base.version_no ? (
+      <div className="flex items-center gap-3 rounded-2xl bg-surface-2 p-4 text-sm" role="status">
+        <p className="flex-1">This order was changed on another device or tab.</p>
+        <Button variant="secondary" onClick={() => setBase(order)}>
+          Reload
+        </Button>
+      </div>
+    ) : undefined
+  return <OrderForm key={base.version_no} order={base} notice={notice} />
+}
+
 export function OrderEditPage() {
-  return (
-    <WithOrder
-      title="Edit order"
-      // Keyed by version: if another device saved meanwhile, the form reloads with fresh data.
-      render={(o) => <OrderForm key={`${o.id}:${o.version_no}`} order={o} />}
-    />
-  )
+  return <WithOrder title="Edit order" render={(o) => <EditOrder key={o.id} order={o} />} />
 }

@@ -1,4 +1,5 @@
 import { z } from 'zod'
+import { pluralize } from './format'
 
 /**
  * Variant sizes. The database stores amounts in base units (grams, millilitres, pieces) as
@@ -38,7 +39,7 @@ export function formatTotals(t: MeasureTotals): string[] {
   if (t.grams > 0) parts.push(formatMeasure('g', t.grams))
   if (t.ml > 0) parts.push(formatMeasure('ml', t.ml))
   if (t.pieces > 0) parts.push(formatMeasure('pcs', t.pieces))
-  if (t.unsized > 0) parts.push(`${t.unsized} ${t.unsized === 1 ? 'item' : 'items'}`)
+  if (t.unsized > 0) parts.push(pluralize(t.unsized, 'item'))
   return parts
 }
 
@@ -84,8 +85,10 @@ export function sizeToInput(
 ): { text: string; unit: InputUnit } {
   if (unit === null || amount === null) return { text: '', unit: 'g' }
   const th = Math.round(amount * 1000)
-  if (unit === 'g' && th >= 1_000_000) return { text: thousandthsToString(th / 1000), unit: 'kg' }
-  if (unit === 'ml' && th >= 1_000_000) return { text: thousandthsToString(th / 1000), unit: 'L' }
+  // Only whole grams / ml switch to kg / L: 1250.5 g would need 4 decimals as kg and not re-parse.
+  if (unit !== 'pcs' && th >= 1_000_000 && th % 1000 === 0) {
+    return { text: thousandthsToString(th / 1000), unit: unit === 'g' ? 'kg' : 'L' }
+  }
   return { text: thousandthsToString(th), unit }
 }
 

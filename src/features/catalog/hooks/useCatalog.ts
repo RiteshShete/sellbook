@@ -1,5 +1,4 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
-import { toast } from '../../../components/ui'
 import { invalidateCatalog } from '../../../lib/invalidate'
 import { queryKeys } from '../../../lib/queryKeys'
 import { useAuth } from '../../auth/useAuth'
@@ -27,13 +26,12 @@ export function useProduct(id: string | undefined) {
   })
 }
 
-/** Shared by every catalog mutation: refresh catalog queries, toast failures. */
+/** Shared by every catalog mutation: refresh catalog queries (failures toast centrally). */
 function useCatalogMutation<TArg, TResult>(fn: (arg: TArg) => Promise<TResult>) {
   const queryClient = useQueryClient()
   return useMutation({
     mutationFn: fn,
     onSuccess: () => invalidateCatalog(queryClient),
-    onError: (e: Error) => toast.error(e.message),
   })
 }
 

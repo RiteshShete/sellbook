@@ -19,7 +19,7 @@ const FILTERS: { value: ActivityEntity; label: string }[] = [
 function useActivity(entity: ActivityEntity) {
   const { client } = useAuth()
   return useInfiniteQuery({
-    queryKey: queryKeys.activity(entity),
+    queryKey: queryKeys.activity.list(entity),
     queryFn: ({ pageParam }) => fetchActivity(client, entity, pageParam),
     initialPageParam: null as number | null,
     getNextPageParam: (last) => (last.length === ACTIVITY_PAGE ? (last.at(-1)?.id ?? null) : null),

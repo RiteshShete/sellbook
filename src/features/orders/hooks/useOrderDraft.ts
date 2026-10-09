@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { todayIST } from '../../../lib/dates'
 import { uuid } from '../../../lib/id'
 import type { Paise } from '../../../lib/money'
+import { toNationalPhone } from '../../../lib/phone'
 import { MAX_QTY, type LineDraft, type OrderDraft, type OrderErrors } from '../schemas'
 
 export interface PickedVariant {
@@ -37,7 +38,11 @@ export function useOrderDraft(initial?: OrderDraft) {
     setErrors,
     setField: (key: TextField, value: string) => setDraft((d) => ({ ...d, [key]: value })),
     pickCustomer: (name: string, phone: string | null) =>
-      setDraft((d) => ({ ...d, customer_name: name, customer_phone: phone ? phone.slice(2) : '' })),
+      setDraft((d) => ({
+        ...d,
+        customer_name: name,
+        customer_phone: phone ? toNationalPhone(phone) : '',
+      })),
     /** Adds one; merges into an existing line only if it has the same variant AND price. */
     addVariant: (v: PickedVariant) =>
       setLines((lines) => {

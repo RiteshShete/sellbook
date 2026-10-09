@@ -63,6 +63,8 @@ export type PendingRow = z.infer<typeof PendingRowSchema>
 export const ExportRowSchema = z.object({
   order_no: count,
   bill_no: count.nullable(),
+  /** The order's own snapshotted prefix (nullish until migration 20261014100000 is applied). */
+  bill_prefix: z.string().nullish(),
   order_date: z.string(),
   delivered_at: z.string(),
   customer_name: z.string(),

@@ -8,12 +8,16 @@ import { useAuth } from '../../auth/useAuth'
 import { fetchExportRows, fetchMonthAnalytics, fetchPendingPayments } from '../api/analyticsApi'
 import { buildOrdersCsv, csvFileName } from '../exportCsv'
 
-export function useMonthAnalytics(month: string) {
+/**
+ * `keepPrevious`: month arrows keep the old numbers (dimmed) until the new ones land. Off for the
+ * comparison month, whose stale data would be labelled with the wrong month.
+ */
+export function useMonthAnalytics(month: string, { keepPrevious = false } = {}) {
   const { client } = useAuth()
   return useQuery({
     queryKey: queryKeys.analytics.month(month),
     queryFn: () => fetchMonthAnalytics(client, month),
-    placeholderData: keepPreviousData, // month arrows keep the old numbers until the new ones land
+    placeholderData: keepPrevious ? keepPreviousData : undefined,
   })
 }
 
@@ -38,6 +42,5 @@ export function useExportCsv() {
       if (count === 0) toast.info(`No delivered orders in ${formatMonth(month)} to export.`)
       else toast.success(`Saved ${pluralize(count, 'order')} for ${formatMonth(month)}.`)
     },
-    onError: (e: Error) => toast.error(e.message),
   })
 }

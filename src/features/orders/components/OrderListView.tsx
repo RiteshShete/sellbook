@@ -4,15 +4,8 @@ import { EmptyState, ErrorState, SegmentedControl, Skeleton } from '../../../com
 import { useDebouncedValue } from '../../../lib/useDebouncedValue'
 import { LIST_LIMIT, type OrderTab } from '../api/ordersApi'
 import { useOrders } from '../hooks/useOrders'
+import { ORDER_TABS } from '../pipeline'
 import { OrderCard } from './OrderCard'
-
-export const ORDER_TABS: { value: OrderTab; label: string }[] = [
-  { value: 'new', label: 'New' },
-  { value: 'ready', label: 'Ready' },
-  { value: 'delivered', label: 'Delivered' },
-  { value: 'cancelled', label: 'Cancelled' },
-  { value: 'all', label: 'All' },
-]
 
 interface Props {
   tab: OrderTab

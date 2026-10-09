@@ -26,7 +26,6 @@ export function useRollback() {
     mutationFn: (v: { order: Pick<Order, 'id' | 'version_no'>; target: number }) =>
       rollbackOrder(client, v.order.id, v.target, v.order.version_no),
     onSuccess: (_o, v) => toast.success(`Rolled back to version ${v.target}`),
-    onError: (e: Error) => toast.error(e.message),
     onSettled: () => invalidateOrders(qc),
   })
 }
@@ -42,7 +41,6 @@ export function useTrashOrder() {
       toast.success(`#${o.order_no} moved to Trash`, {
         action: { label: 'Undo', onClick: () => restore.mutate(o) },
       }),
-    onError: (e) => toast.error(e.message),
     onSettled: () => invalidateOrders(qc),
   })
   return m
@@ -54,7 +52,6 @@ export function useRestoreOrder() {
   return useMutation({
     mutationFn: (o: Pick<Order, 'id' | 'order_no'>) => restoreOrder(client, o.id),
     onSuccess: (o) => toast.success(`#${o.order_no} restored`),
-    onError: (e: Error) => toast.error(e.message),
     onSettled: () => invalidateOrders(qc),
   })
 }

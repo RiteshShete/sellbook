@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { SegmentedControl } from '../../../components/ui'
+import { pluralize } from '../../../lib/format'
 import { formatTotals, type MeasureTotals } from '../../../lib/measure'
 import { formatINR, type Paise } from '../../../lib/money'
 import type { MonthAnalytics } from '../schemas'
@@ -53,9 +54,7 @@ export function Breakdown({ a }: { a: MonthAnalytics }) {
               <tr key={r.key} className="border-t border-border">
                 <td className="py-2 pr-2 break-words">
                   {r.name}
-                  <span className="block text-xs text-muted">
-                    {r.orders} {r.orders === 1 ? 'order' : 'orders'}
-                  </span>
+                  <span className="block text-xs text-muted">{pluralize(r.orders, 'order')}</span>
                 </td>
                 <td className="py-2 text-right align-top">
                   {r.units}

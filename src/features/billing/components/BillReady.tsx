@@ -29,8 +29,10 @@ export function BillReady({ order, settings, state, regenerating, onRegenerate }
   if (!latest) return null
 
   const outdated = isOutdated(state)
-  const billNo = formatBillNo(settings.bill_prefix, latest.bill_no)
-  const fileName = billFileName(settings.bill_prefix, latest.bill_no)
+  // The prefix the bill was printed with (B6), not today's Settings value.
+  const prefix = order.bill_prefix ?? settings.bill_prefix
+  const billNo = formatBillNo(prefix, latest.bill_no)
+  const fileName = billFileName(prefix, latest.bill_no)
   const text = billShareText(order, settings, billNo, latest.total_at_generation)
   const wa = order.customer_phone ? toWaMeLink(order.customer_phone, text) : null
 
@@ -91,7 +93,7 @@ export function BillReady({ order, settings, state, regenerating, onRegenerate }
         <Share2 className="h-5 w-5" /> Share bill
       </Button>
       <div className="flex flex-wrap gap-2">
-        {wa && (
+        {wa && !outdated && (
           <a
             href={wa}
             target="_blank"

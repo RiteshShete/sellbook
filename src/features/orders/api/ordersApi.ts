@@ -60,7 +60,7 @@ export async function fetchOrder(
 ): Promise<OrderWithItems | null> {
   const { data, error } = await client
     .from('orders')
-    .select('*, order_items (*, variants (size_amount, size_unit))')
+    .select('*, order_items (*)')
     .eq('id', id)
     .is('deleted_at', null)
     .maybeSingle()

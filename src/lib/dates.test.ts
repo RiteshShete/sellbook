@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest'
 import {
   formatDate,
+  formatDayMonth,
   formatDateTime,
   formatMonth,
   formatMonthShort,
@@ -104,5 +105,12 @@ describe('month keys and labels', () => {
     expect(formatMonth('2026-10')).toBe('October 2026')
     expect(formatMonth('2027-01')).toBe('January 2027')
     expect(formatMonthShort('2026-09')).toBe('Sep')
+  })
+})
+
+describe('formatDayMonth', () => {
+  it('formats the IST day', () => {
+    expect(formatDayMonth('2026-10-12')).toBe('12 Oct')
+    expect(formatDayMonth(new Date('2026-09-30T18:30:00Z'))).toBe('01 Oct')
   })
 })

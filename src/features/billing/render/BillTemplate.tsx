@@ -1,4 +1,4 @@
-import { formatPhone } from '../../../lib/format'
+import { formatPhone, pluralize } from '../../../lib/format'
 import { addMoney, formatINR } from '../../../lib/money'
 import type { BillSource } from '../schemas'
 import { BILL_FONT } from './billFonts'
@@ -82,7 +82,7 @@ export function BillTemplate({ data }: { data: BillData }) {
             )}
           </div>
           <span className="h-fit shrink-0 rounded-lg bg-[#f5f0e0] px-2.5 py-1 text-[13px] font-medium">
-            {o.items.length} {o.items.length === 1 ? 'item' : 'items'}
+            {pluralize(o.items.length, 'item')}
           </span>
         </section>
 

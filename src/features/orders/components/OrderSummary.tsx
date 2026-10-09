@@ -3,7 +3,7 @@ import { formatDate } from '../../../lib/dates'
 import { formatPhone } from '../../../lib/format'
 import { formatTotals, sumLines } from '../../../lib/measure'
 import { formatINR } from '../../../lib/money'
-import { toWaMeLink } from '../../../lib/phone'
+import { toTelLink, toWaMeLink } from '../../../lib/phone'
 import { itemSize, type OrderWithItems } from '../schemas'
 import { DueBadge, PaymentBadge, StatusBadge } from './OrderBadges'
 
@@ -33,7 +33,7 @@ export function OrderSummary({ order }: { order: OrderWithItems }) {
           </p>
         </div>
         {order.customer_phone && (
-          <a href={`tel:+${order.customer_phone}`} className={iconLink} aria-label="Call">
+          <a href={toTelLink(order.customer_phone)} className={iconLink} aria-label="Call">
             <Phone className="h-5 w-5" />
           </a>
         )}

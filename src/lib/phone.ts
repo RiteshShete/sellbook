@@ -11,6 +11,16 @@ export function normalizePhone(input: string): string | null {
   return /^[6-9]\d{9}$/.test(national) ? `91${national}` : null
 }
 
+/** "919876543210" -> "9876543210" (what the owner types in the form). */
+export function toNationalPhone(phone: string): string {
+  return normalizePhone(phone)?.slice(2) ?? phone
+}
+
+/** tel: link for a stored phone, e.g. "tel:+919876543210". */
+export function toTelLink(phone: string): string {
+  return `tel:+${normalizePhone(phone) ?? phone.replace(/D/g, '')}`
+}
+
 /** wa.me chat link (text only; WhatsApp cannot receive a file via URL). null if phone invalid. */
 export function toWaMeLink(phone: string, text?: string): string | null {
   const normalized = normalizePhone(phone)

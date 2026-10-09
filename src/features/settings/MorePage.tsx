@@ -2,7 +2,7 @@ import { useMutation } from '@tanstack/react-query'
 import { ChevronRight } from 'lucide-react'
 import { Link } from 'react-router-dom'
 import { Page } from '../../app/Page'
-import { Button, toast } from '../../components/ui'
+import { Button } from '../../components/ui'
 import { useAuth } from '../auth/useAuth'
 
 const LINKS = [
@@ -16,7 +16,6 @@ export function MorePage() {
   const { session, signOut } = useAuth()
   const logout = useMutation({
     mutationFn: signOut,
-    onError: (e: Error) => toast.error(e.message),
   })
 
   return (

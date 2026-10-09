@@ -1,5 +1,6 @@
 import { Bar, BarChart, CartesianGrid, ResponsiveContainer, Tooltip, XAxis, YAxis } from 'recharts'
 import { formatDate } from '../../../lib/dates'
+import { pluralize } from '../../../lib/format'
 import { formatINR, fromPaise } from '../../../lib/money'
 import type { MonthAnalytics } from '../schemas'
 
@@ -104,9 +105,7 @@ function TipBox({ point }: { point: Point }) {
     <div className="rounded-xl border border-border bg-surface px-3 py-2 text-sm shadow-md">
       <p className="text-muted">{formatDate(point.date)}</p>
       <p className="font-semibold tabular-nums">{formatINR(point.paise)}</p>
-      <p className="text-muted">
-        {point.orders} {point.orders === 1 ? 'order' : 'orders'}
-      </p>
+      <p className="text-muted">{pluralize(point.orders, 'order')}</p>
     </div>
   )
 }

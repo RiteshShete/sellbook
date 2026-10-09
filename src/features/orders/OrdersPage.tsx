@@ -3,8 +3,9 @@ import { Link, useSearchParams } from 'react-router-dom'
 import { Page } from '../../app/Page'
 import { SegmentedControl } from '../../components/ui'
 import type { OrderTab } from './api/ordersApi'
-import { ORDER_TABS, OrderListView } from './components/OrderListView'
+import { OrderListView } from './components/OrderListView'
 import { PrepList } from './components/PrepList'
+import { isOrderTab } from './pipeline'
 
 type View = 'orders' | 'prep'
 
@@ -13,8 +14,6 @@ const VIEWS: { value: View; label: string }[] = [
   { value: 'prep', label: 'To prepare' },
 ]
 
-const isTab = (v: string | null): v is OrderTab => ORDER_TABS.some((t) => t.value === v)
-
 const newLink =
   'inline-flex min-h-11 items-center gap-1 rounded-xl bg-primary px-5 text-sm font-semibold text-primary-fg'
 
@@ -22,7 +21,7 @@ const newLink =
 export function OrdersPage() {
   const [params, setParams] = useSearchParams()
   const raw = params.get('tab')
-  const tab: OrderTab = isTab(raw) ? raw : 'new'
+  const tab: OrderTab = isOrderTab(raw) ? raw : 'new'
   const view: View = params.get('view') === 'prep' ? 'prep' : 'orders'
 
   const action = (
@@ -38,7 +37,9 @@ export function OrdersPage() {
           label="View"
           options={VIEWS}
           value={view}
-          onChange={(v) => setParams(v === 'prep' ? { view: 'prep' } : { tab }, { replace: true })}
+          onChange={(v) =>
+            setParams(v === 'prep' ? { view: 'prep', tab } : { tab }, { replace: true })
+          }
         />
         {view === 'prep' ? (
           <PrepList />

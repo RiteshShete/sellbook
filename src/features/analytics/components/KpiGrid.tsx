@@ -1,6 +1,7 @@
 import { ChevronRight, TrendingDown, TrendingUp } from 'lucide-react'
 import type { ReactNode } from 'react'
 import { Link } from 'react-router-dom'
+import { pluralize } from '../../../lib/format'
 import { formatINR } from '../../../lib/money'
 import { percentChange, type MonthAnalytics } from '../schemas'
 
@@ -56,7 +57,7 @@ export function KpiGrid({ current: c, previous: p, previousLabel }: Props) {
             {formatINR(c.outstanding_total)}
           </span>
           <span className={`ml-2 text-sm ${TONE.peach.sub}`}>
-            {c.outstanding_count} unpaid {c.outstanding_count === 1 ? 'order' : 'orders'}
+            {pluralize(c.outstanding_count, 'unpaid order')}
           </span>
         </span>
         <ChevronRight className="h-5 w-5 shrink-0" />
