@@ -58,7 +58,7 @@ export function ProductForm({ product }: { product?: Product }) {
   }
 
   return (
-    <Page title={product ? 'Edit product' : 'New product'}>
+    <Page title={product ? 'Edit product' : 'New product'} back="/catalog">
       <form onSubmit={onSubmit} noValidate className="flex flex-col gap-4">
         <Input
           label="Product name"

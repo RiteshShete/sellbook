@@ -8,7 +8,7 @@ export function SettingsPage() {
   const settings = useSettings()
 
   return (
-    <Page title="Settings">
+    <Page title="Settings" back="/more">
       {settings.isPending ? (
         <div className="flex flex-col gap-3" role="status" aria-label="Loading">
           <Skeleton className="h-96 w-full" />

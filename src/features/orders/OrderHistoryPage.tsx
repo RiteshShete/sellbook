@@ -17,7 +17,7 @@ export function OrderHistoryPage() {
     void versions.refetch()
   }
   return (
-    <Page title={title}>
+    <Page title={title} back={`/orders/${id}`}>
       {order.isPending || versions.isPending ? (
         <div className="flex flex-col gap-3" role="status" aria-label="Loading">
           <Skeleton className="h-28 w-full" />

@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { dueGroup, groupByDue, nextDay } from './groupByDue'
+import { dueGroup, groupByDue, nextDay } from './dueGroups'
 
 describe('nextDay', () => {
   it('crosses month and year ends', () => {

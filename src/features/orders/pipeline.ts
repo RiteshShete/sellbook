@@ -8,10 +8,10 @@ export const STATUS_LABEL: Record<OrderStatus, string> = {
   cancelled: 'Cancelled',
 }
 
-/** Order list tabs: one per status, then All. */
+/** All orders screen filters: All first (it is a search screen), then one per status. */
 export const ORDER_TABS: { value: OrderTab; label: string }[] = [
-  ...ORDER_STATUSES.map((s) => ({ value: s, label: STATUS_LABEL[s] })),
   { value: 'all', label: 'All' },
+  ...ORDER_STATUSES.map((s) => ({ value: s, label: STATUS_LABEL[s] })),
 ]
 
 export const isOrderTab = (v: string | null): v is OrderTab => ORDER_TABS.some((t) => t.value === v)

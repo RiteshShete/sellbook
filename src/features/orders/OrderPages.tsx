@@ -20,7 +20,7 @@ function WithOrder({ title, render }: { title: string; render: (o: OrderWithItem
 
   if (order.isPending) {
     return (
-      <Page title={title}>
+      <Page title={title} back="/">
         <div className="flex flex-col gap-3" role="status" aria-label="Loading">
           <Skeleton className="h-20 w-full" />
           <Skeleton className="h-40 w-full" />
@@ -30,20 +30,20 @@ function WithOrder({ title, render }: { title: string; render: (o: OrderWithItem
   }
   if (order.isError) {
     return (
-      <Page title={title}>
+      <Page title={title} back="/">
         <ErrorState error={order.error} onRetry={() => void order.refetch()} />
       </Page>
     )
   }
   if (order.data === null) {
     return (
-      <Page title={title}>
+      <Page title={title} back="/">
         <EmptyState
           title="Order not found"
           description="It may have been moved to Trash."
           action={
-            <Link to="/orders" className="font-medium underline underline-offset-4">
-              Back to Orders
+            <Link to="/" className="font-medium underline underline-offset-4">
+              Back to Home
             </Link>
           }
         />
@@ -64,6 +64,7 @@ export function OrderDetailPage() {
       render={(o) => (
         <Page
           title={`Order #${o.order_no}`}
+          back="/"
           action={
             <Link to={`/orders/${o.id}/edit`} className={editLink}>
               Edit

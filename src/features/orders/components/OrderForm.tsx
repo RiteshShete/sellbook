@@ -42,7 +42,10 @@ export function OrderForm({ order, notice }: { order?: OrderWithItems; notice?: 
   }
 
   return (
-    <Page title={order ? `Edit order #${order.order_no}` : 'New order'}>
+    <Page
+      title={order ? `Edit order #${order.order_no}` : 'New order'}
+      back={order ? `/orders/${order.id}` : '/'}
+    >
       <form onSubmit={onSubmit} noValidate className="flex flex-col gap-4">
         {notice}
         <CustomerFields form={form} />

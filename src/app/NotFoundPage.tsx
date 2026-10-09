@@ -10,7 +10,7 @@ export function NotFoundPage() {
         description="That address doesn't exist."
         action={
           <Link
-            to="/orders"
+            to="/"
             className="inline-flex min-h-11 items-center rounded-xl bg-primary px-5 text-sm font-semibold text-primary-fg"
           >
             Go to Orders
