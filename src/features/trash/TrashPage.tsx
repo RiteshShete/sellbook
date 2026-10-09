@@ -19,7 +19,7 @@ export function TrashPage() {
   const restore = useRestore()
 
   return (
-    <Page title="Trash">
+    <Page title="Trash" back="/more">
       <div className="flex flex-col gap-3">
         <SegmentedControl label="Trash type" options={TABS} value={tab} onChange={setTab} />
         {list.isPending ? (

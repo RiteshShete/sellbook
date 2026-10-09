@@ -32,7 +32,7 @@ export function OrderMoreActions({ order }: { order: Pick<Order, 'id' | 'order_n
         onCancel={() => setConfirm(false)}
         onConfirm={() =>
           trash.mutate(order, {
-            onSuccess: () => void navigate('/orders', { replace: true }),
+            onSuccess: () => void navigate('/', { replace: true }),
           })
         }
       />

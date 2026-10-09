@@ -34,7 +34,7 @@ export function PrepList() {
     <div className="flex flex-col gap-3">
       <p className="text-sm text-muted">
         From {pluralize(prep.data.orders, 'new order')}.{' '}
-        <Link to="/orders?tab=new" className="font-medium text-text underline underline-offset-4">
+        <Link to="/" replace className="font-medium text-text underline underline-offset-4">
           See them
         </Link>
       </p>

@@ -23,7 +23,7 @@ export function PendingPage() {
   const [bucket, setBucket] = useState<AgeBucket | null>(null)
 
   return (
-    <Page title="Pending payments">
+    <Page title="Pending payments" back="/more">
       {pending.isPending ? (
         <div className="flex flex-col gap-3" role="status" aria-label="Loading">
           <Skeleton className="h-20 w-full" />

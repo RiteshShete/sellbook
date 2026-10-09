@@ -12,7 +12,7 @@ function safeTarget(from: unknown): string {
     !from.startsWith('//') &&
     from !== '/login'
     ? from
-    : '/orders'
+    : '/'
 }
 
 export function LoginPage() {

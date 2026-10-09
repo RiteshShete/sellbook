@@ -53,7 +53,7 @@ export function ActivityPage() {
   const rows = activity.data?.pages.flat() ?? []
 
   return (
-    <Page title="Activity">
+    <Page title="Activity" back="/more">
       <div className="flex flex-col gap-3">
         <SegmentedControl label="Show" options={FILTERS} value={entity} onChange={setEntity} />
         {activity.isPending ? (

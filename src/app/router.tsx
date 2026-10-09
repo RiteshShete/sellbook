@@ -1,4 +1,4 @@
-import { createBrowserRouter, Navigate, type RouteObject } from 'react-router-dom'
+import { createBrowserRouter, type RouteObject } from 'react-router-dom'
 import { RequireAuth } from '../features/auth/RequireAuth'
 import { AppLayout } from './AppLayout'
 import { NotFoundPage } from './NotFoundPage'
@@ -19,10 +19,10 @@ const routes: RouteObject[] = [
     ),
     errorElement: <RouteError />,
     children: [
-      { index: true, element: <Navigate to="/orders" replace /> },
+      { index: true, lazy: lazyPage(() => import('../features/orders/HomePage'), 'HomePage') },
       {
         path: 'orders',
-        lazy: lazyPage(() => import('../features/orders/OrdersPage'), 'OrdersPage'),
+        lazy: lazyPage(() => import('../features/orders/AllOrdersPage'), 'AllOrdersPage'),
       },
       {
         path: 'orders/new',
@@ -84,4 +84,7 @@ const routes: RouteObject[] = [
   },
 ]
 
-export const router = createBrowserRouter(routes)
+/** Vite's base ("/sellbook/" on GitHub Pages, "/" locally) without the trailing slash. */
+const basename = import.meta.env.BASE_URL.replace(/\/+$/, '') || '/'
+
+export const router = createBrowserRouter(routes, { basename })

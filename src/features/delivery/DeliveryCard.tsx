@@ -1,17 +1,23 @@
+import { Phone } from 'lucide-react'
 import { useState } from 'react'
 import { Link } from 'react-router-dom'
 import { Button } from '../../components/ui'
 import { formatINR } from '../../lib/money'
-import { PaymentBadge } from '../orders/components/OrderBadges'
-import { PaymentSheet } from '../orders/components/PaymentSheet'
-import { useOrderBusy, useSetStatus } from '../orders/hooks/useOrderActions'
+import { toTelLink } from '../../lib/phone'
+import { DueBadge, PaymentBadge } from '../orders/components/OrderBadges'
+import { useDeliver, useOrderBusy } from '../orders/hooks/useOrderActions'
 import type { OrderListRow } from '../orders/schemas'
+import { DeliverSheet } from './DeliverSheet'
 
-/** One ready order: what to deliver, one-tap delivered, payment shortcut. */
+/**
+ * One ready order: what to hand over, a call button, and Delivered. Unpaid orders ask about the
+ * payment in the same step; already-paid ones are delivered straight away.
+ */
 export function DeliveryCard({ order }: { order: OrderListRow }) {
-  const setStatus = useSetStatus()
+  const deliver = useDeliver()
   const busy = useOrderBusy(order.id)
-  const [payOpen, setPayOpen] = useState(false)
+  const [sheetOpen, setSheetOpen] = useState(false)
+  const paid = order.payment_status === 'paid'
 
   return (
     <li className="flex flex-col gap-2 p-4">
@@ -20,28 +26,31 @@ export function DeliveryCard({ order }: { order: OrderListRow }) {
           <span className="min-w-0 truncate font-medium">
             <span className="text-muted">#{order.order_no}</span> {order.customer_name}
           </span>
-          <span className="shrink-0 font-semibold">{formatINR(order.total)}</span>
+          <span className="shrink-0 font-semibold tabular-nums">{formatINR(order.total)}</span>
         </div>
         <p className="text-sm text-muted">{order.itemsSummary || 'No items'}</p>
       </Link>
       <div className="flex items-center gap-2">
         <PaymentBadge order={order} />
+        <DueBadge order={order} />
+        {order.customer_phone && (
+          <a
+            href={toTelLink(order.customer_phone)}
+            aria-label={`Call ${order.customer_name}`}
+            className="ml-auto inline-flex min-h-11 min-w-11 items-center justify-center rounded-xl border border-border"
+          >
+            <Phone className="h-5 w-5" />
+          </a>
+        )}
         <Button
-          variant="ghost"
-          className="ml-auto"
+          className={order.customer_phone ? '' : 'ml-auto'}
           disabled={busy}
-          onClick={() => setPayOpen(true)}
-        >
-          Payment
-        </Button>
-        <Button
-          disabled={busy}
-          onClick={() => setStatus.mutate({ order, from: order.status, to: 'delivered' })}
+          onClick={() => (paid ? deliver.mutate({ order, paid: null }) : setSheetOpen(true))}
         >
           Delivered
         </Button>
       </div>
-      <PaymentSheet order={order} open={payOpen} onClose={() => setPayOpen(false)} />
+      <DeliverSheet order={order} open={sheetOpen} onClose={() => setSheetOpen(false)} />
     </li>
   )
 }

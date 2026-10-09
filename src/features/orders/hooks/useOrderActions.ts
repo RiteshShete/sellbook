@@ -120,3 +120,60 @@ export function useSetPayment() {
   })
   return m
 }
+
+interface DeliverVars {
+  order: OrderRef & Pick<Order, 'status'>
+  /** Paid online / cash at the door, or null to leave the payment as it is. */
+  paid: Extract<PaymentState, { payment_status: 'paid' }> | null
+  isUndo?: boolean
+}
+
+/**
+ * Delivered, and (when collected at the door) paid, in one tap with one Undo. Two saved steps
+ * on the same order; if the payment step fails the order is still correctly delivered and the
+ * error toasts, so the owner can mark the payment from the order.
+ */
+export function useDeliver() {
+  const { client } = useAuth()
+  const queryClient = useQueryClient()
+  const m: UseMutationResult<Order, Error, DeliverVars> = useMutation({
+    mutationKey: ORDER_ACTION,
+    mutationFn: async ({ order, paid, isUndo }: DeliverVars) => {
+      if (!isUndo) {
+        const delivered = await setOrderStatus(client, order.id, 'delivered', order.version_no)
+        remember(delivered)
+        return paid ? setPayment(client, order.id, paid, delivered.version_no) : delivered
+      }
+      // Undo: payment back to not paid first (if it was set here), then back to the old status.
+      let version = order.version_no
+      if (paid) {
+        const unpaid = { payment_status: 'pending', payment_mode: null } as const
+        const o = await setPayment(client, order.id, unpaid, version)
+        remember(o)
+        version = o.version_no
+      }
+      return setOrderStatus(client, order.id, order.status, version)
+    },
+    onSuccess: (updated, v) => {
+      remember(updated)
+      if (v.isUndo) {
+        toast.success('Undone')
+        return
+      }
+      const payment = v.paid ? ` · ${paymentLabel(v.paid)}` : ''
+      toast.success(`#${updated.order_no} delivered${payment}`, {
+        action: {
+          label: 'Undo',
+          onClick: () =>
+            m.mutate({
+              order: { ...latest(queryClient, updated), status: v.order.status },
+              paid: v.paid,
+              isUndo: true,
+            }),
+        },
+      })
+    },
+    onSettled: () => invalidateOrders(queryClient),
+  })
+  return m
+}

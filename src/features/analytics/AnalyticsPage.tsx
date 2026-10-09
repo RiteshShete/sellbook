@@ -83,8 +83,8 @@ export function AnalyticsPage() {
                 title={`No sales in ${formatMonth(month)}`}
                 description="Delivered orders and payments marked paid this month show up here."
                 action={
-                  <Link to="/orders" className="font-medium underline underline-offset-4">
-                    Go to orders
+                  <Link to="/" className="font-medium underline underline-offset-4">
+                    Go to Home
                   </Link>
                 }
               />

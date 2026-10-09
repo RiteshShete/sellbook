@@ -13,7 +13,7 @@ export function ProductEditorPage() {
 
   if (product.isPending) {
     return (
-      <Page title="Edit product">
+      <Page title="Edit product" back="/catalog">
         <div className="flex flex-col gap-3" role="status" aria-label="Loading">
           <Skeleton className="h-11 w-full" />
           <Skeleton className="h-40 w-full" />
@@ -23,14 +23,14 @@ export function ProductEditorPage() {
   }
   if (product.isError) {
     return (
-      <Page title="Edit product">
+      <Page title="Edit product" back="/catalog">
         <ErrorState error={product.error} onRetry={() => void product.refetch()} />
       </Page>
     )
   }
   if (product.data === null) {
     return (
-      <Page title="Edit product">
+      <Page title="Edit product" back="/catalog">
         <EmptyState
           title="Product not found"
           description="It may have been moved to Trash."
