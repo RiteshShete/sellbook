@@ -56,8 +56,15 @@ body,
   max-width: 100%;
 }
 
+/*
+ * overflow-x: clip, NOT hidden. `hidden` on html/body silently makes overflow-y `auto`, turning
+ * body into a nested scroll box that mobile browsers (iOS Safari especially) won't scroll by
+ * touch. `clip` hides sideways overflow without creating a scroll container, so the page
+ * (the viewport) stays the only vertical scroller.
+ */
 html {
-  overflow-x: hidden;
+  overflow-x: clip;
+  overscroll-behavior-y: none;
 }
 
 body {
@@ -67,8 +74,7 @@ body {
   font-family: var(--font-sans);
   -webkit-text-size-adjust: 100%;
   -webkit-tap-highlight-color: transparent;
-  overflow-x: hidden;
-  overscroll-behavior-y: none;
+  overflow-x: clip;
 }
 
 /* Inputs at 16px stop iOS Safari zooming on focus. */
