@@ -15,7 +15,7 @@ export function OrderMoreActions({ order }: { order: Pick<Order, 'id' | 'order_n
     <div className="flex items-center gap-2 border-t border-border pt-3">
       <Link
         to={`/orders/${order.id}/history`}
-        className="inline-flex min-h-11 items-center gap-2 rounded-xl px-2 font-medium text-primary"
+        className="inline-flex min-h-11 items-center gap-2 rounded-xl px-2 font-medium text-text"
       >
         <History className="h-5 w-5" /> History
       </Link>

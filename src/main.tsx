@@ -6,6 +6,9 @@ import { ErrorBoundary } from './app/ErrorBoundary'
 import { Providers } from './app/providers'
 import { router } from './app/router'
 import { parseEnv } from './lib/env'
+import '@fontsource/inter/400.css'
+import '@fontsource/inter/500.css'
+import '@fontsource/inter/600.css'
 import './index.css'
 
 const rootEl = document.getElementById('root')

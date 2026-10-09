@@ -32,7 +32,7 @@ export function CustomerFields({ form }: { form: OrderDraftState }) {
           <ul
             role="listbox"
             aria-label="Past customers"
-            className="absolute inset-x-0 top-full z-20 mt-1 overflow-hidden rounded-xl border border-border bg-surface shadow-lg"
+            className="absolute inset-x-0 top-full z-20 mt-1 overflow-hidden rounded-xl border border-border bg-surface shadow-md"
           >
             {list.map((s) => (
               <li key={`${s.customer_phone ?? ''}|${s.customer_name}`}>

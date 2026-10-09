@@ -24,7 +24,7 @@ export function Modal({ open, onClose, title, children, placement = 'center' }: 
   const bottom = placement === 'bottom'
   return (
     <div
-      className={`fixed inset-0 z-50 flex bg-black/50 ${bottom ? 'items-end' : 'items-center justify-center p-4'}`}
+      className={`fixed inset-0 z-50 flex bg-black/40 ${bottom ? 'items-end' : 'items-center justify-center p-4'}`}
       onClick={onClose}
     >
       <div
@@ -32,9 +32,9 @@ export function Modal({ open, onClose, title, children, placement = 'center' }: 
         aria-modal="true"
         aria-label={title}
         onClick={(e) => e.stopPropagation()}
-        className={`w-full min-w-0 bg-surface text-text shadow-xl ${bottom ? 'max-h-[85dvh] overflow-y-auto rounded-t-2xl pb-[env(safe-area-inset-bottom)]' : 'max-w-sm rounded-2xl'}`}
+        className={`w-full min-w-0 bg-surface text-text ${bottom ? 'max-h-[85dvh] overflow-y-auto rounded-t-3xl pb-[env(safe-area-inset-bottom)]' : 'max-w-sm rounded-3xl'}`}
       >
-        <div className="flex items-center justify-between gap-2 border-b border-border px-4 py-3">
+        <div className="flex items-center justify-between gap-2 border-b border-border px-5 py-3">
           <h2 className="text-lg font-semibold">{title}</h2>
           <button
             type="button"
@@ -45,7 +45,7 @@ export function Modal({ open, onClose, title, children, placement = 'center' }: 
             ×
           </button>
         </div>
-        <div className="p-4">{children}</div>
+        <div className="p-5">{children}</div>
       </div>
     </div>
   )

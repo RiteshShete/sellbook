@@ -85,7 +85,7 @@ src/
   lib/            env.ts supabase.ts money.ts dates.ts phone.ts format.ts (+ later queryKeys, csv, share, realtime)
   types/          shared types; database.ts is generated, never hand-edited
 supabase/         (M1+) config.toml, migrations/, tests/database/, seed.sql
-docs/PLAN.md  scripts/scan-secrets.mjs  public/ (_redirects, later icons/_headers)
+docs/PLAN.md  docs/DESIGN.md (UI style)  scripts/scan-secrets.mjs  public/ (_redirects, later icons/_headers)
 ```
 
 Tabs (bottom bar): Orders, Delivery, Analytics, Catalog, More (More links to Settings and Trash).
@@ -106,6 +106,11 @@ phone = digits with country code, e.g. `919876543210` (`normalizePhone`, `toWaMe
 - All server state in TanStack Query; centralised query keys in `lib/queryKeys.ts`; mutations invalidate by key.
 - Writes touching >1 row => RPC, never several client calls. Orders are written ONLY through RPCs.
 - Tailwind only; mobile-first (design at 360px), touch targets >= 44px, safe-area insets respected.
+- **UI style follows `docs/DESIGN.md`** (warm cream "Clay" system): tokens live in `src/index.css`; use token classes
+  (`bg-surface`, `bg-surface-2`, `text-muted`, `bg-teal`, `bg-lavender`, ...), never raw hex in components (the bill
+  template is the exception: fixed colours for the PNG). Light only, no dark mode (user decision). Inter everywhere;
+  headings `font-display` (500, tight tracking), never bold 700. Buttons 12px radius, cards 16px, brand cards 24px,
+  tabs/badges pills. Brand fills carry ink text (white on teal); semantic text colours are the darker AA steps.
 - Migrations are append-only; never edit an applied migration. Every new table: RLS enabled + policies + pgTAP test.
 - Tests live next to code (`*.test.ts`); DB tests in `supabase/tests/database`.
 - Commits small and focused; never commit secrets, `.env*`, or service_role keys.

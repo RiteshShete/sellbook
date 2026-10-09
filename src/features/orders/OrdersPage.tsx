@@ -19,7 +19,7 @@ const TABS: { value: OrderTab; label: string }[] = [
 const isTab = (v: string | null): v is OrderTab => TABS.some((t) => t.value === v)
 
 const newLink =
-  'inline-flex min-h-11 items-center gap-1 rounded-xl bg-primary px-4 font-medium text-primary-fg'
+  'inline-flex min-h-11 items-center gap-1 rounded-xl bg-primary px-5 text-sm font-semibold text-primary-fg'
 
 export function OrdersPage() {
   const [params, setParams] = useSearchParams()
@@ -52,7 +52,7 @@ export function OrdersPage() {
             placeholder="Name, phone, order or bill no."
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            className="min-h-11 w-full rounded-xl border border-border bg-surface pr-3 pl-10 outline-none focus:border-primary"
+            className="min-h-11 w-full rounded-xl border border-border bg-surface pr-4 pl-10 outline-none focus:border-text focus:ring-1 focus:ring-text"
           />
         </label>
 

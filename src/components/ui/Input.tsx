@@ -19,7 +19,7 @@ export function Input({ label, error, className = '', id, ...rest }: InputProps)
         id={inputId}
         aria-invalid={error ? true : undefined}
         aria-describedby={error ? `${inputId}-err` : undefined}
-        className={`min-h-11 w-full min-w-0 rounded-xl border bg-surface px-3 text-text outline-none focus:border-primary ${error ? 'border-danger' : 'border-border'} ${className}`}
+        className={`min-h-11 w-full min-w-0 rounded-xl border bg-surface px-4 text-text outline-none focus:border-text focus:ring-1 focus:ring-text ${error ? 'border-danger' : 'border-border'} ${className}`}
         {...rest}
       />
       {error && (

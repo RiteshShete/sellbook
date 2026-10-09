@@ -35,7 +35,7 @@ export function ProductEditorPage() {
           title="Product not found"
           description="It may have been moved to Trash."
           action={
-            <Link to="/catalog" className="font-medium text-primary">
+            <Link to="/catalog" className="font-medium underline underline-offset-4">
               Back to Catalog
             </Link>
           }

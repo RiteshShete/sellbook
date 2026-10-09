@@ -50,7 +50,7 @@ export function BillReady({ order, settings, state, regenerating, onRegenerate }
       {outdated && (
         <div
           role="alert"
-          className="flex items-start gap-2 rounded-xl bg-warning/15 p-3 text-sm text-warning"
+          className="flex items-start gap-2 rounded-2xl bg-ochre p-3 text-sm text-text"
         >
           <AlertTriangle className="mt-0.5 h-4 w-4 shrink-0" />
           <span>Outdated: items, discount or total changed after this bill was made.</span>
@@ -96,7 +96,7 @@ export function BillReady({ order, settings, state, regenerating, onRegenerate }
             href={wa}
             target="_blank"
             rel="noreferrer"
-            className="inline-flex min-h-11 items-center gap-2 rounded-xl px-2 font-medium text-primary"
+            className="inline-flex min-h-11 items-center gap-2 rounded-xl px-2 font-medium text-text"
           >
             <MessageCircle className="h-5 w-5" /> Send payment message
           </a>

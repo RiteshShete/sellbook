@@ -12,7 +12,7 @@ export function Page({ title, action, children }: PageProps) {
     <>
       <header className="sticky top-0 z-30 border-b border-border bg-surface pt-[env(safe-area-inset-top)]">
         <div className="mx-auto flex min-h-14 max-w-2xl items-center justify-between gap-3 px-4">
-          <h1 className="min-w-0 truncate text-xl font-semibold">{title}</h1>
+          <h1 className="font-display min-w-0 truncate text-2xl">{title}</h1>
           {action && <div className="shrink-0">{action}</div>}
         </div>
       </header>
