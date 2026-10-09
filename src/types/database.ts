@@ -130,6 +130,8 @@ export type Database = {
           position: number
           product_name: string
           quantity: number
+          size_amount: number | null
+          size_unit: Database['public']['Enums']['size_unit'] | null
           unit_price: number
           updated_at: string
           variant_id: string | null
@@ -145,6 +147,8 @@ export type Database = {
           position?: number
           product_name: string
           quantity: number
+          size_amount?: number | null
+          size_unit?: Database['public']['Enums']['size_unit'] | null
           unit_price: number
           updated_at?: string
           variant_id?: string | null
@@ -160,6 +164,8 @@ export type Database = {
           position?: number
           product_name?: string
           quantity?: number
+          size_amount?: number | null
+          size_unit?: Database['public']['Enums']['size_unit'] | null
           unit_price?: number
           updated_at?: string
           variant_id?: string | null
@@ -402,6 +408,8 @@ export type Database = {
           owner_id: string
           price: number
           product_id: string
+          size_amount: number | null
+          size_unit: Database['public']['Enums']['size_unit'] | null
           sort_order: number
           updated_at: string
         }
@@ -415,6 +423,8 @@ export type Database = {
           owner_id?: string
           price: number
           product_id: string
+          size_amount?: number | null
+          size_unit?: Database['public']['Enums']['size_unit'] | null
           sort_order?: number
           updated_at?: string
         }
@@ -428,6 +438,8 @@ export type Database = {
           owner_id?: string
           price?: number
           product_id?: string
+          size_amount?: number | null
+          size_unit?: Database['public']['Enums']['size_unit'] | null
           sort_order?: number
           updated_at?: string
         }
@@ -532,6 +544,10 @@ export type Database = {
           isSetofReturn: false
         }
       }
+      item_size: {
+        Args: { p_item: Database['public']['Tables']['order_items']['Row'] }
+        Returns: Record<string, unknown>
+      }
       month_window: {
         Args: { p_month: string }
         Returns: Record<string, unknown>
@@ -555,6 +571,7 @@ export type Database = {
         }[]
       }
       ping: { Args: never; Returns: number }
+      prep_list: { Args: never; Returns: Json }
       record_order_version: {
         Args: { p_order: string; p_reason: string; p_summary: string }
         Returns: undefined
@@ -817,6 +834,7 @@ export type Database = {
       order_status: 'new' | 'ready' | 'delivered' | 'cancelled'
       payment_mode: 'online' | 'cash'
       payment_status: 'pending' | 'paid'
+      size_unit: 'g' | 'ml' | 'pcs'
     }
     CompositeTypes: {
       [_ in never]: never
@@ -944,6 +962,7 @@ export const Constants = {
       order_status: ['new', 'ready', 'delivered', 'cancelled'],
       payment_mode: ['online', 'cash'],
       payment_status: ['pending', 'paid'],
+      size_unit: ['g', 'ml', 'pcs'],
     },
   },
 } as const

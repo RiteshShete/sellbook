@@ -7,6 +7,8 @@ const blankVariant = (): VariantDraft => ({
   name: '',
   price: '',
   cost: '',
+  sizeText: '',
+  sizeUnit: 'g',
   is_active: true,
 })
 

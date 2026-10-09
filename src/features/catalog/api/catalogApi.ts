@@ -9,7 +9,7 @@ import {
 } from '../schemas'
 
 const PRODUCT_SELECT =
-  'id, name, sort_order, is_active, variants (id, product_id, name, price, cost_price, sort_order, is_active, deleted_at)'
+  'id, name, sort_order, is_active, variants (id, product_id, name, price, cost_price, size_amount, size_unit, sort_order, is_active, deleted_at)'
 
 /** All live products (active and inactive) with their live variants. */
 export async function fetchProducts(client: SupabaseClient): Promise<Product[]> {

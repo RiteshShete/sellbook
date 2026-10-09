@@ -9,6 +9,8 @@ export const queryKeys = {
     versions: (id: string) => ['orders', 'versions', id] as const,
     // Under 'orders' so every order change also refreshes the bill's outdated check (B7).
     bills: (id: string) => ['orders', 'bills', id] as const,
+    // Under 'orders' so creating, editing or moving any order refreshes the prep list.
+    prep: ['orders', 'prep'] as const,
   },
   /** Bill PNGs are immutable per path, so they are cached forever. */
   billImage: (path: string) => ['billImage', path] as const,
