@@ -53,6 +53,10 @@ const routes: RouteObject[] = [
         lazy: lazyPage(() => import('../features/analytics/AnalyticsPage'), 'AnalyticsPage'),
       },
       {
+        path: 'pending',
+        lazy: lazyPage(() => import('../features/analytics/PendingPage'), 'PendingPage'),
+      },
+      {
         path: 'catalog',
         lazy: lazyPage(() => import('../features/catalog/CatalogPage'), 'CatalogPage'),
       },

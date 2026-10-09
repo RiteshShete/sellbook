@@ -18,6 +18,11 @@ export const queryKeys = {
     tab: (tab: string) => ['trash', tab] as const,
   },
   activity: (entity: string) => ['activity', entity] as const,
+  analytics: {
+    all: ['analytics'] as const,
+    month: (month: string) => ['analytics', 'month', month] as const,
+  },
+  pending: ['pending'] as const,
   products: {
     all: ['products'] as const,
     list: () => ['products', 'list'] as const,

@@ -446,6 +446,7 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      analytics_month: { Args: { p_month: string }; Returns: Json }
       bill_content_hash: { Args: { p_order: string }; Returns: string }
       check_order_rules: { Args: { p_order: string }; Returns: undefined }
       compute_order_total: {
@@ -486,6 +487,24 @@ export type Database = {
           isSetofReturn: false
         }
       }
+      export_orders_csv_rows: {
+        Args: { p_month: string }
+        Returns: {
+          bill_no: number
+          customer_name: string
+          customer_phone: string
+          delivered_at: string
+          discount: number
+          items: string
+          order_date: string
+          order_no: number
+          paid_at: string
+          payment_mode: Database['public']['Enums']['payment_mode']
+          payment_status: Database['public']['Enums']['payment_status']
+          total: number
+          units: number
+        }[]
+      }
       init_settings: {
         Args: never
         Returns: {
@@ -513,10 +532,28 @@ export type Database = {
           isSetofReturn: false
         }
       }
+      month_window: {
+        Args: { p_month: string }
+        Returns: Record<string, unknown>
+      }
       next_bill_no: { Args: never; Returns: number }
       next_order_no: { Args: never; Returns: number }
       normalize_phone: { Args: { p: string }; Returns: string }
       order_snapshot: { Args: { p_order: string }; Returns: Json }
+      pending_payments: {
+        Args: never
+        Returns: {
+          age_days: number
+          bill_no: number
+          bucket: string
+          customer_name: string
+          customer_phone: string
+          delivered_at: string
+          id: string
+          order_no: number
+          total: number
+        }[]
+      }
       ping: { Args: never; Returns: number }
       record_order_version: {
         Args: { p_order: string; p_reason: string; p_summary: string }

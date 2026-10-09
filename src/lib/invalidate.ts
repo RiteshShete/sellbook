@@ -1,10 +1,12 @@
 import type { QueryClient } from '@tanstack/react-query'
 import { queryKeys } from './queryKeys'
 
-/** After anything that changes orders: lists, details, versions, trash and the activity log. */
+/** After anything that changes orders: lists, details, versions, trash, activity and analytics. */
 export function invalidateOrders(qc: QueryClient) {
   return Promise.all([
     qc.invalidateQueries({ queryKey: queryKeys.orders.all }),
+    qc.invalidateQueries({ queryKey: queryKeys.analytics.all }),
+    qc.invalidateQueries({ queryKey: queryKeys.pending }),
     qc.invalidateQueries({ queryKey: queryKeys.trash.all }),
     qc.invalidateQueries({ queryKey: ['activity'] }),
   ])
