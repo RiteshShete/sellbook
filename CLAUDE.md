@@ -31,7 +31,8 @@ Never claim a command passed unless it ran. If something was skipped or failed, 
 - React + Vite + TypeScript (strict), Tailwind, React Router, TanStack Query, Recharts, html-to-image,
   vite-plugin-pwa, zod, Vitest.
 - Supabase free plan (Postgres, Auth, Storage, Realtime); Supabase CLI migrations in `supabase/migrations`.
-- Hosting: Cloudflare Pages, GitHub auto-deploy.
+- Hosting: GitHub Pages at https://riteshshete.github.io/sellbook/ (public repo, free plan), deployed by
+  `.github/workflows/deploy.yml` on every push to `main`; the build uses `BASE_PATH=/sellbook/`.
 - Money: `numeric(12,2)` in Postgres, **integer paise** in JS. Time: `timestamptz`; month boundaries in `Asia/Kolkata`.
 - Single owner user, public sign-ups disabled, RLS on every table keyed by `owner_id`, private storage buckets.
 - Frontend uses ONLY the anon key. **A service_role key must never appear in the repo** (code, env files, docs, CI).
@@ -70,7 +71,7 @@ supabase db push       # (M1+) apply migrations to the linked remote project
 supabase gen types typescript --local > src/types/database.ts
 ```
 
-Env (`.env.local`, git-ignored; same names in Cloudflare Pages): `VITE_SUPABASE_URL`, `VITE_SUPABASE_ANON_KEY`.
+Env (`.env.local`, git-ignored; same names as GitHub repository Actions _variables_ for the deploy): `VITE_SUPABASE_URL`, `VITE_SUPABASE_ANON_KEY`.
 Validated by `src/lib/env.ts` (zod); a missing value shows a readable error screen.
 
 ## Folder map
@@ -88,7 +89,9 @@ supabase/         (M1+) config.toml, migrations/, tests/database/, seed.sql
 docs/PLAN.md  docs/DESIGN.md (UI style)  scripts/scan-secrets.mjs  public/ (_redirects, later icons/_headers)
 ```
 
-Tabs (bottom bar): Orders, Delivery, Analytics, Catalog, More (More links to Settings and Trash).
+Tabs (bottom bar): Home, Delivery, Analytics, Products (`/catalog`), More (Pending payments, Settings, Trash, Activity).
+Home = New orders to make (+ "To prepare"), Delivery = Ready orders to hand over; old orders via "Search all orders" (`/orders`).
+"New order" is a floating button on Home and Delivery; inner pages have a header back button (`Page back=`).
 Helper contracts: money = integer paise (`toPaise`, `fromPaise`, `addMoney`, `multiplyMoney`, `formatINR`, `parseMoneyInput`);
 dates = always Asia/Kolkata (`monthRange`, `isoMonth`, `todayIST`, `formatDate`, `formatDateTime`);
 phone = digits with country code, e.g. `919876543210` (`normalizePhone`, `toWaMeLink`).
@@ -118,5 +121,7 @@ phone = digits with country code, e.g. `919876543210` (`normalizePhone`, `toWaMe
 ## Working agreement
 
 - Follow milestones in `docs/PLAN.md` in order; finish one (its Definition of Done) before starting the next.
+- **`main` is live** (every push deploys). Work on a branch, finalize and test it (`npm run check`, DB tests,
+  phone check), then merge to `main`. Never commit unfinished work straight to `main`.
 - If a requirement is ambiguous or conflicts with a decision above, ask the user; don't guess silently.
 - Report honestly: what changed, what was verified (real command output), what remains.

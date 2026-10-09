@@ -35,5 +35,7 @@ only; never put any secret or admin key anywhere in this repo.
 
 ## Deploy
 
-Cloudflare Pages: build command `npm run build`, output `dist`, env vars `VITE_SUPABASE_URL` and
-`VITE_SUPABASE_ANON_KEY`. `public/_redirects` provides the SPA fallback.
+GitHub Pages: https://riteshshete.github.io/sellbook/. Every push to `main` runs `.github/workflows/deploy.yml`
+(check, build with `BASE_PATH=/sellbook/`, copy `index.html` to `404.html` for deep links, publish).
+Set repository Actions variables `VITE_SUPABASE_URL` and `VITE_SUPABASE_ANON_KEY` (public anon key only).
+Work on a branch and merge to `main` only when it is tested: `main` is what is live.

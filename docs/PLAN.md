@@ -34,7 +34,7 @@ Dependencies I would add beyond your list (**need your approval**, see §16): ES
      |  html-to-image (bill PNG, client)     |- Postgres (RLS, RPC functions, triggers)
      |  Realtime websocket <-----------------|- Realtime (postgres_changes)
      |                                       '- Storage (private: `bills`, `assets`)
- Cloudflare Pages (static hosting, GitHub auto-deploy; no server code)
+ GitHub Pages (static hosting at riteshshete.github.io/sellbook, deployed by GitHub Actions from `main`; no server code)
 ```
 
 - **No backend server.** All trust sits in Postgres: RLS + `SECURITY DEFINER` RPCs that check `auth.uid()`.
@@ -233,26 +233,26 @@ All return typed JSON/rows parsed by zod on the client. All write an `order_vers
 
 ## 6. Screen map & routes
 
-Bottom nav (5): Orders · Delivery · **+ New** · Analytics · More. All routes except `/login` are guarded.
+Bottom nav (5): Home · Delivery · Analytics · Products · More (UX pass after M7: Home/Delivery show waiting counts; "+ New order" floats on Home and Delivery; every inner page has a back button). All routes except `/login` are guarded.
 
-| Route                 | Screen                | Notes                                                                                                                                        |
-| --------------------- | --------------------- | -------------------------------------------------------------------------------------------------------------------------------------------- |
-| `/login`              | Login                 | email+password; no signup link                                                                                                               |
-| `/`                   | redirect to `/orders` |                                                                                                                                              |
-| `/orders`             | Orders list           | tabs New / Ready / Delivered / Cancelled / All; search by name/phone/bill no; payment badge; due-date highlight                              |
-| `/orders/new`         | Order form            | customer autocomplete, item picker (product -> variant chips), qty stepper, discount, live total                                             |
-| `/orders/:id`         | Order detail          | status stepper with Undo, payment sheet, bill card (preview, revision history, "Outdated — Regenerate"), Share, Edit, History, Move to Trash |
-| `/orders/:id/edit`    | Edit order            | same form; save via `update_order`                                                                                                           |
-| `/orders/:id/history` | Version history       | list of versions with diff summary; "Roll back to this version" with confirm                                                                 |
-| `/delivery`           | Delivery stack        | ready orders only (grouped by due date), one-tap Mark delivered, payment shortcut                                                            |
-| `/analytics`          | Monthly analytics     | month picker (`?month=YYYY-MM`), KPI cards + deltas, Recharts daily trend, online/cash donut, product/variant tables, CSV button             |
-| `/pending`            | Pending payments      | ageing buckets + list, tap -> order                                                                                                          |
-| `/catalog`            | Products              | list incl. inactive; add product                                                                                                             |
-| `/catalog/:productId` | Product editor        | name, variants (price, cost, active), deactivate, trash                                                                                      |
-| `/trash`              | Trash                 | tabs Orders / Products / Variants; Restore                                                                                                   |
-| `/activity`           | Audit log             | filter by entity; infinite list                                                                                                              |
-| `/settings`           | Shop settings         | shop details, logo, QR upload with preview, bill prefix, footer note, sign out                                                               |
-| `*`                   | Not found             |                                                                                                                                              |
+| Route                 | Screen            | Notes                                                                                                                                            |
+| --------------------- | ----------------- | ------------------------------------------------------------------------------------------------------------------------------------------------ |
+| `/login`              | Login             | email+password; no signup link                                                                                                                   |
+| `/`                   | Home              | overview (to make / to deliver / unpaid), "Search all orders", New orders grouped by due with one-tap Mark ready, or "To prepare" (`?view=prep`) |
+| `/orders`             | All orders        | search by name/phone/order/bill no; filter All / New / Ready / Delivered / Cancelled; payment badge; due-date highlight                          |
+| `/orders/new`         | Order form        | customer autocomplete, item picker (product -> variant chips), qty stepper, discount, live total                                                 |
+| `/orders/:id`         | Order detail      | status stepper with Undo, payment sheet, bill card (preview, revision history, "Outdated — Regenerate"), Share, Edit, History, Move to Trash     |
+| `/orders/:id/edit`    | Edit order        | same form; save via `update_order`                                                                                                               |
+| `/orders/:id/history` | Version history   | list of versions with diff summary; "Roll back to this version" with confirm                                                                     |
+| `/delivery`           | Delivery stack    | ready orders only (grouped by due date), call button; Delivered on an unpaid order asks Paid cash / Paid online / Not paid yet (one Undo)        |
+| `/analytics`          | Monthly analytics | month picker (`?month=YYYY-MM`), KPI cards + deltas, Recharts daily trend, online/cash donut, product/variant tables, CSV button                 |
+| `/pending`            | Pending payments  | ageing buckets + list, tap -> order                                                                                                              |
+| `/catalog`            | Products          | list incl. inactive; add product                                                                                                                 |
+| `/catalog/:productId` | Product editor    | name, variants (price, cost, active), deactivate, trash                                                                                          |
+| `/trash`              | Trash             | tabs Orders / Products / Variants; Restore                                                                                                       |
+| `/activity`           | Audit log         | filter by entity; infinite list                                                                                                                  |
+| `/settings`           | Shop settings     | shop details, logo, QR upload with preview, bill prefix, footer note, sign out                                                                   |
+| `*`                   | Not found         |                                                                                                                                                  |
 
 Every list screen implements loading skeleton, empty state, error state with retry.
 
@@ -302,7 +302,7 @@ Every list screen implements loading skeleton, empty state, error state with ret
 - Manifest: name Sellbook, `display: standalone`, `start_url: /orders`, theme/background colours, icons 192, 512, maskable 512, `apple-touch-icon` 180; `apple-mobile-web-app-capable` meta, status bar style.
 - Workbox: precache the app shell/assets only. **Runtime caching: none for Supabase** (`NetworkOnly` for `*.supabase.co`) — private data and signed URLs must not be cached by the SW. Navigation fallback to `index.html` (denylist `/api`).
 - Offline: shell loads; `useOnlineStatus` shows a banner and disables write buttons (A10).
-- Cloudflare Pages: `public/_redirects` -> `/* /index.html 200`; `public/_headers` -> `sw.js` and `index.html` `Cache-Control: no-cache`, hashed assets immutable; security headers (CSP restricting connect-src to Supabase, `X-Content-Type-Options`, `Referrer-Policy`).
+- GitHub Pages (changed from Cloudflare Pages on 2026-10-09, user decision): no rewrites, so the deploy copies `index.html` to `404.html` (deep links open the app); no custom response headers, so CSP / `Referrer-Policy` go in `<meta>` tags in M9 and cache headers are GitHub's own (~10 min). App lives under `/sellbook/` (Vite `base`, router `basename`); manifest `start_url`/`scope` must use it.
 - Add-to-Home-Screen instructions screen for iOS (no install prompt event on iOS). Session stored in the PWA's own localStorage -> log in again once inside the installed app (A1 makes this painless).
 
 ## 10. Testing strategy
@@ -315,12 +315,12 @@ Every list screen implements loading skeleton, empty state, error state with ret
 | Integration (manual checklist) | real phone                                                            | bill render + share on iPhone Safari, installed PWA, Android Chrome; realtime across two devices                                                                                                                                                                                                                                                                                                                                                                                                               |
 | Static                         | tsc strict, ESLint (`no-explicit-any`, hooks rules), grep for secrets | in `npm run check` and CI                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      |
 
-CI (GitHub Actions, free): on PR/push run `npm ci`, `npm run check`; DB tests run in a job using the Supabase CLI + Docker. Cloudflare builds on push to `main`. Optional (needs approval): Playwright smoke test.
+CI (GitHub Actions, free): on PR/push run `npm ci`, `npm run check`; DB tests run in a job using the Supabase CLI + Docker. The Deploy workflow builds and publishes to GitHub Pages on push to `main` (work happens on branches, merged when tested). Optional (needs approval): Playwright smoke test.
 
 ## 11. Deployment & environments
 
 - Local: `supabase start` + `npm run dev`. Remote: one Supabase project; migrations applied with `supabase db push` (manual, from the owner's/dev machine with `supabase login`; DB password never stored in repo).
-- Cloudflare Pages build: `npm run build`, output `dist`, env vars `VITE_SUPABASE_URL`, `VITE_SUPABASE_ANON_KEY`.
+- GitHub Pages: `.github/workflows/deploy.yml` runs `npm run check`, builds with `BASE_PATH=/sellbook/` and repository variables `VITE_SUPABASE_URL`, `VITE_SUPABASE_ANON_KEY`, adds `404.html`, publishes `dist`. Repo must be public (free plan); Pages source = GitHub Actions.
 - Hosted Supabase settings checklist (done by hand, recorded in docs): disable sign-ups, create the owner user, set Site URL to the Pages URL, enable Realtime on the listed tables (migration does it), confirm RLS on all tables via dashboard linter.
 
 ## 12. Risks & mitigations
@@ -384,7 +384,7 @@ _DoD:_ pgTAP fixture verifies every metric incl. IST month boundary and exclusio
 _DoD:_ with two devices/tabs, a change (status, payment, new order, catalog edit) appears on the other without refresh within ~2 s; recovers after phone sleep/offline; no duplicate-fetch storms (debounce verified).
 
 **M9 — PWA, hardening, release**
-Manifest/icons/service worker update prompt, offline banner, `_headers`/`_redirects`, CSP, a11y + touch-target pass, empty/error state audit, README/runbook (restore, pause, backups), optional keep-alive and backup jobs.
+Manifest/icons/service worker update prompt, offline banner, CSP via `<meta>` (GitHub Pages has no custom headers), a11y + touch-target pass, empty/error state audit, README/runbook (restore, pause, backups), optional keep-alive and backup jobs.
 _DoD:_ installable on iOS and Android; Lighthouse PWA/installability pass; update-prompt flow tested via two consecutive deploys; security checklist (R9, R10) verified; all milestone DoDs re-confirmed on production URL.
 
 ## 14. Definition of done (global, every task)
