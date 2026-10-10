@@ -14,6 +14,7 @@ import {
   type OrderWithItems,
 } from '../schemas'
 import { CustomerFields } from './CustomerFields'
+import { DueChips } from './DueChips'
 import { LineItems } from './LineItems'
 import { ProductPicker } from './ProductPicker'
 
@@ -76,6 +77,11 @@ export function OrderForm({ order, notice }: { order?: OrderWithItems; notice?: 
             error={form.errors.due_date}
           />
         </div>
+        <DueChips
+          value={form.draft.due_date}
+          orderDate={form.draft.order_date}
+          onPick={(d) => form.setField('due_date', d)}
+        />
 
         <h2 className="mt-2 font-display text-xl">Add items</h2>
         <ProductPicker form={form} />

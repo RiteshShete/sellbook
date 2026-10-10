@@ -28,7 +28,10 @@ export function DeliveryCard({ order }: { order: OrderListRow }) {
           </span>
           <span className="shrink-0 font-semibold tabular-nums">{formatINR(order.total)}</span>
         </div>
-        <p className="text-sm text-muted">{order.itemsSummary || 'No items'}</p>
+        <p className="text-sm text-muted">
+          {order.itemsSummary || 'No items'}
+          {order.weight.text && ` · ${order.weight.text}`}
+        </p>
       </Link>
       <div className="flex items-center gap-2">
         <PaymentBadge order={order} />
