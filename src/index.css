@@ -41,6 +41,26 @@
   --success: #15803d;
   --warning: #b45309;
 
+  /*
+   * Status + action families added in UI round 2 (docs/UI_AUDIT.md). The design file has no
+   * blue, so `info` is proposed in the same style as the semantic steps above: a dark solid
+   * (white text), a pale soft fill and a deep ink for text on that fill. Same pattern for
+   * success and danger. Mapped to actions/badges in src/lib/actionStyles.ts.
+   */
+  --info: #1d4ed8;
+  --info-soft: #dbe7fb;
+  --info-ink: #1e3a8a;
+  --success-soft: #d9f0dc;
+  --success-ink: #14532d;
+  --danger-soft: #fde2e2;
+  --danger-ink: #991b1b;
+  --danger-deep: #991b1b;
+
+  /* Input borders / switch tracks: the spec hairline (#e5e5e5) is ~1.2:1, under the 3:1 non-text minimum. */
+  --border-strong: #858585;
+  /* Text on disabled primary buttons: spec muted (#6a6a6a) on #e5e5e5 is 4.29:1. */
+  --disabled-fg: #5c5c5c;
+
   /* Chart series: deep lavender + brand pink, validated for colour-blind separation on canvas. */
   --chart-1: #7b61d9;
   --chart-2: #ff4d8b;
@@ -73,6 +93,16 @@
   --color-danger: var(--danger);
   --color-success: var(--success);
   --color-warning: var(--warning);
+  --color-info: var(--info);
+  --color-info-soft: var(--info-soft);
+  --color-info-ink: var(--info-ink);
+  --color-success-soft: var(--success-soft);
+  --color-success-ink: var(--success-ink);
+  --color-danger-soft: var(--danger-soft);
+  --color-danger-ink: var(--danger-ink);
+  --color-danger-deep: var(--danger-deep);
+  --color-border-strong: var(--border-strong);
+  --color-disabled-fg: var(--disabled-fg);
   --color-pink: var(--pink);
   --color-teal: var(--teal);
   --color-lavender: var(--lavender);
@@ -84,7 +114,8 @@
   --color-chart-2: var(--chart-2);
   /* Inter everywhere (self-hosted, see main.tsx); the spec's display face is not public. */
   --font-sans:
-    Inter, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Noto Sans', Arial, sans-serif;
+    Inter, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Noto Sans',
+    'Noto Sans Devanagari', 'Nirmala UI', 'Devanagari Sangam MN', Mukta, Arial, sans-serif;
 }
 
 html,
@@ -120,6 +151,27 @@ input,
 select,
 textarea {
   font-size: 16px;
+}
+
+/*
+ * Devanagari matras sit above/below the line box; `truncate` (overflow: hidden) clips them when
+ * the line height is tight. Give every clipped single-line text room, without moving layout much.
+ */
+.truncate {
+  line-height: 1.6;
+  padding-block: 0.05em;
+}
+
+/* Respect the OS "reduce motion" setting. */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    scroll-behavior: auto !important;
+    transition-duration: 0.01ms !important;
+  }
 }
 
 /* Display headings: Inter 500 with tight tracking, standing in for the spec's display face. */

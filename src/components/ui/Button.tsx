@@ -5,7 +5,7 @@ type Variant = 'primary' | 'secondary' | 'danger' | 'ghost'
 /** docs/DESIGN.md: button-primary / button-secondary / button-text-link. */
 const styles: Record<Variant, string> = {
   primary:
-    'bg-primary text-primary-fg active:bg-primary-active disabled:bg-primary-disabled disabled:text-muted',
+    'bg-primary text-primary-fg active:bg-primary-active disabled:bg-primary-disabled disabled:text-disabled-fg',
   secondary: 'bg-surface text-text border border-border active:bg-surface-2 disabled:opacity-50',
   danger: 'bg-danger text-white active:opacity-90 disabled:opacity-50',
   ghost: 'bg-transparent text-text active:bg-surface-2 disabled:opacity-40',
