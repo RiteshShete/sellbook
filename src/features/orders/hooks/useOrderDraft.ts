@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { todayIST } from '../../../lib/dates'
 import { uuid } from '../../../lib/id'
+import type { SizeUnit } from '../../../lib/measure'
 import type { Paise } from '../../../lib/money'
 import { toNationalPhone } from '../../../lib/phone'
 import { MAX_QTY, type LineDraft, type OrderDraft, type OrderErrors } from '../schemas'
@@ -10,6 +11,8 @@ export interface PickedVariant {
   product_name: string
   variant_name: string
   unit_price: Paise
+  size_amount?: number | null
+  size_unit?: SizeUnit | null
 }
 
 type TextField = Exclude<keyof OrderDraft, 'lines'>

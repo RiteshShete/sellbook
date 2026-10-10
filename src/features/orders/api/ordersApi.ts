@@ -42,7 +42,9 @@ export async function fetchOrders(
 ): Promise<OrderListRow[]> {
   let query = client
     .from('orders')
-    .select('*, order_items (quantity, product_name, variant_name, position)')
+    .select(
+      '*, order_items (quantity, product_name, variant_name, position, size_amount, size_unit)',
+    )
     .is('deleted_at', null)
     .order('created_at', { ascending: false })
     .limit(LIST_LIMIT)

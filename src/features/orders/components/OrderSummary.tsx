@@ -4,7 +4,7 @@ import { formatPhone } from '../../../lib/format'
 import { formatTotals, sumLines } from '../../../lib/measure'
 import { formatINR } from '../../../lib/money'
 import { toTelLink, toWaMeLink } from '../../../lib/phone'
-import { itemSize, type OrderWithItems } from '../schemas'
+import { itemSize, itemVariantLabel, type OrderWithItems } from '../schemas'
 import { DueBadge, PaymentBadge, StatusBadge } from './OrderBadges'
 
 const iconLink =
@@ -63,7 +63,7 @@ export function OrderSummary({ order }: { order: OrderWithItems }) {
             {order.items.map((i) => (
               <li key={i.id} className="flex items-baseline gap-3 px-4 py-3">
                 <span className="min-w-0 flex-1">
-                  {i.product_name} · {i.variant_name}
+                  {i.product_name} · {itemVariantLabel(i)}
                   <span className="block text-sm text-muted">
                     {i.quantity} × {formatINR(i.unit_price)}
                   </span>

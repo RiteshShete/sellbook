@@ -8,6 +8,7 @@ import {
   type InputUnit,
   type SizeUnit,
 } from '../../lib/measure'
+import { fallbackVariantName } from '../../lib/variants'
 import { dbMoney, dbMoneyNullable } from '../../lib/zodMoney'
 
 // ---- Rows from the database (prices -> integer paise) ------------------------------------------
@@ -132,13 +133,12 @@ export function validateProductDraft(draft: ProductDraft, id?: string): ProductV
 
   const seen = new Set<string>()
   const variants: UpsertProductPayload['variants'] = []
-  for (const v of draft.variants) {
+  for (const [index, v] of draft.variants.entries()) {
     const e: VariantErrors = {}
-    const vName = v.name.trim()
-    if (!vName) e.name = 'Name needed'
-    else if (vName.length > 80) e.name = 'Too long'
-    else if (seen.has(vName.toLowerCase())) e.name = 'Duplicate name'
-    seen.add(vName.toLowerCase())
+    // The name is optional (a size alone is enough); the database needs one, so a blank name
+    // becomes "500 g" / "Variant 2". variantLabel() shows it once, never twice.
+    const vName = v.name.trim() || fallbackVariantName(v.sizeText, v.sizeUnit, index)
+    if (vName.length > 80) e.name = 'Too long'
 
     const price = parseMoneyInput(v.price)
     if (price === null) e.price = 'Enter a price'
@@ -148,6 +148,12 @@ export function validateProductDraft(draft: ProductDraft, id?: string): ProductV
 
     const size = parseSizeInput(v.sizeText, v.sizeUnit)
     if (!size.ok) e.size = size.error
+    else {
+      // Same name AND same size twice in one product is a duplicate (the same name with another size is fine).
+      const id = `${vName.toLowerCase()}|${size.size?.size_amount ?? ''}|${size.size?.size_unit ?? ''}`
+      if (seen.has(id)) e.name = 'Same name and size already listed'
+      seen.add(id)
+    }
 
     if (e.name || e.price || e.cost || e.size) errors.byVariant[v.key] = e
     else if (price !== null && size.ok) {

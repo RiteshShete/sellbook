@@ -74,10 +74,14 @@ export function ProductForm({ product }: { product?: Product }) {
 
         <h2 className="mt-2 font-semibold">Variants</h2>
         {form.errors.variants && <p className="text-sm text-danger">{form.errors.variants}</p>}
-        {form.draft.variants.map((v) => (
+        {form.draft.variants.map((v, i, all) => (
           <VariantFields
             key={v.key}
             variant={v}
+            isFirst={i === 0}
+            isLast={i === all.length - 1}
+            onDuplicate={() => form.duplicateVariant(v.key)}
+            onMove={(by) => form.moveVariant(v.key, by)}
             errors={form.errors.byVariant[v.key]}
             onChange={(patch) => form.updateVariant(v.key, patch)}
             onRemove={() => removeVariant(v)}
