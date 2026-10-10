@@ -9,3 +9,10 @@ export function formatPhone(input: string): string {
 export function pluralize(count: number, singular: string, plural = `${singular}s`): string {
   return `${count} ${count === 1 ? singular : plural}`
 }
+
+const nameCollator = new Intl.Collator('mr', { sensitivity: 'base', numeric: true })
+
+/** Sorts Devanagari (Marathi) and Latin names the way a Marathi reader expects; "10" after "9". */
+export function compareNames(a: string, b: string): number {
+  return nameCollator.compare(a, b)
+}

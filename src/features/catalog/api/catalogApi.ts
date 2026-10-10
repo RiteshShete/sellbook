@@ -1,6 +1,7 @@
 import type { SupabaseClient } from '@supabase/supabase-js'
 import { z } from 'zod'
 import { throwIfError } from '../../../lib/dbError'
+import { compareNames } from '../../../lib/format'
 import {
   CategorySchema,
   ProductSchema,
@@ -29,7 +30,11 @@ export async function fetchProducts(client: SupabaseClient): Promise<Product[]> 
   // Safe on an older database: no category column means every product is Uncategorised.
   if (isMissingSchema(error)) ({ data, error } = await run(PRODUCT_SELECT_LEGACY))
   throwIfError(error)
-  return z.array(ProductSchema).parse(data)
+  // The server orders by sort_order then name in its own collation; ties are re-sorted Marathi-aware.
+  return z
+    .array(ProductSchema)
+    .parse(data)
+    .sort((a, b) => a.sort_order - b.sort_order || compareNames(a.name, b.name))
 }
 
 /** One live product, or null if it doesn't exist / is in Trash. */

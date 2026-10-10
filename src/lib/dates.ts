@@ -80,3 +80,8 @@ export function formatMonth(month: string): string {
 export function formatMonthShort(month: string): string {
   return formatInTimeZone(monthRange(month).start, IST, 'MMM')
 }
+
+/** "2026-10-31" + 2 -> "2026-11-02". India has no daylight saving, so adding whole days is exact. */
+export function addDaysIST(date: string, days: number): string {
+  return formatInTimeZone(new Date(toDate(date).getTime() + days * 86_400_000), IST, 'yyyy-MM-dd')
+}
