@@ -12,6 +12,5 @@ test('receipt animation frames', async ({ page }) => {
   for (const [name, ms] of [['mid', 450], ['end', 1900]] as const) {
     await page.waitForTimeout(ms)
     await page.screenshot({ path: `docs/ui-audit/after/14-bill-receipt-${name}.png`, fullPage: true })
-    ms === 450 && (await page.waitForTimeout(0))
   }
 })
