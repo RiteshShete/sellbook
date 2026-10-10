@@ -265,6 +265,18 @@ export async function mockApi(page: Page, opts: MockOptions = {}): Promise<void>
     if (path === '/rest/v1/categories') {
       return url.search.includes('deleted_at=not.is.null') ? json([]) : json(cats)
     }
+    if (path === '/rest/v1/bills') {
+      const oid = url.searchParams.get('order_id')?.replace('eq.', '')
+      return json(
+        oid === ORDERS[0]?.id
+          ? [{ id: id(500), order_id: oid, bill_no: 1, revision: 1, image_path: `${OWNER}/2026/bill.png`, total_at_generation: 800, items_hash: 'hash', generated_at: new Date().toISOString() }]
+          : [],
+      )
+    }
+    if (path.startsWith('/storage/v1/object')) {
+      const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="540" height="700"><rect width="540" height="700" fill="#f5f0e0"/><rect x="20" y="20" width="500" height="660" rx="24" fill="#fffaf0"/><text x="50" y="80" font-size="24" font-family="sans-serif">Test Shop</text><rect x="60" y="120" width="420" height="260" rx="16" fill="#faf5e8"/><text x="150" y="260" font-size="22" font-family="sans-serif">Scan to pay | ₹800</text><text x="50" y="440" font-size="20" font-family="sans-serif">Order #15 · test data</text></svg>`
+      return route.fulfill({ status: 200, headers: { ...CORS, 'content-type': 'image/svg+xml' }, body: svg })
+    }
     if (path === '/rest/v1/settings') return json([SETTINGS])
     if (path === '/rest/v1/orders') {
       const status = url.searchParams.get('status')?.replace('eq.', '')
