@@ -8,3 +8,5 @@ dist
 supabase/.branches
 supabase/.temp
 *.tsbuildinfo
+test-results
+playwright-report

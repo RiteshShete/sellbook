@@ -3,7 +3,7 @@
 Method: read every screen/component in `src/` (routes: Home, Delivery, Analytics, Pending, Products + editor,
 New/Edit/Detail order, History, More, Settings, Trash, Activity, Login) against WCAG 2.2 AA + WAI-ARIA practice
 and Nielsen heuristics. Contrast is computed by `scripts/contrast.mjs` from the real tokens in `src/index.css`.
-Automated axe results are in the last section (filled in once the screens were run against test data).
+Automated axe results are in the last section.
 
 Severity: **High** = blocks or misleads, or fails AA. **Medium** = friction/inconsistency. **Low** = polish.
 "Fixed in" names the task or commit that resolves it; "Rec." = recommendation, not done.
@@ -95,4 +95,22 @@ existing semantic steps; each pair is in the table above.
 
 ## Automated accessibility run (axe-core)
 
-_Pending: filled in after the Playwright run._
+axe-core 4.x via @axe-core/playwright, tags wcag2a, wcag2aa, wcag21a, wcag21aa, wcag22aa, Chrome at 360x800, production build under /sellbook/, mocked API with test data (Devanagari names). Run: see docs/ui-audit/README.md.
+
+| Screen | axe violations | Sideways scroll (360 px / 200% text) |
+|---|---|---|
+| 01-home | 0 | 360px: ok; 200% text: ok |
+| 02-home-to-prepare | 0 | 360px: ok; 200% text: ok |
+| 03-delivery | 0 | 360px: ok; 200% text: ok |
+| 04-products | 0 | 360px: ok; 200% text: ok |
+| 05-products-categories | 0 | 360px: ok; 200% text: ok |
+| 06-categories-manager | 0 | 360px: ok; 200% text: ok |
+| 07-product-editor | 0 | 360px: ok; 200% text: ok |
+| 08-new-order | 0 | 360px: ok; 200% text: ok |
+| 09-new-order-variant-sheet | 0 | 360px: ok; 200% text: ok |
+| 10-new-order-with-items | 0 | 360px: ok; 200% text: ok |
+| 11-order-detail | 0 | 360px: ok; 200% text: ok |
+| 12-order-detail-more-actions | 0 | 360px: ok; 200% text: ok |
+| 13-more | 0 | 360px: ok; 200% text: ok |
+
+axe cannot judge everything (focus order, reading order, real screen-reader output): the phone check in the PR checklist covers those.
