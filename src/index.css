@@ -179,3 +179,28 @@ textarea {
   font-weight: 500;
   letter-spacing: -0.02em;
 }
+
+/*
+ * Receipt printer (Make bill): the paper slides out of the dark slot, then rests. The zigzag
+ * bottom edge is a mask. With "reduce motion" the global rule above makes it appear at once.
+ */
+@keyframes receipt-out {
+  from {
+    transform: translateY(-100%);
+  }
+  to {
+    transform: translateY(0);
+  }
+}
+
+.receipt-paper {
+  animation: receipt-out 1.6s cubic-bezier(0.22, 0.8, 0.3, 1) both;
+  filter: drop-shadow(0 6px 8px rgb(0 0 0 / 0.18));
+}
+
+.receipt-edge {
+  -webkit-mask: conic-gradient(from -45deg at bottom, #0000, #000 1deg 89deg, #0000 90deg) 50% / 14px 100%;
+  mask: conic-gradient(from -45deg at bottom, #0000, #000 1deg 89deg, #0000 90deg) 50% / 14px 100%;
+  padding-bottom: 7px;
+  background: var(--canvas);
+}
