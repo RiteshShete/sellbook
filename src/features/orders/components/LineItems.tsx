@@ -17,7 +17,7 @@ export interface LineItemsProps {
 
 export function LineItems({ lines, onQuantity, onRemove }: LineItemsProps) {
   if (lines.length === 0) {
-    return <p className="text-sm text-muted">No items yet. Tap a variant above to add it.</p>
+    return <p className="text-sm text-muted">No items yet. Tap a product above to add it.</p>
   }
   return (
     <ul className="divide-y divide-border overflow-hidden rounded-2xl border border-border bg-surface">

@@ -46,18 +46,30 @@ export function useOrderDraft(initial?: OrderDraft) {
         customer_name: name,
         customer_phone: phone ? toNationalPhone(phone) : '',
       })),
-    /** Adds one; merges into an existing line only if it has the same variant AND price. */
-    addVariant: (v: PickedVariant) =>
+    /** Adds `qty` (default 1); merges into an existing line only if it has the same variant AND price. */
+    addVariant: (v: PickedVariant, qty = 1) =>
       setLines((lines) => {
         const same = lines.find(
           (l) => l.variant_id === v.variant_id && l.unit_price === v.unit_price,
         )
         if (same) {
           return lines.map((l) =>
-            l === same ? { ...l, quantity: Math.min(MAX_QTY, l.quantity + 1) } : l,
+            l === same ? { ...l, quantity: Math.min(MAX_QTY, l.quantity + qty) } : l,
           )
         }
-        return [...lines, { key: uuid(), ...v, quantity: 1 }]
+        return [...lines, { key: uuid(), ...v, quantity: Math.min(MAX_QTY, qty) }]
+      }),
+    /** Sets the quantity of the line for this variant+price (adds it, or removes it at 0). */
+    setVariantQty: (v: PickedVariant, qty: number) =>
+      setLines((lines) => {
+        const same = lines.find(
+          (l) => l.variant_id === v.variant_id && l.unit_price === v.unit_price,
+        )
+        const q = Math.min(MAX_QTY, Math.max(0, qty))
+        if (!same) return q === 0 ? lines : [...lines, { key: uuid(), ...v, quantity: q }]
+        return q === 0
+          ? lines.filter((l) => l !== same)
+          : lines.map((l) => (l === same ? { ...l, quantity: q } : l))
       }),
     setQuantity: (key: string, quantity: number) =>
       setLines((lines) => lines.map((l) => (l.key === key ? { ...l, quantity } : l))),
