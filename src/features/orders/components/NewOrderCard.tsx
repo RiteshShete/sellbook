@@ -1,5 +1,5 @@
 import { Link } from 'react-router-dom'
-import { Button } from '../../../components/ui'
+import { ActionButton } from '../../../components/ui'
 import { formatINR } from '../../../lib/money'
 import { useOrderBusy, useSetStatus } from '../hooks/useOrderActions'
 import type { OrderListRow } from '../schemas'
@@ -27,18 +27,19 @@ export function NewOrderCard({ order }: { order: OrderListRow }) {
         {empty ? (
           <Link
             to={`/orders/${order.id}/edit`}
-            className="ml-auto inline-flex min-h-11 items-center rounded-xl border border-border px-4 text-sm font-semibold"
+            className="ml-auto inline-flex min-h-11 items-center rounded-xl border border-border-strong px-4 text-sm font-semibold"
           >
             Add items
           </Link>
         ) : (
-          <Button
+          <ActionButton
+            kind="ready"
             className="ml-auto"
             disabled={busy}
             onClick={() => setStatus.mutate({ order, from: order.status, to: 'ready' })}
           >
             Mark ready
-          </Button>
+          </ActionButton>
         )}
       </div>
     </li>
