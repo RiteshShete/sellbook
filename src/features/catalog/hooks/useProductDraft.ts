@@ -24,6 +24,7 @@ export function useProductDraft(initial?: ProductDraft) {
     errors,
     setErrors,
     setName: (name: string) => setDraft((d) => ({ ...d, name })),
+    setCategory: (category_id: string | null) => setDraft((d) => ({ ...d, category_id })),
     setActive: (is_active: boolean) => setDraft((d) => ({ ...d, is_active })),
     addVariant: () => setDraft((d) => ({ ...d, variants: [...d.variants, blankVariant()] })),
     updateVariant: (key: string, patch: Partial<VariantDraft>) =>
