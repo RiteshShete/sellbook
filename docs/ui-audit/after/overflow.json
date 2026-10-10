@@ -1,0 +1,15 @@
+{
+  "01-home": "360px: ok; 200% text: ok",
+  "02-home-to-prepare": "360px: ok; 200% text: ok",
+  "03-delivery": "360px: ok; 200% text: ok",
+  "04-products": "360px: ok; 200% text: ok",
+  "05-products-categories": "360px: ok; 200% text: ok",
+  "06-categories-manager": "360px: ok; 200% text: ok",
+  "07-product-editor": "360px: ok; 200% text: ok",
+  "08-new-order": "360px: ok; 200% text: ok",
+  "09-new-order-variant-sheet": "360px: ok; 200% text: ok",
+  "10-new-order-with-items": "360px: ok; 200% text: ok",
+  "11-order-detail": "360px: ok; 200% text: ok",
+  "12-order-detail-more-actions": "360px: ok; 200% text: ok",
+  "13-more": "360px: ok; 200% text: ok"
+}

@@ -22,6 +22,25 @@ describe('useOrderDraft', () => {
     expect(result.current.draft.lines).toHaveLength(2)
   })
 
+  it('sets a variant quantity directly: adds, changes, and removes at 0', () => {
+    const { result } = renderHook(() => useOrderDraft())
+    act(() => result.current.setVariantQty(cake, 3))
+    expect(result.current.draft.lines.map((l) => l.quantity)).toEqual([3])
+    act(() => result.current.setVariantQty(cake, 7))
+    expect(result.current.draft.lines.map((l) => l.quantity)).toEqual([7])
+    act(() => result.current.setVariantQty(cake, 0))
+    expect(result.current.draft.lines).toEqual([])
+    act(() => result.current.setVariantQty(cake, 0))
+    expect(result.current.draft.lines).toEqual([])
+  })
+
+  it('adds several at once from the variant sheet', () => {
+    const { result } = renderHook(() => useOrderDraft())
+    act(() => result.current.addVariant(cake, 4))
+    act(() => result.current.addVariant(cake, 2))
+    expect(result.current.draft.lines[0]?.quantity).toBe(6)
+  })
+
   it('fills name and the 10-digit phone from a suggestion', () => {
     const { result } = renderHook(() => useOrderDraft())
     act(() => result.current.pickCustomer('Asha', '919876543210'))

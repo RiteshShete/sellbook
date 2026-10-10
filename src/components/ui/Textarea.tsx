@@ -20,7 +20,7 @@ export function Textarea({ label, error, className = '', id, rows = 3, ...rest }
         rows={rows}
         aria-invalid={error ? true : undefined}
         aria-describedby={error ? `${inputId}-err` : undefined}
-        className={`w-full min-w-0 rounded-xl border bg-surface px-4 py-2 text-text outline-none focus:border-text focus:ring-1 focus:ring-text ${error ? 'border-danger' : 'border-border'} ${className}`}
+        className={`w-full min-w-0 rounded-xl border bg-surface px-4 py-2 text-text outline-none focus:border-text focus:ring-1 focus:ring-text ${error ? 'border-danger' : 'border-border-strong'} ${className}`}
         {...rest}
       />
       {error && (

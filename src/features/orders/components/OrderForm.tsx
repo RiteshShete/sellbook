@@ -3,12 +3,20 @@ import { useNavigate } from 'react-router-dom'
 import { Page } from '../../../app/Page'
 import { Button, Input, Textarea, toast } from '../../../components/ui'
 import { formatINR } from '../../../lib/money'
+import { weightSummary } from '../../../lib/variants'
 import { useCreateOrder, useUpdateOrder } from '../hooks/useOrders'
 import { useOrderDraft } from '../hooks/useOrderDraft'
-import { draftFromOrder, draftTotals, validateOrderDraft, type OrderWithItems } from '../schemas'
+import {
+  draftFromOrder,
+  draftTotals,
+  itemSize,
+  validateOrderDraft,
+  type OrderWithItems,
+} from '../schemas'
 import { CustomerFields } from './CustomerFields'
-import { ItemPicker } from './ItemPicker'
+import { DueChips } from './DueChips'
 import { LineItems } from './LineItems'
+import { ProductPicker } from './ProductPicker'
 
 /** New order (no `order`) or edit of an existing one. `notice` shows above the fields. */
 export function OrderForm({ order, notice }: { order?: OrderWithItems; notice?: ReactNode }) {
@@ -18,6 +26,9 @@ export function OrderForm({ order, notice }: { order?: OrderWithItems; notice?: 
   const update = useUpdateOrder(order?.id ?? '')
   const busy = create.isPending || update.isPending
   const totals = draftTotals(form.draft.lines, form.draft.discount)
+  const weight = weightSummary(
+    form.draft.lines.map((l) => ({ quantity: l.quantity, size: itemSize(l) })),
+  )
 
   function onSubmit(e: FormEvent) {
     e.preventDefault()
@@ -66,14 +77,29 @@ export function OrderForm({ order, notice }: { order?: OrderWithItems; notice?: 
             error={form.errors.due_date}
           />
         </div>
+        <DueChips
+          value={form.draft.due_date}
+          orderDate={form.draft.order_date}
+          onPick={(d) => form.setField('due_date', d)}
+        />
 
-        <h2 className="mt-2 font-semibold">Items</h2>
-        <ItemPicker onPick={form.addVariant} />
+        <h2 className="mt-2 font-display text-xl">Add items</h2>
+        <ProductPicker form={form} />
+
+        <h2 className="mt-2 flex items-baseline justify-between gap-2 font-display text-xl">
+          In this order
+          {weight.text && (
+            <span className="text-base font-normal text-muted tabular-nums">{weight.text}</span>
+          )}
+        </h2>
         <LineItems
           lines={form.draft.lines}
           onQuantity={form.setQuantity}
           onRemove={form.removeLine}
         />
+        {weight.note && form.draft.lines.length > 0 && (
+          <p className="-mt-2 text-sm text-muted">{weight.note}</p>
+        )}
         {form.errors.lines && <p className="text-sm text-danger">{form.errors.lines}</p>}
 
         <Input
@@ -91,26 +117,29 @@ export function OrderForm({ order, notice }: { order?: OrderWithItems; notice?: 
           onChange={(e) => form.setField('notes', e.target.value)}
         />
 
-        <dl className="flex flex-col gap-1 rounded-2xl bg-surface-2 p-4 text-sm">
-          <div className="flex justify-between">
-            <dt className="text-muted">Items</dt>
-            <dd>{formatINR(totals.subtotal)}</dd>
-          </div>
-          {totals.discount > 0 && (
+        {totals.discount > 0 && (
+          <dl className="flex flex-col gap-1 rounded-2xl bg-surface-2 p-4 text-sm">
+            <div className="flex justify-between">
+              <dt className="text-muted">Items</dt>
+              <dd className="tabular-nums">{formatINR(totals.subtotal)}</dd>
+            </div>
             <div className="flex justify-between">
               <dt className="text-muted">Discount</dt>
-              <dd>− {formatINR(totals.discount)}</dd>
+              <dd className="tabular-nums">− {formatINR(totals.discount)}</dd>
             </div>
-          )}
-          <div className="flex justify-between text-base font-semibold">
-            <dt>Total</dt>
-            <dd>{formatINR(totals.total)}</dd>
-          </div>
-        </dl>
+          </dl>
+        )}
 
-        <Button type="submit" block disabled={busy}>
-          {busy ? 'Saving…' : order ? 'Save changes' : 'Add order'}
-        </Button>
+        {/* Sticky: always visible above the tab bar, so Add order is one tap from anywhere in the form. */}
+        <div className="sticky bottom-[calc(3.5rem+env(safe-area-inset-bottom))] -mx-4 flex items-center gap-3 border-t border-border bg-surface px-4 py-3">
+          <div className="min-w-0 flex-1">
+            <p className="text-sm text-muted">Total</p>
+            <p className="font-display text-2xl tabular-nums">{formatINR(totals.total)}</p>
+          </div>
+          <Button type="submit" disabled={busy} className="min-w-40">
+            {busy ? 'Saving…' : order ? 'Save changes' : 'Add order'}
+          </Button>
+        </div>
       </form>
     </Page>
   )

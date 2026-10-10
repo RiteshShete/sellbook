@@ -238,7 +238,7 @@ Bottom nav (5): Home · Delivery · Analytics · Products · More (UX pass after
 | Route                 | Screen            | Notes                                                                                                                                            |
 | --------------------- | ----------------- | ------------------------------------------------------------------------------------------------------------------------------------------------ |
 | `/login`              | Login             | email+password; no signup link                                                                                                                   |
-| `/`                   | Home              | overview (to make / to deliver / unpaid), "Search all orders", New orders grouped by due with one-tap Mark ready, or "To prepare" (`?view=prep`) |
+| `/`                   | Home              | overview (to prepare / to deliver / unpaid), "Search all orders", New orders grouped by due with one-tap Mark ready, or "To prepare" (`?view=prep`) |
 | `/orders`             | All orders        | search by name/phone/order/bill no; filter All / New / Ready / Delivered / Cancelled; payment badge; due-date highlight                          |
 | `/orders/new`         | Order form        | customer autocomplete, item picker (product -> variant chips), qty stepper, discount, live total                                                 |
 | `/orders/:id`         | Order detail      | status stepper with Undo, payment sheet, bill card (preview, revision history, "Outdated — Regenerate"), Share, Edit, History, Move to Trash     |

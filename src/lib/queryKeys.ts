@@ -31,6 +31,7 @@ export const queryKeys = {
     month: (month: string) => ['analytics', 'month', month] as const,
   },
   pending: ['pending'] as const,
+  categories: ['categories'] as const,
   products: {
     all: ['products'] as const,
     list: () => ['products', 'list'] as const,

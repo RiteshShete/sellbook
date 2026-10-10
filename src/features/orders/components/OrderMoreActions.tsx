@@ -1,7 +1,7 @@
-import { History } from 'lucide-react'
+import { History, Trash2 } from 'lucide-react'
 import { useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
-import { Button, ConfirmDialog } from '../../../components/ui'
+import { ActionButton, ConfirmDialog } from '../../../components/ui'
 import { useTrashOrder } from '../hooks/useOrderHistory'
 import type { Order } from '../schemas'
 
@@ -19,9 +19,14 @@ export function OrderMoreActions({ order }: { order: Pick<Order, 'id' | 'order_n
       >
         <History className="h-5 w-5" /> History
       </Link>
-      <Button variant="ghost" className="ml-auto text-danger" onClick={() => setConfirm(true)}>
+      <ActionButton
+        kind="cancel"
+        icon={Trash2}
+        className="ml-auto"
+        onClick={() => setConfirm(true)}
+      >
         Move to Trash
-      </Button>
+      </ActionButton>
       <ConfirmDialog
         open={confirm}
         title={`Move #${order.order_no} to Trash?`}

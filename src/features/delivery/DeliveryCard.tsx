@@ -1,7 +1,7 @@
 import { Phone } from 'lucide-react'
 import { useState } from 'react'
 import { Link } from 'react-router-dom'
-import { Button } from '../../components/ui'
+import { ActionButton } from '../../components/ui'
 import { formatINR } from '../../lib/money'
 import { toTelLink } from '../../lib/phone'
 import { DueBadge, PaymentBadge } from '../orders/components/OrderBadges'
@@ -28,7 +28,10 @@ export function DeliveryCard({ order }: { order: OrderListRow }) {
           </span>
           <span className="shrink-0 font-semibold tabular-nums">{formatINR(order.total)}</span>
         </div>
-        <p className="text-sm text-muted">{order.itemsSummary || 'No items'}</p>
+        <p className="text-sm text-muted">
+          {order.itemsSummary || 'No items'}
+          {order.weight.text && ` · ${order.weight.text}`}
+        </p>
       </Link>
       <div className="flex items-center gap-2">
         <PaymentBadge order={order} />
@@ -37,18 +40,19 @@ export function DeliveryCard({ order }: { order: OrderListRow }) {
           <a
             href={toTelLink(order.customer_phone)}
             aria-label={`Call ${order.customer_name}`}
-            className="ml-auto inline-flex min-h-11 min-w-11 items-center justify-center rounded-xl border border-border"
+            className="ml-auto inline-flex min-h-11 min-w-11 items-center justify-center rounded-xl border border-border-strong"
           >
             <Phone className="h-5 w-5" />
           </a>
         )}
-        <Button
+        <ActionButton
+          kind="delivered"
           className={order.customer_phone ? '' : 'ml-auto'}
           disabled={busy}
           onClick={() => (paid ? deliver.mutate({ order, paid: null }) : setSheetOpen(true))}
         >
           Delivered
-        </Button>
+        </ActionButton>
       </div>
       <DeliverSheet order={order} open={sheetOpen} onClose={() => setSheetOpen(false)} />
     </li>
