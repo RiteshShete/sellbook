@@ -1,6 +1,7 @@
 import type { ButtonHTMLAttributes } from 'react'
+import { ACTION_STYLES, type ActionKind } from '../../lib/actionStyles'
 
-type Variant = 'primary' | 'secondary' | 'danger' | 'ghost'
+type Variant = 'primary' | 'secondary' | 'danger' | 'ghost' | ActionKind
 
 /** docs/DESIGN.md: button-primary / button-secondary / button-text-link. */
 const styles: Record<Variant, string> = {
@@ -9,6 +10,12 @@ const styles: Record<Variant, string> = {
   secondary: 'bg-surface text-text border border-border active:bg-surface-2 disabled:opacity-50',
   danger: 'bg-danger text-white active:opacity-90 disabled:opacity-50',
   ghost: 'bg-transparent text-text active:bg-surface-2 disabled:opacity-40',
+  // Action kinds (ready / delivered / paid / back / cancel): see lib/actionStyles.ts.
+  ready: `${ACTION_STYLES.ready.className} disabled:opacity-50`,
+  delivered: `${ACTION_STYLES.delivered.className} disabled:opacity-50`,
+  paid: `${ACTION_STYLES.paid.className} disabled:opacity-50`,
+  back: `${ACTION_STYLES.back.className} disabled:opacity-50`,
+  cancel: `${ACTION_STYLES.cancel.className} disabled:opacity-50`,
 }
 
 export interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
