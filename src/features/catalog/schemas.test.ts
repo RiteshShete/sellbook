@@ -184,11 +184,41 @@ describe('validateProductDraft', () => {
     expect(r.ok).toBe(false)
     if (!r.ok) {
       expect(r.errors.byVariant.a).toEqual({ price: 'Enter a price' })
-      expect(r.errors.byVariant.b).toEqual({
-        name: 'Duplicate name',
-        cost: 'Invalid amount',
-        size: 'Up to 3 decimals',
-      })
+      expect(r.errors.byVariant.b).toEqual({ cost: 'Invalid amount', size: 'Up to 3 decimals' })
     }
+  })
+
+  const v = (key: string, name: string, sizeText: string, sizeUnit: 'g' | 'kg' = 'g') => ({
+    key,
+    name,
+    price: '10',
+    cost: '',
+    sizeText,
+    sizeUnit,
+    is_active: true,
+  })
+
+  it('allows the same name with different sizes, rejects the same name and size', () => {
+    const ok = validateProductDraft(
+      draft({ variants: [v('a', 'Retail', '500'), v('b', 'retail', '1', 'kg')] }),
+    )
+    expect(ok.ok).toBe(true)
+    const dup = validateProductDraft(
+      draft({ variants: [v('a', 'Retail', '1', 'kg'), v('b', 'RETAIL', '1000')] }),
+    )
+    expect(dup.ok).toBe(false)
+    if (!dup.ok) expect(dup.errors.byVariant.b?.name).toBe('Same name and size already listed')
+  })
+
+  it('makes the name optional: a blank name becomes the size, or "Variant N"', () => {
+    const r = validateProductDraft(draft({ variants: [v('a', '', '500'), v('b', '', '')] }))
+    expect(r.ok).toBe(true)
+    if (r.ok) expect(r.payload.variants.map((x) => x.name)).toEqual(['500 g', 'Variant 2'])
+  })
+
+  it('rejects a size of zero or less', () => {
+    const r = validateProductDraft(draft({ variants: [v('a', 'Retail', '0')] }))
+    expect(r.ok).toBe(false)
+    if (!r.ok) expect(r.errors.byVariant.a?.size).toBe('Must be more than 0')
   })
 })

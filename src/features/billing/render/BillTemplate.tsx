@@ -1,5 +1,6 @@
 import { formatPhone, pluralize } from '../../../lib/format'
 import { addMoney, formatINR } from '../../../lib/money'
+import { itemVariantLabel } from '../../orders/schemas'
 import type { BillSource } from '../schemas'
 import { BILL_FONT } from './billFonts'
 
@@ -90,7 +91,7 @@ export function BillTemplate({ data }: { data: BillData }) {
           {o.items.map((i) => (
             <li key={i.id} className={`flex items-baseline gap-3 border-b py-2.5 ${line}`}>
               <span className="min-w-0 flex-1 break-words">
-                {i.product_name} · {i.variant_name}
+                {i.product_name} · {itemVariantLabel(i)}
                 <span className={`block text-[13px] ${muted}`}>
                   {i.quantity} × {formatINR(i.unit_price)}
                 </span>
