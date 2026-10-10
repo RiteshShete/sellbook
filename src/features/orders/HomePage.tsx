@@ -16,6 +16,11 @@ const VIEWS: { value: View; label: string }[] = [
   { value: 'prep', label: 'To prepare' },
 ]
 
+const VIEW_HINT: Record<View, string> = {
+  orders: 'Each new order on its own, with one tap to mark it ready.',
+  prep: 'All new orders added up per product: what to make.',
+}
+
 /**
  * Home: the "make it" screen. Overview of the day, then the New orders (one tap to mark Ready)
  * or the same orders summed per product ("To prepare"). Ready orders live on Delivery; older
@@ -29,7 +34,7 @@ export function HomePage() {
   return (
     <Page title="Home">
       <div className={`flex flex-col gap-4 ${FAB_CLEARANCE}`}>
-        <HomeOverview onShowPrep={() => setView('prep')} />
+        <HomeOverview />
         <Link
           to="/orders"
           className="flex min-h-12 items-center gap-3 rounded-xl border border-border bg-surface px-3 text-muted"
@@ -37,6 +42,7 @@ export function HomePage() {
           <Search className="h-5 w-5" /> Search all orders
         </Link>
         <SegmentedControl label="Show" options={VIEWS} value={view} onChange={setView} />
+        <p className="-mt-2 text-sm text-muted">{VIEW_HINT[view]}</p>
         {view === 'prep' ? <PrepList /> : <NewOrders />}
       </div>
       <NewOrderFab />
