@@ -2,8 +2,13 @@ import { Plus } from 'lucide-react'
 import { useState, type FormEvent } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { Page } from '../../../app/Page'
-import { Button, ConfirmDialog, Input, Switch, toast } from '../../../components/ui'
-import { useSaveProduct, useTrashProduct, useTrashVariant } from '../hooks/useCatalog'
+import { Button, ConfirmDialog, Input, Select, Switch, toast } from '../../../components/ui'
+import {
+  useCategories,
+  useSaveProduct,
+  useTrashProduct,
+  useTrashVariant,
+} from '../hooks/useCatalog'
 import { useProductDraft } from '../hooks/useProductDraft'
 import { draftFromProduct, validateProductDraft, type Product, type VariantDraft } from '../schemas'
 import { VariantFields } from './VariantFields'
@@ -13,6 +18,7 @@ type Pending = { kind: 'product' } | { kind: 'variant'; variant: VariantDraft } 
 export function ProductForm({ product }: { product?: Product }) {
   const navigate = useNavigate()
   const form = useProductDraft(product ? draftFromProduct(product) : undefined)
+  const categories = useCategories().data?.categories ?? []
   const save = useSaveProduct()
   const trashProduct = useTrashProduct()
   const trashVariant = useTrashVariant()
@@ -66,6 +72,17 @@ export function ProductForm({ product }: { product?: Product }) {
           onChange={(e) => form.setName(e.target.value)}
           error={form.errors.name}
         />
+        {categories.length > 0 && (
+          <Select
+            label="Category"
+            value={form.draft.category_id ?? ''}
+            options={[
+              { value: '', label: 'Uncategorised' },
+              ...categories.map((c) => ({ value: c.id, label: c.name })),
+            ]}
+            onChange={(e) => form.setCategory(e.target.value || null)}
+          />
+        )}
         <Switch
           label={form.draft.is_active ? 'Active' : 'Inactive (hidden when taking orders)'}
           checked={form.draft.is_active}

@@ -4,7 +4,7 @@ import { throwIfError } from '../../../lib/dbError'
 import { pluralize } from '../../../lib/format'
 import { dbMoney } from '../../../lib/zodMoney'
 
-export type TrashTab = 'orders' | 'products' | 'variants'
+export type TrashTab = 'orders' | 'products' | 'variants' | 'categories'
 
 /** One row on the Trash screen, whatever its kind. */
 export interface TrashRow {
@@ -24,6 +24,8 @@ const OrderRow = z.object({
   total: dbMoney,
   deleted_at: DeletedAt,
 })
+
+const CategoryRow = z.object({ id: z.guid(), name: z.string(), deleted_at: DeletedAt })
 
 const ProductRow = z.object({
   id: z.guid(),
@@ -59,6 +61,26 @@ export async function fetchTrash(client: SupabaseClient, tab: TrashTab): Promise
         detail: 'Order',
         deleted_at: o.deleted_at,
         amount: o.total,
+      }))
+  }
+  if (tab === 'categories') {
+    const { data, error } = await client
+      .from('categories')
+      .select('id, name, deleted_at')
+      .not('deleted_at', 'is', null)
+      .order('deleted_at', { ascending: false })
+    // Migration not applied yet: there can be no trashed categories.
+    if (error && ['42P01', 'PGRST205'].includes(error.code)) return []
+    throwIfError(error)
+    return z
+      .array(CategoryRow)
+      .parse(data)
+      .map((c) => ({
+        id: c.id,
+        title: c.name,
+        detail: 'Category · its products come back into it',
+        deleted_at: c.deleted_at,
+        amount: null,
       }))
   }
   if (tab === 'products') {

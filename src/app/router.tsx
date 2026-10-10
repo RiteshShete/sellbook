@@ -61,6 +61,10 @@ const routes: RouteObject[] = [
         lazy: lazyPage(() => import('../features/catalog/CatalogPage'), 'CatalogPage'),
       },
       {
+        path: 'catalog/categories',
+        lazy: lazyPage(() => import('../features/catalog/CategoriesPage'), 'CategoriesPage'),
+      },
+      {
         path: 'catalog/new',
         lazy: lazyPage(() => import('../features/catalog/ProductEditorPage'), 'ProductEditorPage'),
       },

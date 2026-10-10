@@ -35,6 +35,11 @@ export const ProductSchema = z
     name: z.string(),
     sort_order: z.number().int(),
     is_active: z.boolean(),
+    /** null / missing = Uncategorised (also while the categories migration is not applied). */
+    category_id: z
+      .guid()
+      .nullish()
+      .transform((v) => v ?? null),
     variants: z.array(VariantSchema),
   })
   .transform((p) => ({
@@ -44,6 +49,14 @@ export const ProductSchema = z
       .sort((a, b) => a.sort_order - b.sort_order),
   }))
 export type Product = z.infer<typeof ProductSchema>
+
+/** A product grouping. Trashed ones are never loaded (their products show as Uncategorised). */
+export const CategorySchema = z.object({
+  id: z.guid(),
+  name: z.string(),
+  sort_order: z.number().int(),
+})
+export type Category = z.infer<typeof CategorySchema>
 
 export const UpsertResultSchema = z.object({ id: z.guid() })
 
@@ -65,6 +78,8 @@ export interface VariantDraft {
 export interface ProductDraft {
   name: string
   is_active: boolean
+  /** Chosen category id; null = Uncategorised; undefined = leave as is (new product). */
+  category_id?: string | null
   variants: VariantDraft[]
 }
 
@@ -72,6 +87,7 @@ export interface UpsertProductPayload {
   id?: string
   name: string
   is_active: boolean
+  category_id?: string | null
   variants: {
     id?: string
     name: string
@@ -106,6 +122,7 @@ export function draftFromProduct(p: Product): ProductDraft {
   return {
     name: p.name,
     is_active: p.is_active,
+    category_id: p.category_id,
     variants: p.variants.map((v) => {
       const size = sizeToInput(v.size_unit, v.size_amount)
       return {
@@ -174,6 +191,12 @@ export function validateProductDraft(draft: ProductDraft, id?: string): ProductV
   }
   return {
     ok: true,
-    payload: { ...(id ? { id } : {}), name, is_active: draft.is_active, variants },
+    payload: {
+      ...(id ? { id } : {}),
+      name,
+      is_active: draft.is_active,
+      ...(draft.category_id !== undefined ? { category_id: draft.category_id } : {}),
+      variants,
+    },
   }
 }
