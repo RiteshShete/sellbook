@@ -8,6 +8,7 @@ import {
   type InputUnit,
   type SizeUnit,
 } from '../../lib/measure'
+import { fallbackVariantName } from '../../lib/variants'
 import { dbMoney, dbMoneyNullable } from '../../lib/zodMoney'
 
 // ---- Rows from the database (prices -> integer paise) ------------------------------------------
@@ -34,6 +35,11 @@ export const ProductSchema = z
     name: z.string(),
     sort_order: z.number().int(),
     is_active: z.boolean(),
+    /** null / missing = Uncategorised (also while the categories migration is not applied). */
+    category_id: z
+      .guid()
+      .nullish()
+      .transform((v) => v ?? null),
     variants: z.array(VariantSchema),
   })
   .transform((p) => ({
@@ -43,6 +49,14 @@ export const ProductSchema = z
       .sort((a, b) => a.sort_order - b.sort_order),
   }))
 export type Product = z.infer<typeof ProductSchema>
+
+/** A product grouping. Trashed ones are never loaded (their products show as Uncategorised). */
+export const CategorySchema = z.object({
+  id: z.guid(),
+  name: z.string(),
+  sort_order: z.number().int(),
+})
+export type Category = z.infer<typeof CategorySchema>
 
 export const UpsertResultSchema = z.object({ id: z.guid() })
 
@@ -64,6 +78,8 @@ export interface VariantDraft {
 export interface ProductDraft {
   name: string
   is_active: boolean
+  /** Chosen category id; null = Uncategorised; undefined = leave as is (new product). */
+  category_id?: string | null
   variants: VariantDraft[]
 }
 
@@ -71,6 +87,7 @@ export interface UpsertProductPayload {
   id?: string
   name: string
   is_active: boolean
+  category_id?: string | null
   variants: {
     id?: string
     name: string
@@ -105,6 +122,7 @@ export function draftFromProduct(p: Product): ProductDraft {
   return {
     name: p.name,
     is_active: p.is_active,
+    category_id: p.category_id,
     variants: p.variants.map((v) => {
       const size = sizeToInput(v.size_unit, v.size_amount)
       return {
@@ -132,13 +150,12 @@ export function validateProductDraft(draft: ProductDraft, id?: string): ProductV
 
   const seen = new Set<string>()
   const variants: UpsertProductPayload['variants'] = []
-  for (const v of draft.variants) {
+  for (const [index, v] of draft.variants.entries()) {
     const e: VariantErrors = {}
-    const vName = v.name.trim()
-    if (!vName) e.name = 'Name needed'
-    else if (vName.length > 80) e.name = 'Too long'
-    else if (seen.has(vName.toLowerCase())) e.name = 'Duplicate name'
-    seen.add(vName.toLowerCase())
+    // The name is optional (a size alone is enough); the database needs one, so a blank name
+    // becomes "500 g" / "Variant 2". variantLabel() shows it once, never twice.
+    const vName = v.name.trim() || fallbackVariantName(v.sizeText, v.sizeUnit, index)
+    if (vName.length > 80) e.name = 'Too long'
 
     const price = parseMoneyInput(v.price)
     if (price === null) e.price = 'Enter a price'
@@ -148,6 +165,12 @@ export function validateProductDraft(draft: ProductDraft, id?: string): ProductV
 
     const size = parseSizeInput(v.sizeText, v.sizeUnit)
     if (!size.ok) e.size = size.error
+    else {
+      // Same name AND same size twice in one product is a duplicate (the same name with another size is fine).
+      const id = `${vName.toLowerCase()}|${size.size?.size_amount ?? ''}|${size.size?.size_unit ?? ''}`
+      if (seen.has(id)) e.name = 'Same name and size already listed'
+      seen.add(id)
+    }
 
     if (e.name || e.price || e.cost || e.size) errors.byVariant[v.key] = e
     else if (price !== null && size.ok) {
@@ -168,6 +191,12 @@ export function validateProductDraft(draft: ProductDraft, id?: string): ProductV
   }
   return {
     ok: true,
-    payload: { ...(id ? { id } : {}), name, is_active: draft.is_active, variants },
+    payload: {
+      ...(id ? { id } : {}),
+      name,
+      is_active: draft.is_active,
+      ...(draft.category_id !== undefined ? { category_id: draft.category_id } : {}),
+      variants,
+    },
   }
 }

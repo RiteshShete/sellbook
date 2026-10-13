@@ -27,20 +27,27 @@ export function HomePage() {
   const setView = (v: View) => setParams(v === 'prep' ? { view: 'prep' } : {}, { replace: true })
 
   return (
-    <Page title="Home">
+    <Page title="Sellbook" action={<SearchLink />}>
       <div className={`flex flex-col gap-4 ${FAB_CLEARANCE}`}>
-        <HomeOverview onShowPrep={() => setView('prep')} />
-        <Link
-          to="/orders"
-          className="flex min-h-12 items-center gap-3 rounded-xl border border-border bg-surface px-3 text-muted"
-        >
-          <Search className="h-5 w-5" /> Search all orders
-        </Link>
+        <HomeOverview />
         <SegmentedControl label="Show" options={VIEWS} value={view} onChange={setView} />
         {view === 'prep' ? <PrepList /> : <NewOrders />}
       </div>
       <NewOrderFab />
     </Page>
+  )
+}
+
+/** Search field look-alike beside the title: opens the all-orders search, ready to type. */
+function SearchLink() {
+  return (
+    <Link
+      to="/orders"
+      aria-label="Search all orders"
+      className="flex min-h-11 w-40 items-center gap-2 rounded-xl border border-border-strong bg-surface px-3 text-sm text-muted"
+    >
+      <Search className="h-4 w-4 shrink-0" aria-hidden /> Search orders
+    </Link>
   )
 }
 

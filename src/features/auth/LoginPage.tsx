@@ -2,6 +2,7 @@ import { useMutation } from '@tanstack/react-query'
 import { useState, type FormEvent } from 'react'
 import { Navigate, useLocation } from 'react-router-dom'
 import { Button, Input, Skeleton } from '../../components/ui'
+import { RotatingArt } from './components/RotatingArt'
 import { validateLogin, type LoginErrors } from './schemas'
 import { useAuth } from './useAuth'
 
@@ -38,6 +39,11 @@ export function LoginPage() {
     return <Navigate to={safeTarget(from)} replace />
   }
 
+  /** Typing in a field removes its error at once; Sign in re-validates and shows it again if needed. */
+  function clearError(field: keyof LoginErrors) {
+    setErrors((prev) => (prev[field] ? { ...prev, [field]: undefined } : prev))
+  }
+
   function onSubmit(e: FormEvent) {
     e.preventDefault()
     const result = validateLogin({ email, password })
@@ -46,7 +52,8 @@ export function LoginPage() {
   }
 
   return (
-    <main className="mx-auto flex min-h-dvh max-w-sm flex-col justify-center gap-6 px-6 py-8 pt-[max(2rem,env(safe-area-inset-top))]">
+    <main className="mx-auto flex min-h-dvh max-w-sm flex-col justify-end gap-6 px-6 pt-[max(2rem,env(safe-area-inset-top))] pb-[max(5rem,env(safe-area-inset-bottom))]">
+      <RotatingArt />
       <div>
         <h1 className="font-display text-5xl tracking-tight">Sellbook</h1>
         <p className="text-muted">Owner sign-in</p>
@@ -59,7 +66,10 @@ export function LoginPage() {
           autoComplete="username"
           autoCapitalize="none"
           value={email}
-          onChange={(e) => setEmail(e.target.value)}
+          onChange={(e) => {
+            setEmail(e.target.value)
+            clearError('email')
+          }}
           error={errors.email}
         />
         <Input
@@ -67,7 +77,10 @@ export function LoginPage() {
           type="password"
           autoComplete="current-password"
           value={password}
-          onChange={(e) => setPassword(e.target.value)}
+          onChange={(e) => {
+            setPassword(e.target.value)
+            clearError('password')
+          }}
           error={errors.password}
         />
         <Button type="submit" block disabled={login.isPending}>

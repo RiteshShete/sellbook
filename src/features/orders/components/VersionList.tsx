@@ -38,7 +38,7 @@ export function VersionList({ order, versions, onRolledBack }: VersionListProps)
             <li key={v.version_no} className="rounded-2xl border border-border bg-surface p-4">
               <div className="flex items-center gap-2">
                 <span className="font-semibold">v{v.version_no}</span>
-                <Badge tone={current ? 'info' : 'neutral'}>
+                <Badge kind={current ? 'info' : 'neutral'}>
                   {current ? 'Current' : REASON[v.reason]}
                 </Badge>
                 <span className="ml-auto text-sm text-muted">{formatDateTime(v.created_at)}</span>

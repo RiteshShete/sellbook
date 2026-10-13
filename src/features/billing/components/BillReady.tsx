@@ -7,6 +7,7 @@ import { useBillImage } from '../hooks/useBills'
 import { useShareBill } from '../hooks/useShareBill'
 import { billShareText, type BillState, billFileName, formatBillNo, isOutdated } from '../schemas'
 import { BillRevisions } from './BillRevisions'
+import { ReceiptPrinter } from './ReceiptPrinter'
 import { formatDateTime } from '../../../lib/dates'
 import { toWaMeLink } from '../../../lib/phone'
 
@@ -59,25 +60,23 @@ export function BillReady({ order, settings, state, regenerating, onRegenerate }
         </div>
       )}
 
-      <button
-        type="button"
-        className="overflow-hidden rounded-xl border border-border"
-        onClick={() => setZoom(true)}
-        aria-label="View bill"
-        disabled={!image.url}
-      >
-        {image.url ? (
-          <img
-            src={image.url}
-            alt={`Bill ${billNo}`}
-            className="max-h-72 w-full object-cover object-top"
-          />
-        ) : image.error ? (
-          <p className="p-4 text-sm text-danger">{image.error.message}</p>
-        ) : (
-          <Skeleton className="h-72 w-full" />
-        )}
-      </button>
+      <ReceiptPrinter playKey={latest.id}>
+        <button
+          type="button"
+          className="block w-full"
+          onClick={() => setZoom(true)}
+          aria-label="View bill"
+          disabled={!image.url}
+        >
+          {image.url ? (
+            <img src={image.url} alt={`Bill ${billNo}`} className="w-full" />
+          ) : image.error ? (
+            <p className="p-4 text-sm text-danger">{image.error.message}</p>
+          ) : (
+            <Skeleton className="h-72 w-full" />
+          )}
+        </button>
+      </ReceiptPrinter>
 
       {outdated && (
         <Button block disabled={regenerating} onClick={onRegenerate}>

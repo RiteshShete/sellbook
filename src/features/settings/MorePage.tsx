@@ -43,6 +43,7 @@ export function MorePage() {
           {logout.isPending ? 'Signing out…' : 'Sign out'}
         </Button>
       </div>
+      <p className="mt-6 text-center text-xs text-muted">Version {__APP_VERSION__}</p>
     </Page>
   )
 }

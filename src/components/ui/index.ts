@@ -1,6 +1,8 @@
+export { ActionButton, type ActionButtonProps } from './ActionButton'
 export { Badge } from './Badge'
 export { BottomSheet, type BottomSheetProps } from './BottomSheet'
 export { Button, type ButtonProps } from './Button'
+export { Chip, type ChipProps } from './Chip'
 export { ConfirmDialog, type ConfirmDialogProps } from './ConfirmDialog'
 export { EmptyState, type EmptyStateProps } from './EmptyState'
 export { ErrorState, type ErrorStateProps } from './ErrorState'

@@ -3,17 +3,19 @@ import { Page } from '../../app/Page'
 import { EmptyState, ErrorState, Skeleton } from '../../components/ui'
 import { pluralize } from '../../lib/format'
 import { DueGroupedList } from '../orders/components/DueGroupedList'
-import { FAB_CLEARANCE, NewOrderFab } from '../orders/components/NewOrderFab'
 import { useOrders } from '../orders/hooks/useOrders'
 import { DeliveryCard } from './DeliveryCard'
 
-/** The "hand it over" screen: exactly the `ready` orders, grouped by due date. */
+/**
+ * The "hand it over" screen: exactly the `ready` orders, grouped by due date. No New order button
+ * here: this screen is for handing over, and taking orders is on Home.
+ */
 export function DeliveryPage() {
   const orders = useOrders('ready', '')
 
   return (
     <Page title="Delivery">
-      <div className={FAB_CLEARANCE}>
+      <div>
         {orders.isPending ? (
           <div className="flex flex-col gap-3" role="status" aria-label="Loading">
             <Skeleton className="h-28 w-full" />
@@ -41,7 +43,6 @@ export function DeliveryPage() {
           </div>
         )}
       </div>
-      <NewOrderFab />
     </Page>
   )
 }

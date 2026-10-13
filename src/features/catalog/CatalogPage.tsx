@@ -1,12 +1,11 @@
-import { ChevronRight, Plus } from 'lucide-react'
+import { Plus, Tags } from 'lucide-react'
 import { Link } from 'react-router-dom'
 import { Page } from '../../app/Page'
 import { Badge, EmptyState, ErrorState, Skeleton } from '../../components/ui'
 import { pluralize } from '../../lib/format'
-import { formatMeasure } from '../../lib/measure'
-import { formatINR } from '../../lib/money'
-import { useProducts } from './hooks/useCatalog'
-import type { Product, Variant } from './schemas'
+import { ProductCard } from './components/ProductCard'
+import { ProductFilters, ProductGrid, sectionTitle } from './components/ProductGrid'
+import { useProductBrowser } from './hooks/useProductBrowser'
 
 /**
  * Outlined, in the header: deliberately unlike the filled floating "New order" button on Home
@@ -15,53 +14,8 @@ import type { Product, Variant } from './schemas'
 const addLink =
   'inline-flex min-h-11 items-center gap-1 rounded-xl border border-text bg-surface px-4 text-sm font-semibold text-text active:bg-surface-2'
 
-function VariantChip({ variant: v }: { variant: Variant }) {
-  const size =
-    v.size_unit && v.size_amount !== null ? formatMeasure(v.size_unit, v.size_amount) : null
-  // Skip the size when the name already says it ("1 kg" named "1 kg").
-  const showSize = size !== null && size.replace(/\s/g, '') !== v.name.replace(/\s/g, '')
-  return (
-    <li
-      className={`inline-flex items-baseline gap-1.5 rounded-full bg-surface-2 px-3 py-1 text-sm ${v.is_active ? '' : 'text-muted line-through'}`}
-    >
-      <span>{v.name}</span>
-      {showSize && <span className="text-muted">{size}</span>}
-      <span className="font-semibold tabular-nums">{formatINR(v.price)}</span>
-    </li>
-  )
-}
-
-function ProductCard({ product: p }: { product: Product }) {
-  return (
-    <li>
-      <Link
-        to={`/catalog/${p.id}`}
-        className={`flex flex-col gap-3 rounded-2xl border border-border bg-surface p-4 ${p.is_active ? '' : 'opacity-60'}`}
-      >
-        <div className="flex items-center gap-2">
-          <span className="font-display min-w-0 flex-1 truncate text-xl">{p.name}</span>
-          {!p.is_active && <Badge>Hidden</Badge>}
-          <ChevronRight className="h-5 w-5 shrink-0 text-muted" />
-        </div>
-        {p.variants.length === 0 ? (
-          <p className="text-sm text-muted">No variants yet. Tap to add sizes and prices.</p>
-        ) : (
-          <ul
-            className="flex flex-wrap gap-1.5"
-            aria-label={pluralize(p.variants.length, 'variant')}
-          >
-            {p.variants.map((v) => (
-              <VariantChip key={v.id} variant={v} />
-            ))}
-          </ul>
-        )}
-      </Link>
-    </li>
-  )
-}
-
 export function CatalogPage() {
-  const products = useProducts()
+  const b = useProductBrowser()
 
   const addButton = (
     <Link to="/catalog/new" className={addLink}>
@@ -71,30 +25,66 @@ export function CatalogPage() {
 
   return (
     <Page title="Products" action={addButton}>
-      {products.isPending ? (
-        <div className="flex flex-col gap-3" role="status" aria-label="Loading">
-          <Skeleton className="h-24 w-full" />
-          <Skeleton className="h-24 w-full" />
-          <Skeleton className="h-24 w-full" />
+      {b.products.isPending ? (
+        <div className="grid grid-cols-2 gap-3" role="status" aria-label="Loading">
+          {[0, 1, 2, 3].map((i) => (
+            <Skeleton key={i} className="h-28 w-full" />
+          ))}
         </div>
-      ) : products.isError ? (
-        <ErrorState error={products.error} onRetry={() => void products.refetch()} />
-      ) : products.data.length === 0 ? (
+      ) : b.products.isError ? (
+        <ErrorState error={b.products.error} onRetry={() => void b.products.refetch()} />
+      ) : b.all.length === 0 ? (
         <EmptyState
           title="No products yet"
           description="Add the things you sell, with a price for each size or flavour."
           action={addButton}
         />
       ) : (
-        <div className="flex flex-col gap-3">
-          <p className="text-sm text-muted">
-            {pluralize(products.data.length, 'product')}. Tap one to change prices or sizes.
-          </p>
-          <ul className="flex flex-col gap-3">
-            {products.data.map((p) => (
-              <ProductCard key={p.id} product={p} />
-            ))}
-          </ul>
+        <div className="flex flex-col gap-4">
+          <ProductFilters
+            query={b.query}
+            onQuery={b.setQuery}
+            filter={b.filter}
+            onFilter={b.setFilter}
+            categories={b.categories}
+            showUncategorised={b.showUncategorised}
+          />
+          <div className="flex items-center justify-between gap-2 text-sm text-muted">
+            <p>{pluralize(b.all.length, 'product')}. Tap one to change prices or sizes.</p>
+            <Link
+              to="/catalog/categories"
+              className="inline-flex min-h-11 shrink-0 items-center gap-1 rounded-xl px-2 font-medium text-text underline underline-offset-4"
+            >
+              <Tags className="h-4 w-4" /> Categories
+            </Link>
+          </div>
+          {b.sections.length === 0 ? (
+            <EmptyState title="No products match" description="Try a different word or category." />
+          ) : (
+            b.sections.map((s) => (
+              <section key={s.category?.id ?? 'none'} className="flex flex-col gap-2">
+                {b.categories.length > 0 && (
+                  <h2 className="font-display text-xl">{sectionTitle(s)}</h2>
+                )}
+                <ProductGrid>
+                  {s.products.map((p) => (
+                    <ProductCard
+                      key={p.id}
+                      product={p}
+                      to={`/catalog/${p.id}`}
+                      extra={
+                        !p.is_active ? (
+                          <span className="mt-1">
+                            <Badge>Hidden</Badge>
+                          </span>
+                        ) : undefined
+                      }
+                    />
+                  ))}
+                </ProductGrid>
+              </section>
+            ))
+          )}
         </div>
       )}
     </Page>

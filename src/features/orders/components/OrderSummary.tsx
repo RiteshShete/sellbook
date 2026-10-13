@@ -1,18 +1,51 @@
 import { MessageCircle, Phone } from 'lucide-react'
+import { Link } from 'react-router-dom'
 import { formatDate } from '../../../lib/dates'
 import { formatPhone } from '../../../lib/format'
 import { formatTotals, sumLines } from '../../../lib/measure'
 import { formatINR } from '../../../lib/money'
 import { toTelLink, toWaMeLink } from '../../../lib/phone'
-import { itemSize, type OrderWithItems } from '../schemas'
+import { itemSize, itemVariantLabel, type OrderWithItems } from '../schemas'
 import { DueBadge, PaymentBadge, StatusBadge } from './OrderBadges'
 
-const iconLink =
-  'inline-flex min-h-11 min-w-11 items-center justify-center rounded-xl border border-border bg-surface'
+const contactLink =
+  'inline-flex min-h-11 items-center gap-2 rounded-xl border border-border-strong bg-surface px-4 text-sm font-medium'
 
-/** Read-only view of an order: customer, dates, items, totals. */
+/**
+ * Under the customer name in the page header: tap to call, WhatsApp, or a quiet "Add phone" link
+ * to Edit when there is no number.
+ */
+function CustomerContact({ order }: { order: OrderWithItems }) {
+  if (!order.customer_phone) {
+    return (
+      <p>
+        <Link
+          to={`/orders/${order.id}/edit`}
+          className="inline-flex min-h-11 items-center text-sm text-muted underline underline-offset-4"
+        >
+          Add phone
+        </Link>
+      </p>
+    )
+  }
+  const wa = toWaMeLink(order.customer_phone)
+  return (
+    <div className="flex flex-wrap gap-2">
+      <a href={toTelLink(order.customer_phone)} className={contactLink}>
+        <Phone className="h-5 w-5" aria-hidden="true" />
+        <span className="tabular-nums">{formatPhone(order.customer_phone)}</span>
+      </a>
+      {wa && (
+        <a href={wa} target="_blank" rel="noreferrer" className={contactLink}>
+          <MessageCircle className="h-5 w-5" aria-hidden="true" /> WhatsApp
+        </a>
+      )}
+    </div>
+  )
+}
+
+/** Read-only view of an order: contact, dates, items, totals. The customer name is the page heading. */
 export function OrderSummary({ order }: { order: OrderWithItems }) {
-  const wa = order.customer_phone ? toWaMeLink(order.customer_phone) : null
   // e.g. "3.25 kg"; lines without a size are left out here (they show as items above).
   const totals = sumLines(order.items.map((i) => ({ quantity: i.quantity, size: itemSize(i) })))
   const weight = formatTotals({ ...totals, unsized: 0 }).join(' + ')
@@ -25,24 +58,7 @@ export function OrderSummary({ order }: { order: OrderWithItems }) {
         <DueBadge order={order} />
       </div>
 
-      <section className="flex items-center gap-3 rounded-2xl border border-border bg-surface p-4">
-        <div className="min-w-0 flex-1">
-          <p className="truncate text-lg font-semibold">{order.customer_name}</p>
-          <p className="text-sm text-muted">
-            {order.customer_phone ? formatPhone(order.customer_phone) : 'No phone'}
-          </p>
-        </div>
-        {order.customer_phone && (
-          <a href={toTelLink(order.customer_phone)} className={iconLink} aria-label="Call">
-            <Phone className="h-5 w-5" />
-          </a>
-        )}
-        {wa && (
-          <a href={wa} target="_blank" rel="noreferrer" className={iconLink} aria-label="WhatsApp">
-            <MessageCircle className="h-5 w-5" />
-          </a>
-        )}
-      </section>
+      <CustomerContact order={order} />
 
       <dl className="grid grid-cols-2 gap-2 text-sm">
         <div>
@@ -63,7 +79,7 @@ export function OrderSummary({ order }: { order: OrderWithItems }) {
             {order.items.map((i) => (
               <li key={i.id} className="flex items-baseline gap-3 px-4 py-3">
                 <span className="min-w-0 flex-1">
-                  {i.product_name} · {i.variant_name}
+                  {i.product_name} · {itemVariantLabel(i)}
                   <span className="block text-sm text-muted">
                     {i.quantity} × {formatINR(i.unit_price)}
                   </span>

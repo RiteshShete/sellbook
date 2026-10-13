@@ -1,5 +1,5 @@
 import { Link } from 'react-router-dom'
-import { Button } from '../../../components/ui'
+import { ActionButton } from '../../../components/ui'
 import { formatINR } from '../../../lib/money'
 import { useOrderBusy, useSetStatus } from '../hooks/useOrderActions'
 import type { OrderListRow } from '../schemas'
@@ -20,25 +20,29 @@ export function NewOrderCard({ order }: { order: OrderListRow }) {
           </span>
           <span className="shrink-0 font-semibold tabular-nums">{formatINR(order.total)}</span>
         </div>
-        <p className="text-sm text-muted">{order.itemsSummary || 'No items yet'}</p>
+        <p className="text-sm text-muted">
+          {order.itemsSummary || 'No items yet'}
+          {order.weight.text && ` · ${order.weight.text}`}
+        </p>
       </Link>
       <div className="flex items-center gap-2">
         <DueBadge order={order} />
         {empty ? (
           <Link
             to={`/orders/${order.id}/edit`}
-            className="ml-auto inline-flex min-h-11 items-center rounded-xl border border-border px-4 text-sm font-semibold"
+            className="ml-auto inline-flex min-h-11 items-center rounded-xl border border-border-strong px-4 text-sm font-semibold"
           >
             Add items
           </Link>
         ) : (
-          <Button
+          <ActionButton
+            kind="ready"
             className="ml-auto"
             disabled={busy}
             onClick={() => setStatus.mutate({ order, from: order.status, to: 'ready' })}
           >
             Mark ready
-          </Button>
+          </ActionButton>
         )}
       </div>
     </li>

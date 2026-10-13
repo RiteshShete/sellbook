@@ -11,6 +11,7 @@ import {
   nextMonth,
   previousMonth,
   todayIST,
+  addDaysIST,
 } from './dates'
 
 const iso = (d: Date) => d.toISOString()
@@ -112,5 +113,13 @@ describe('formatDayMonth', () => {
   it('formats the IST day', () => {
     expect(formatDayMonth('2026-10-12')).toBe('12 Oct')
     expect(formatDayMonth(new Date('2026-09-30T18:30:00Z'))).toBe('01 Oct')
+  })
+})
+
+describe('addDaysIST', () => {
+  it('adds days across month and year ends', () => {
+    expect(addDaysIST('2026-10-31', 2)).toBe('2026-11-02')
+    expect(addDaysIST('2026-12-31', 1)).toBe('2027-01-01')
+    expect(addDaysIST('2026-03-01', -1)).toBe('2026-02-28')
   })
 })

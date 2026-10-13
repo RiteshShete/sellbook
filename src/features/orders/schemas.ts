@@ -8,6 +8,7 @@ import {
 } from '../../lib/money'
 import { SizeUnitSchema, dbAmount, type SizeUnit } from '../../lib/measure'
 import { normalizePhone, toNationalPhone } from '../../lib/phone'
+import { variantLabel, weightSummary } from '../../lib/variants'
 import { dbMoney } from '../../lib/zodMoney'
 
 // ---- Rows from the database ----------------------------------------------------------------------
@@ -62,8 +63,17 @@ export const OrderItemSchema = z.object({
 export type OrderItem = z.infer<typeof OrderItemSchema>
 
 /** A line's own size snapshot, or null. Never the catalog's current size (B8; same as DB). */
-export function itemSize(i: OrderItem): { unit: SizeUnit; amount: number } | null {
+export function itemSize(
+  i: Pick<OrderItem, 'size_amount' | 'size_unit'>,
+): { unit: SizeUnit; amount: number } | null {
   return i.size_unit && i.size_amount != null ? { unit: i.size_unit, amount: i.size_amount } : null
+}
+
+/** The one variant label for a saved line: its own name + size snapshot, never the live catalog (B8). */
+export function itemVariantLabel(
+  i: Pick<OrderItem, 'variant_name' | 'size_amount' | 'size_unit'>,
+): string {
+  return variantLabel({ name: i.variant_name, size_amount: i.size_amount, size_unit: i.size_unit })
 }
 
 export const OrderWithItemsSchema = OrderSchema.extend({
@@ -82,6 +92,8 @@ export const OrderListRowSchema = OrderSchema.extend({
       product_name: z.string(),
       variant_name: z.string(),
       position: z.number().int(),
+      size_amount: dbAmount.nullish(),
+      size_unit: SizeUnitSchema.nullish(),
     }),
   ),
 }).transform(({ order_items, ...order }) => {
@@ -89,7 +101,10 @@ export const OrderListRowSchema = OrderSchema.extend({
   return {
     ...order,
     units: items.reduce((n, i) => n + i.quantity, 0),
-    itemsSummary: items.map((i) => `${i.quantity}× ${i.product_name} ${i.variant_name}`).join(', '),
+    itemsSummary: items
+      .map((i) => `${i.quantity}× ${i.product_name} ${itemVariantLabel(i)}`)
+      .join(', '),
+    weight: weightSummary(items.map((i) => ({ quantity: i.quantity, size: itemSize(i) }))),
   }
 })
 export type OrderListRow = z.infer<typeof OrderListRowSchema>
@@ -113,6 +128,9 @@ export interface LineDraft {
   variant_name: string
   unit_price: Paise
   quantity: number
+  /** Size snapshot (base units) for the weight total; null = no size. */
+  size_amount?: number | null
+  size_unit?: SizeUnit | null
 }
 
 export interface OrderDraft {
@@ -164,6 +182,8 @@ export function draftFromOrder(o: OrderWithItems): OrderDraft {
       variant_name: i.variant_name,
       unit_price: i.unit_price,
       quantity: i.quantity,
+      size_amount: i.size_amount ?? null,
+      size_unit: i.size_unit ?? null,
     })),
   }
 }

@@ -90,8 +90,8 @@ docs/PLAN.md  docs/DESIGN.md (UI style)  scripts/scan-secrets.mjs  public/ (_red
 ```
 
 Tabs (bottom bar): Home, Delivery, Analytics, Products (`/catalog`), More (Pending payments, Settings, Trash, Activity).
-Home = New orders to make (+ "To prepare"), Delivery = Ready orders to hand over; old orders via "Search all orders" (`/orders`).
-"New order" is a floating button on Home and Delivery; inner pages have a header back button (`Page back=`).
+Home = New orders (+ "To prepare": the same orders added up per product; the KPI card opens `/?view=prep`), Delivery = Ready orders to hand over (no New order button there); old orders via "Search all orders" (`/orders`).
+"New order" is a floating button on Home; inner pages have a header back button (`Page back=`).
 Helper contracts: money = integer paise (`toPaise`, `fromPaise`, `addMoney`, `multiplyMoney`, `formatINR`, `parseMoneyInput`);
 dates = always Asia/Kolkata (`monthRange`, `isoMonth`, `todayIST`, `formatDate`, `formatDateTime`);
 phone = digits with country code, e.g. `919876543210` (`normalizePhone`, `toWaMeLink`).
@@ -117,6 +117,20 @@ phone = digits with country code, e.g. `919876543210` (`normalizePhone`, `toWaMe
 - Migrations are append-only; never edit an applied migration. Every new table: RLS enabled + policies + pgTAP test.
 - Tests live next to code (`*.test.ts`); DB tests in `supabase/tests/database`.
 - Commits small and focused; never commit secrets, `.env*`, or service_role keys.
+
+## UI conventions (round 2)
+
+- **Token layer:** every colour is a CSS variable in `src/index.css` (`:root`), exposed as Tailwind token classes. Never raw hex in components. Added steps: `info*`, `success-soft/ink`, `danger-soft/ink/deep`, `border-strong` (form borders, 3:1), `disabled-fg`. Changing a token? Run `npm run contrast` (fails under 4.5:1 text / 3:1 UI).
+- **Action/status style map:** `src/lib/actionStyles.ts` is the ONLY place that decides how Ready (blue), Delivered (green), Paid (teal), Back (neutral outline), Cancel/Trash (red outline) and the status badges look. Use `<ActionButton kind=...>` / `<Badge kind=...>`; icon + label always.
+- **Variants:** one label helper, `variantLabel()` in `src/lib/variants.ts` ("Retail · 500 g · ₹150"); weight totals via `weightSummary()` (g/kg only; the rest is reported as not counted). Order lines use their own snapshot (B8).
+- **Products:** shared `ProductCard`/`ProductGrid`/`ProductFilters` (Products + New order); categories are optional and soft-deleted (Trash); products without one show under "Uncategorised".
+- **Names:** sort with `compareNames()` (Marathi collation); search with `normalizeSearch()`.
+- **Accessibility:** WCAG 2.2 AA. Dialogs trap focus; chips use aria-pressed; no horizontal scroll at 360 px or 200% text. `npm run e2e` (Playwright + axe, mocked API, see docs/ui-audit/README.md; not part of `check`).
+- Windows Git Bash rewrites `BASE_PATH=/sellbook/`: use `MSYS_NO_PATHCONV=1` or PowerShell.
+
+## Branch workflow
+
+Work on a branch (`ui-round-2` style), small commits per task, PR into `main` with a test checklist + screenshots; the owner tests on the phone and merges. Never commit to or push `main` directly. Migrations are written on the branch and applied (`supabase db push`) by the owner after review. The deploy workflow only runs on `main`.
 
 ## Working agreement
 

@@ -19,6 +19,7 @@ export function invalidateOrders(qc: QueryClient) {
 export function invalidateCatalog(qc: QueryClient) {
   return Promise.all([
     qc.invalidateQueries({ queryKey: queryKeys.products.all }),
+    qc.invalidateQueries({ queryKey: queryKeys.categories }),
     qc.invalidateQueries({ queryKey: queryKeys.orders.all }),
     qc.invalidateQueries({ queryKey: queryKeys.trash.all }),
     qc.invalidateQueries({ queryKey: queryKeys.activity.all }),
