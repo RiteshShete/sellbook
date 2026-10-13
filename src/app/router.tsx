@@ -38,7 +38,11 @@ const routes: RouteObject[] = [
       },
       {
         path: 'activity',
-        lazy: lazyPage(() => import('../features/settings/ActivityPage'), 'ActivityPage'),
+        lazy: lazyPage(() => import('../features/activity/ActivityPage'), 'ActivityPage'),
+      },
+      {
+        path: 'activity/:kind/:id',
+        lazy: lazyPage(() => import('../features/activity/EntityLogPage'), 'EntityLogPage'),
       },
       {
         path: 'orders/:id/edit',
@@ -59,6 +63,10 @@ const routes: RouteObject[] = [
       {
         path: 'catalog',
         lazy: lazyPage(() => import('../features/catalog/CatalogPage'), 'CatalogPage'),
+      },
+      {
+        path: 'catalog/categories',
+        lazy: lazyPage(() => import('../features/catalog/CategoriesPage'), 'CategoriesPage'),
       },
       {
         path: 'catalog/new',

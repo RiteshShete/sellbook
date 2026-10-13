@@ -1,4 +1,4 @@
-import { BottomSheet } from '../../components/ui'
+import { ActionButton, BottomSheet, Button } from '../../components/ui'
 import { formatINR } from '../../lib/money'
 import { useDeliver } from '../orders/hooks/useOrderActions'
 import type { OrderListRow } from '../orders/schemas'
@@ -20,6 +20,10 @@ export function DeliverSheet({
   onClose: () => void
 }) {
   const deliver = useDeliver()
+  const pick = (paid: (typeof CHOICES)[number]['paid']) => {
+    onClose()
+    deliver.mutate({ order, paid })
+  }
 
   return (
     <BottomSheet
@@ -31,16 +35,25 @@ export function DeliverSheet({
       <ul className="flex flex-col gap-2">
         {CHOICES.map((c) => (
           <li key={c.label}>
-            <button
-              type="button"
-              onClick={() => {
-                onClose()
-                deliver.mutate({ order, paid: c.paid })
-              }}
-              className={`flex min-h-12 w-full items-center rounded-xl px-4 text-left font-medium ${c.paid ? 'bg-primary text-primary-fg active:bg-primary-active' : 'border border-border bg-surface active:bg-surface-2'}`}
-            >
-              {c.label}
-            </button>
+            {c.paid ? (
+              <ActionButton
+                kind="paid"
+                block
+                className="min-h-12 justify-start"
+                onClick={() => pick(c.paid)}
+              >
+                {c.label}
+              </ActionButton>
+            ) : (
+              <Button
+                variant="secondary"
+                block
+                className="min-h-12 justify-start"
+                onClick={() => pick(null)}
+              >
+                {c.label}
+              </Button>
+            )}
           </li>
         ))}
       </ul>

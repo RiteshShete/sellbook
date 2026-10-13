@@ -1,6 +1,10 @@
 import { Minus, Plus, X } from 'lucide-react'
 import { formatINR, multiplyMoney } from '../../../lib/money'
+import { variantLabel } from '../../../lib/variants'
 import { MAX_QTY, type LineDraft } from '../schemas'
+
+const lineLabel = (l: LineDraft) =>
+  variantLabel({ name: l.variant_name, size_amount: l.size_amount, size_unit: l.size_unit })
 
 const stepBtn =
   'inline-flex h-11 w-11 items-center justify-center rounded-xl border border-border bg-surface disabled:opacity-40'
@@ -13,7 +17,7 @@ export interface LineItemsProps {
 
 export function LineItems({ lines, onQuantity, onRemove }: LineItemsProps) {
   if (lines.length === 0) {
-    return <p className="text-sm text-muted">No items yet. Tap a variant above to add it.</p>
+    return <p className="text-sm text-muted">No items yet. Tap a product above to add it.</p>
   }
   return (
     <ul className="divide-y divide-border overflow-hidden rounded-2xl border border-border bg-surface">
@@ -22,13 +26,13 @@ export function LineItems({ lines, onQuantity, onRemove }: LineItemsProps) {
           <div className="flex items-start gap-2">
             <div className="min-w-0 flex-1">
               <p className="truncate font-medium">
-                {l.product_name} · {l.variant_name}
+                {l.product_name} · {lineLabel(l)}
               </p>
               <p className="text-sm text-muted">{formatINR(l.unit_price)} each</p>
             </div>
             <button
               type="button"
-              aria-label={`Remove ${l.product_name} ${l.variant_name}`}
+              aria-label={`Remove ${l.product_name} ${lineLabel(l)}`}
               onClick={() => onRemove(l.key)}
               className="inline-flex h-11 w-11 items-center justify-center rounded-xl text-muted"
             >
@@ -46,7 +50,7 @@ export function LineItems({ lines, onQuantity, onRemove }: LineItemsProps) {
               <Minus className="h-4 w-4" />
             </button>
             <input
-              aria-label={`Quantity of ${l.product_name} ${l.variant_name}`}
+              aria-label={`Quantity of ${l.product_name} ${lineLabel(l)}`}
               inputMode="numeric"
               className="h-11 w-16 rounded-xl border border-border bg-surface text-center"
               value={Number.isNaN(l.quantity) ? '' : String(l.quantity)}

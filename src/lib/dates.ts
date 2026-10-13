@@ -23,6 +23,18 @@ export function isoMonth(value: Date | string): string {
   return formatInTimeZone(toDate(value), IST, 'yyyy-MM')
 }
 
+/** "2026-10-13" for the IST calendar day an instant falls in. */
+export function isoDay(value: Date | string): string {
+  return formatInTimeZone(toDate(value), IST, 'yyyy-MM-dd')
+}
+
+/** "Today", "Yesterday", else "13 Oct 2026" for a "YYYY-MM-DD" day, relative to `today`. */
+export function dayLabel(day: string, today: string = todayIST()): string {
+  if (day === today) return 'Today'
+  if (day === addDaysIST(today, -1)) return 'Yesterday'
+  return formatDate(day)
+}
+
 /** Today's calendar date in IST, "YYYY-MM-DD". `now` is injectable for tests. */
 export function todayIST(now: Date = new Date()): string {
   return formatInTimeZone(now, IST, 'yyyy-MM-dd')
@@ -79,4 +91,9 @@ export function formatMonth(month: string): string {
 /** "2026-10" -> "Oct" */
 export function formatMonthShort(month: string): string {
   return formatInTimeZone(monthRange(month).start, IST, 'MMM')
+}
+
+/** "2026-10-31" + 2 -> "2026-11-02". India has no daylight saving, so adding whole days is exact. */
+export function addDaysIST(date: string, days: number): string {
+  return formatInTimeZone(new Date(toDate(date).getTime() + days * 86_400_000), IST, 'yyyy-MM-dd')
 }

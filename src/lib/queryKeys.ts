@@ -24,13 +24,17 @@ export const queryKeys = {
   },
   activity: {
     all: ['activity'] as const,
-    list: (entity: string) => ['activity', entity] as const,
+    feed: (entity: string, entityId: string | null) =>
+      ['activity', 'feed', entity, entityId] as const,
+    entities: (kind: string, search: string) => ['activity', 'entities', kind, search] as const,
+    entity: (kind: string, id: string) => ['activity', 'entity', kind, id] as const,
   },
   analytics: {
     all: ['analytics'] as const,
     month: (month: string) => ['analytics', 'month', month] as const,
   },
   pending: ['pending'] as const,
+  categories: ['categories'] as const,
   products: {
     all: ['products'] as const,
     list: () => ['products', 'list'] as const,

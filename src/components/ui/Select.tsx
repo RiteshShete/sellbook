@@ -24,7 +24,8 @@ export function Select({ label, options, error, className = '', id, ...rest }: S
       <select
         id={selectId}
         aria-invalid={error ? true : undefined}
-        className={`min-h-11 w-full min-w-0 rounded-xl border bg-surface px-4 text-text outline-none focus:border-text focus:ring-1 focus:ring-text ${error ? 'border-danger' : 'border-border'} ${className}`}
+        aria-describedby={error ? `${selectId}-err` : undefined}
+        className={`min-h-11 w-full min-w-0 rounded-xl border bg-surface px-4 text-text outline-none focus:border-text focus:ring-1 focus:ring-text ${error ? 'border-danger' : 'border-border-strong'} ${className}`}
         {...rest}
       >
         {options.map((o) => (
@@ -33,7 +34,11 @@ export function Select({ label, options, error, className = '', id, ...rest }: S
           </option>
         ))}
       </select>
-      {error && <p className="text-sm text-danger">{error}</p>}
+      {error && (
+        <p id={`${selectId}-err`} className="text-sm text-danger">
+          {error}
+        </p>
+      )}
     </div>
   )
 }

@@ -1,6 +1,7 @@
 import { useState, type ReactNode } from 'react'
 import { Link, useParams } from 'react-router-dom'
 import { Page } from '../../app/Page'
+import { formatDate } from '../../lib/dates'
 import { Button, EmptyState, ErrorState, Skeleton } from '../../components/ui'
 import { BillCard } from '../billing/components/BillCard'
 import { OrderActions } from './components/OrderActions'
@@ -63,7 +64,9 @@ export function OrderDetailPage() {
       title="Order"
       render={(o) => (
         <Page
-          title={`Order #${o.order_no}`}
+          title={o.customer_name}
+          subtitle={`Order #${o.order_no} · ${formatDate(o.order_date)}`}
+          wrapTitle
           back="/"
           action={
             <Link to={`/orders/${o.id}/edit`} className={editLink}>

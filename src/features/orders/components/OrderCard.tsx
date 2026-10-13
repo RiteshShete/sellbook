@@ -20,7 +20,8 @@ export function OrderCard({ order }: { order: OrderListRow }) {
           <PaymentBadge order={order} />
           <DueBadge order={order} />
           <span className="ml-auto">
-            {pluralize(order.units, 'item')} · {formatDate(order.order_date)}
+            {pluralize(order.units, 'item')}
+            {order.weight.text && ` · ${order.weight.text}`} · {formatDate(order.order_date)}
           </span>
         </div>
       </Link>

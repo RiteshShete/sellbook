@@ -55,3 +55,19 @@ describe('Page back button', () => {
     expect(screen.queryByRole('button', { name: 'Back' })).toBeNull()
   })
 })
+
+describe('Page heading', () => {
+  it('shows the title as the one h1 with a small subtitle, wrapping a long name', () => {
+    render(
+      <MemoryRouter>
+        <Page title="सौ. सुनंदा कुलकर्णी आणि कुटुंब" subtitle="Order #15 · 10 Oct 2026" wrapTitle>
+          x
+        </Page>
+      </MemoryRouter>,
+    )
+    const h1 = screen.getByRole('heading', { level: 1 })
+    expect(h1.textContent).toBe('सौ. सुनंदा कुलकर्णी आणि कुटुंब')
+    expect(h1.className).toContain('line-clamp-2')
+    expect(screen.getByText('Order #15 · 10 Oct 2026')).toBeTruthy()
+  })
+})

@@ -10,6 +10,7 @@ const TABS: { value: TrashTab; label: string }[] = [
   { value: 'orders', label: 'Orders' },
   { value: 'products', label: 'Products' },
   { value: 'variants', label: 'Variants' },
+  { value: 'categories', label: 'Categories' },
 ]
 
 /** Soft-deleted items. Nothing is ever hard-deleted from here (requirement 7). */
