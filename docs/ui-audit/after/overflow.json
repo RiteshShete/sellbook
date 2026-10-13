@@ -11,5 +11,10 @@
   "10-new-order-with-items": "360px: ok; 200% text: ok",
   "11-order-detail": "360px: ok; 200% text: ok",
   "12-order-detail-more-actions": "360px: ok; 200% text: ok",
-  "13-more": "360px: ok; 200% text: ok"
+  "13-more": "360px: ok; 200% text: ok",
+  "14-bill-receipt": "360px: ok; 200% text: ok",
+  "15-activity-all": "360px: ok; 200% text: ok",
+  "16-activity-orders": "360px: ok; 200% text: ok",
+  "17-activity-order-log": "360px: ok; 200% text: ok",
+  "18-activity-products": "360px: ok; 200% text: ok"
 }
