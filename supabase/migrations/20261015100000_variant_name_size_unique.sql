@@ -4,6 +4,8 @@
 -- changes. Same-name variants without any size still collide, as before.
 drop index public.variants_product_name_uniq;
 
+-- NULLS NOT DISTINCT (Postgres 15+): two variants without a size still collide. (An expression like
+-- coalesce(size_unit::text, '') is rejected: the enum-to-text cast is not IMMUTABLE.)
 create unique index variants_product_name_size_uniq
-  on public.variants (product_id, lower(name), coalesce(size_amount, 0), coalesce(size_unit::text, ''))
+  on public.variants (product_id, lower(name), size_amount, size_unit) nulls not distinct
   where deleted_at is null;

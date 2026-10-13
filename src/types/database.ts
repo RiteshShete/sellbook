@@ -119,6 +119,36 @@ export type Database = {
           },
         ]
       }
+      categories: {
+        Row: {
+          created_at: string
+          deleted_at: string | null
+          id: string
+          name: string
+          owner_id: string
+          sort_order: number
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          deleted_at?: string | null
+          id?: string
+          name: string
+          owner_id?: string
+          sort_order?: number
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          deleted_at?: string | null
+          id?: string
+          name?: string
+          owner_id?: string
+          sort_order?: number
+          updated_at?: string
+        }
+        Relationships: []
+      }
       order_items: {
         Row: {
           cost_price: number | null
@@ -232,6 +262,7 @@ export type Database = {
       orders: {
         Row: {
           bill_no: number | null
+          bill_prefix: string | null
           cancelled_at: string | null
           cancelled_from: Database['public']['Enums']['order_status'] | null
           created_at: string
@@ -257,6 +288,7 @@ export type Database = {
         }
         Insert: {
           bill_no?: number | null
+          bill_prefix?: string | null
           cancelled_at?: string | null
           cancelled_from?: Database['public']['Enums']['order_status'] | null
           created_at?: string
@@ -282,6 +314,7 @@ export type Database = {
         }
         Update: {
           bill_no?: number | null
+          bill_prefix?: string | null
           cancelled_at?: string | null
           cancelled_from?: Database['public']['Enums']['order_status'] | null
           created_at?: string
@@ -309,6 +342,7 @@ export type Database = {
       }
       products: {
         Row: {
+          category_id: string | null
           created_at: string
           deleted_at: string | null
           id: string
@@ -319,6 +353,7 @@ export type Database = {
           updated_at: string
         }
         Insert: {
+          category_id?: string | null
           created_at?: string
           deleted_at?: string | null
           id?: string
@@ -329,6 +364,7 @@ export type Database = {
           updated_at?: string
         }
         Update: {
+          category_id?: string | null
           created_at?: string
           deleted_at?: string | null
           id?: string
@@ -338,7 +374,15 @@ export type Database = {
           sort_order?: number
           updated_at?: string
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: 'products_category_id_fkey'
+            columns: ['category_id']
+            isOneToOne: false
+            referencedRelation: 'categories'
+            referencedColumns: ['id']
+          },
+        ]
       }
       settings: {
         Row: {
@@ -469,6 +513,7 @@ export type Database = {
         Args: { p: Json }
         Returns: {
           bill_no: number | null
+          bill_prefix: string | null
           cancelled_at: string | null
           cancelled_from: Database['public']['Enums']['order_status'] | null
           created_at: string
@@ -503,6 +548,7 @@ export type Database = {
         Args: { p_month: string }
         Returns: {
           bill_no: number
+          bill_prefix: string
           customer_name: string
           customer_phone: string
           delivered_at: string
@@ -598,15 +644,18 @@ export type Database = {
           isSetofReturn: false
         }
       }
+      reorder_categories: { Args: { p_ids: string[] }; Returns: undefined }
       replace_order_items: {
         Args: { p_items: Json; p_order: string }
         Returns: undefined
       }
       reserve_bill_number: { Args: { p_order: string }; Returns: Json }
+      restore_category: { Args: { p_id: string }; Returns: undefined }
       restore_order: {
         Args: { p_id: string }
         Returns: {
           bill_no: number | null
+          bill_prefix: string | null
           cancelled_at: string | null
           cancelled_from: Database['public']['Enums']['order_status'] | null
           created_at: string
@@ -643,6 +692,7 @@ export type Database = {
         Args: { p_id: string; p_target: number; p_version: number }
         Returns: {
           bill_no: number | null
+          bill_prefix: string | null
           cancelled_at: string | null
           cancelled_from: Database['public']['Enums']['order_status'] | null
           created_at: string
@@ -681,6 +731,7 @@ export type Database = {
         }
         Returns: {
           bill_no: number | null
+          bill_prefix: string | null
           cancelled_at: string | null
           cancelled_from: Database['public']['Enums']['order_status'] | null
           created_at: string
@@ -720,6 +771,7 @@ export type Database = {
         }
         Returns: {
           bill_no: number | null
+          bill_prefix: string | null
           cancelled_at: string | null
           cancelled_from: Database['public']['Enums']['order_status'] | null
           created_at: string
@@ -758,10 +810,12 @@ export type Database = {
           last_order_date: string
         }[]
       }
+      trash_category: { Args: { p_id: string }; Returns: undefined }
       trash_order: {
         Args: { p_id: string }
         Returns: {
           bill_no: number | null
+          bill_prefix: string | null
           cancelled_at: string | null
           cancelled_from: Database['public']['Enums']['order_status'] | null
           created_at: string
@@ -798,6 +852,7 @@ export type Database = {
         Args: { p: Json; p_id: string; p_version: number }
         Returns: {
           bill_no: number | null
+          bill_prefix: string | null
           cancelled_at: string | null
           cancelled_from: Database['public']['Enums']['order_status'] | null
           created_at: string
@@ -828,6 +883,7 @@ export type Database = {
           isSetofReturn: false
         }
       }
+      upsert_category: { Args: { p: Json }; Returns: Json }
       upsert_product: { Args: { p: Json }; Returns: Json }
     }
     Enums: {
