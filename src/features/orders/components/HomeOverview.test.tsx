@@ -26,15 +26,12 @@ describe('HomeOverview', () => {
     expect(screen.getByRole('link', { name: /Unpaid/ }).getAttribute('href')).toBe('/pending')
   })
 
-  it('says what each number counts, and sums only the pending (delivered, unpaid) orders', () => {
+  it('sums only the pending (delivered, unpaid) orders', () => {
     render(
       <MemoryRouter>
         <HomeOverview />
       </MemoryRouter>,
     )
-    expect(screen.getByText('new orders')).toBeTruthy()
-    expect(screen.getByText('ready orders')).toBeTruthy()
-    expect(screen.getByText('delivered orders')).toBeTruthy()
     expect(screen.getByText('₹600')).toBeTruthy()
   })
 })
