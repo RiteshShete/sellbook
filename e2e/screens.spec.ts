@@ -58,6 +58,10 @@ const SCREENS: Screen[] = [
   },
   { name: '13-more', path: '/more' },
   { name: '14-bill-receipt', path: `/orders/${orderId}`, afterOnly: true },
+  { name: '15-activity-all', path: '/activity', afterOnly: true },
+  { name: '16-activity-orders', path: '/activity?tab=order', afterOnly: true },
+  { name: '17-activity-order-log', path: `/activity/order/${orderId}`, afterOnly: true },
+  { name: '18-activity-products', path: '/activity?tab=product', afterOnly: true },
 ]
 
 test.describe(`screens (${label})`, () => {

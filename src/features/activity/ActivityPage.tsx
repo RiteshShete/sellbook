@@ -1,89 +1,32 @@
-import { useInfiniteQuery } from '@tanstack/react-query'
-import { useState } from 'react'
-import { Link } from 'react-router-dom'
+import { useSearchParams } from 'react-router-dom'
 import { Page } from '../../app/Page'
-import { Button, EmptyState, ErrorState, SegmentedControl, Skeleton } from '../../components/ui'
-import { formatDateTime } from '../../lib/dates'
-import { queryKeys } from '../../lib/queryKeys'
-import { useAuth } from '../auth/useAuth'
-import { ACTIVITY_PAGE, fetchActivity, type ActivityEntity, type AuditRow } from './api/activityApi'
+import { SegmentedControl } from '../../components/ui'
+import { ACTIVITY_TABS, type ActivityTab } from './api/activityApi'
+import { ActivityFeed } from './components/ActivityFeed'
+import { EntityList } from './components/EntityList'
 
-const FILTERS: { value: ActivityEntity; label: string }[] = [
+const TABS: { value: ActivityTab; label: string }[] = [
   { value: 'all', label: 'All' },
   { value: 'order', label: 'Orders' },
   { value: 'product', label: 'Products' },
   { value: 'variant', label: 'Variants' },
-  { value: 'settings', label: 'Settings' },
 ]
 
-function useActivity(entity: ActivityEntity) {
-  const { client } = useAuth()
-  return useInfiniteQuery({
-    queryKey: queryKeys.activity.list(entity),
-    queryFn: ({ pageParam }) => fetchActivity(client, entity, pageParam),
-    initialPageParam: null as number | null,
-    getNextPageParam: (last) => (last.length === ACTIVITY_PAGE ? (last.at(-1)?.id ?? null) : null),
-  })
-}
-
-function Row({ row }: { row: AuditRow }) {
-  const text = (
-    <>
-      <p>{row.summary}</p>
-      <p className="text-xs text-muted">{formatDateTime(row.created_at)}</p>
-    </>
-  )
-  return (
-    <li className="px-4 py-3">
-      {(row.entity === 'order' || row.entity === 'bill') && row.entity_id ? (
-        <Link to={`/orders/${row.entity_id}`} className="block">
-          {text}
-        </Link>
-      ) : (
-        text
-      )}
-    </li>
-  )
-}
-
-/** Audit log: every change, newest first. */
+/**
+ * Activity: what happened, in plain words. "All" is one feed by day; Orders / Products / Variants
+ * list the things themselves (orders by #number) and each opens its own log.
+ */
 export function ActivityPage() {
-  const [entity, setEntity] = useState<ActivityEntity>('all')
-  const activity = useActivity(entity)
-  const rows = activity.data?.pages.flat() ?? []
+  const [params, setParams] = useSearchParams()
+  const raw = params.get('tab')
+  const tab = ACTIVITY_TABS.find((t) => t === raw) ?? 'all'
+  const setTab = (t: ActivityTab) => setParams(t === 'all' ? {} : { tab: t }, { replace: true })
 
   return (
     <Page title="Activity" back="/more">
       <div className="flex flex-col gap-3">
-        <SegmentedControl label="Show" options={FILTERS} value={entity} onChange={setEntity} />
-        {activity.isPending ? (
-          <div className="flex flex-col gap-2" role="status" aria-label="Loading">
-            <Skeleton className="h-12 w-full" />
-            <Skeleton className="h-12 w-full" />
-            <Skeleton className="h-12 w-full" />
-          </div>
-        ) : activity.isError ? (
-          <ErrorState error={activity.error} onRetry={() => void activity.refetch()} />
-        ) : rows.length === 0 ? (
-          <EmptyState title="No activity yet" />
-        ) : (
-          <>
-            <ul className="divide-y divide-border overflow-hidden rounded-2xl border border-border bg-surface text-sm">
-              {rows.map((r) => (
-                <Row key={r.id} row={r} />
-              ))}
-            </ul>
-            {activity.hasNextPage && (
-              <Button
-                variant="secondary"
-                disabled={activity.isFetchingNextPage}
-                onClick={() => void activity.fetchNextPage()}
-              >
-                {activity.isFetchingNextPage ? 'Loading…' : 'Load more'}
-              </Button>
-            )}
-          </>
-        )}
+        <SegmentedControl label="Show" options={TABS} value={tab} onChange={setTab} />
+        {tab === 'all' ? <ActivityFeed tab="all" entityId={null} /> : <EntityList kind={tab} />}
       </div>
     </Page>
   )
