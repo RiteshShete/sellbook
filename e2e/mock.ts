@@ -137,10 +137,27 @@ const order = (
   paid_at: paid ? new Date().toISOString() : null,
   cancelled_at: null,
   cancelled_from: null,
+  deleted_at: null,
   order_items: items,
 })
 
 export const LONG_NAME = 'सौ. सुनंदा श्रीकांत कुलकर्णी आणि कुटुंब, पुणे'
+
+const ago = (min: number) => new Date(Date.now() - min * 60_000).toISOString()
+const aud = (n: number, min: number, entity: string, entityId: string, action: string, summary: string) => ({
+  id: n, created_at: ago(min), entity, entity_id: entityId, action, summary,
+})
+export const PRODUCT_ID = id(601)
+export const VARIANT_ID = id(602)
+export const AUDIT = [
+  aud(9, 5, 'order', id(302), 'status', '#14 Asha Patil: Status: new → ready'),
+  aud(8, 30, 'bill', id(301), 'bill', `#15 ${LONG_NAME}: bill no. 1, revision 1`),
+  aud(7, 31, 'order', id(301), 'payment', `#15 ${LONG_NAME}: Payment: paid (online)`),
+  aud(6, 90, 'variant', VARIANT_ID, 'update', 'Variant Retail updated'),
+  aud(5, 200, 'product', PRODUCT_ID, 'create', 'Product Modak Pith added'),
+  aud(4, 1500, 'order', id(303), 'create', '#13 राहुल देशपांडे: Order created'),
+  aud(3, 1600, 'settings', id(1), 'update', 'Settings updated'),
+]
 
 export const ORDERS = [
   order(301, 15, 'ready', LONG_NAME, '919876543210', day(1), [
@@ -260,6 +277,22 @@ export async function mockApi(page: Page, opts: MockOptions = {}): Promise<void>
         })
       }
       return json([])
+    }
+    if (path === '/rest/v1/audit_log') {
+      const ent = url.searchParams.get('entity')?.replace(/^in\.\(|\)$|"/g, '').split(',') ?? []
+      const eid = url.searchParams.get('entity_id')?.replace('eq.', '')
+      return json(AUDIT.filter((a) => ent.includes(a.entity) && (!eid || a.entity_id === eid)))
+    }
+    if (path === '/rest/v1/variants') {
+      const vid = url.searchParams.get('id')?.replace('eq.', '')
+      const row = { id: VARIANT_ID, name: 'Retail', size_amount: 500, size_unit: 'g', deleted_at: null, products: { name: 'Modak Pith' } }
+      const wantsObject = (req.headers()['accept'] ?? '').includes('vnd.pgrst.object')
+      return wantsObject ? json(vid === VARIANT_ID ? row : null) : json([row])
+    }
+    if (path === '/rest/v1/products' && url.searchParams.get('select') === 'id, name, deleted_at') {
+      const row = { id: PRODUCT_ID, name: 'Modak Pith', deleted_at: null }
+      const wantsObject = (req.headers()['accept'] ?? '').includes('vnd.pgrst.object')
+      return wantsObject ? json(row) : json([row])
     }
     if (path === '/rest/v1/products') return json(products(cats.length > 0))
     if (path === '/rest/v1/categories') {
