@@ -6,6 +6,7 @@ import { uuid } from '../../../lib/id'
 import {
   BillSchema,
   BillSourceSchema,
+  MAX_BILL_BYTES,
   type Bill,
   type BillSource,
   type BillState,
@@ -36,6 +37,9 @@ export async function uploadBillImage(
   orderId: string,
   png: Blob,
 ): Promise<string> {
+  if (png.size > MAX_BILL_BYTES) {
+    throw new Error(`The bill image is over ${MAX_BILL_BYTES / 1024} KB and cannot be saved.`)
+  }
   // Storage policy requires <owner_id>/<yyyy>/<file>.
   const path = `${ownerId}/${todayIST().slice(0, 4)}/bill-${orderId}-${uuid()}.png`
   const { error } = await client.storage

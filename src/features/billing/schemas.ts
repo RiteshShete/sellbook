@@ -32,6 +32,9 @@ export interface BillState {
   currentHash: string
 }
 
+/** The bills storage bucket rejects files over this (500 KB); renderBill shrinks the PNG to fit. */
+export const MAX_BILL_BYTES = 500 * 1024
+
 /** A bill this tall is still well under the iOS canvas limit at 2x. */
 export const MAX_BILL_LINES = 60
 
