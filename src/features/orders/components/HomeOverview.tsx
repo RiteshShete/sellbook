@@ -23,21 +23,13 @@ export function HomeOverview() {
       <Card
         tone="bg-lavender text-text"
         label="To prepare"
-        caption="new orders"
         value={fresh.data?.length}
         to="/?view=prep"
       />
-      <Card
-        tone="bg-mint text-text"
-        label="To deliver"
-        caption="ready orders"
-        value={ready.data?.length}
-        to="/delivery"
-      />
+      <Card tone="bg-mint text-text" label="To deliver" value={ready.data?.length} to="/delivery" />
       <Card
         tone="bg-peach text-text"
         label="Unpaid"
-        caption="delivered orders"
         value={unpaid === undefined ? undefined : formatINR(unpaid)}
         to="/pending"
       />
@@ -48,18 +40,16 @@ export function HomeOverview() {
 interface CardProps {
   tone: string
   label: string
-  /** What the number counts, so it is never mistaken for something else. */
-  caption: string
   value: ReactNode | undefined
   to: string
 }
 
-function Card({ tone, label, caption, value, to }: CardProps) {
+function Card({ tone, label, value, to }: CardProps) {
   return (
     <Link
       to={to}
       replace={to.startsWith('/?')}
-      className={`flex min-h-24 min-w-0 flex-col justify-between rounded-2xl p-3 text-left ${tone}`}
+      className={`flex min-h-20 min-w-0 flex-col justify-between rounded-2xl p-3 text-left ${tone}`}
     >
       <span className="text-sm font-medium text-text/70">{label}</span>
       {value === undefined ? (
@@ -67,7 +57,6 @@ function Card({ tone, label, caption, value, to }: CardProps) {
       ) : (
         <span className="font-display block truncate text-2xl tabular-nums">{value}</span>
       )}
-      <span className="text-xs text-text/70">{caption}</span>
     </Link>
   )
 }
