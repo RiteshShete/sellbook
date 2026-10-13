@@ -3,15 +3,17 @@ import { flushSync } from 'react-dom'
 import { createRoot } from 'react-dom/client'
 import { billFontCss } from './billFonts'
 import { BILL_WIDTH, BillTemplate, type BillData } from './BillTemplate'
-
-const PIXEL_RATIO = 2
-/** iOS canvas limit is ~16.7M px; 1080 x 7000 stays far below it. */
-const MAX_HEIGHT = 3500
-/** A real bill PNG is tens of KB; anything this small is a blank (Safari first-pass) capture. */
-const MIN_BYTES = 8_000
+import { fitBill, ratiosFor } from './fitBill'
 
 /**
- * Renders the bill off-screen and returns a PNG Blob (1080 px wide).
+ * Tallest bill (CSS px) we draw: room for the 60-line cap. Tall bills skip the sharpest ratios
+ * (see ratiosFor) so the canvas stays under the iOS limit.
+ */
+const MAX_HEIGHT = 7000
+
+/**
+ * Renders the bill off-screen and returns a PNG Blob (1080 px wide, smaller only if needed to stay
+ * within the 500 KB bills bucket limit).
  * Safari quirks handled: fonts inlined up front, images awaited with decode(), a discarded
  * warm-up capture, and one retry when the output looks blank.
  */
@@ -40,9 +42,9 @@ export async function renderBill(data: BillData): Promise<Blob> {
 
     const height = Math.ceil(node.scrollHeight)
     if (height > MAX_HEIGHT) throw new Error('This bill is too long for one image.')
-    const capture = () =>
+    const capture = (pixelRatio: number) =>
       toBlob(node, {
-        pixelRatio: PIXEL_RATIO,
+        pixelRatio,
         backgroundColor: '#ffffff',
         width: BILL_WIDTH,
         height,
@@ -50,11 +52,9 @@ export async function renderBill(data: BillData): Promise<Blob> {
         fontEmbedCSS,
       })
 
-    await capture() // warm-up: Safari often drops images/fonts on the first pass
-    let blob = await capture()
-    if (!blob || blob.size < MIN_BYTES) blob = await capture()
-    if (!blob || blob.size < MIN_BYTES) throw new Error('Could not draw the bill. Try again.')
-    return blob
+    const ratios = ratiosFor(BILL_WIDTH, height)
+    await capture(ratios[0] ?? 1) // warm-up: Safari often drops images/fonts on the first pass
+    return await fitBill(capture, ratios)
   } finally {
     root.unmount()
     host.remove()
