@@ -23,18 +23,28 @@ export function HomeOverview() {
       <Card
         tone="bg-lavender text-text"
         label="To prepare"
-        value={fresh.data?.length}
+        value={cardValue(fresh.isError, fresh.data?.length)}
         to="/?view=prep"
       />
-      <Card tone="bg-mint text-text" label="To deliver" value={ready.data?.length} to="/delivery" />
+      <Card
+        tone="bg-mint text-text"
+        label="To deliver"
+        value={cardValue(ready.isError, ready.data?.length)}
+        to="/delivery"
+      />
       <Card
         tone="bg-peach text-text"
         label="Unpaid"
-        value={unpaid === undefined ? undefined : formatINR(unpaid)}
+        value={cardValue(pending.isError, unpaid === undefined ? undefined : formatINR(unpaid))}
         to="/pending"
       />
     </div>
   )
+}
+
+/** A failed query shows a dash (the card still opens its screen, which has the retry), never a stuck skeleton. */
+function cardValue(failed: boolean, value: ReactNode | undefined): ReactNode | undefined {
+  return failed ? '—' : value
 }
 
 interface CardProps {
