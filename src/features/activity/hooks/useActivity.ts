@@ -1,6 +1,6 @@
 import { useInfiniteQuery, useQuery } from '@tanstack/react-query'
-import { queryKeys } from '../../lib/queryKeys'
-import { useAuth } from '../auth/useAuth'
+import { queryKeys } from '../../../lib/queryKeys'
+import { useAuth } from '../../auth/useAuth'
 import {
   ACTIVITY_PAGE,
   fetchActivity,
@@ -10,7 +10,7 @@ import {
   fetchVariantItems,
   type ActivityTab,
   type EntityKind,
-} from './api/activityApi'
+} from '../api/activityApi'
 
 /** The change feed: everything (`entityId` null) or the log of one order / product / variant. */
 export function useActivityFeed(tab: ActivityTab, entityId: string | null) {
