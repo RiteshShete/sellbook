@@ -2,7 +2,7 @@ import { toBlob } from 'html-to-image'
 import { flushSync } from 'react-dom'
 import { createRoot } from 'react-dom/client'
 import { billFontCss } from './billFonts'
-import { BILL_WIDTH, BillTemplate, type BillData } from './BillTemplate'
+import { BILL_FRAME_BG, BILL_WIDTH, BillTemplate, type BillData } from './BillTemplate'
 import { fitBill, ratiosFor } from './fitBill'
 
 /**
@@ -45,7 +45,7 @@ export async function renderBill(data: BillData): Promise<Blob> {
     const capture = (pixelRatio: number) =>
       toBlob(node, {
         pixelRatio,
-        backgroundColor: '#ffffff',
+        backgroundColor: BILL_FRAME_BG,
         width: BILL_WIDTH,
         height,
         cacheBust: false,

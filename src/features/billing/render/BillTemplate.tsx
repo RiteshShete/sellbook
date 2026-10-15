@@ -6,6 +6,9 @@ import { BILL_FONT } from './billFonts'
 
 export const BILL_WIDTH = 540
 
+/** The cream frame around the bill card. renderBill paints the PNG with this same colour so the shared image matches the template. */
+export const BILL_FRAME_BG = '#f5f0e0'
+
 export interface BillData {
   source: BillSource
   billNo: string
@@ -35,8 +38,8 @@ export function BillTemplate({ data }: { data: BillData }) {
   const subtotal = addMoney(...o.items.map((i) => i.line_total))
   return (
     <div
-      style={{ width: BILL_WIDTH, fontFamily: BILL_FONT }}
-      className="bg-[#f5f0e0] p-5 text-[15px] leading-snug text-[#0a0a0a] [font-variant-numeric:tabular-nums]"
+      style={{ width: BILL_WIDTH, fontFamily: BILL_FONT, backgroundColor: BILL_FRAME_BG }}
+      className="p-5 text-[15px] leading-snug text-[#0a0a0a] [font-variant-numeric:tabular-nums]"
     >
       <div className="overflow-hidden rounded-[24px] bg-[#fffaf0]">
         <header className="flex items-center gap-3 px-6 pt-6 pb-4">
