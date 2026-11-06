@@ -26,7 +26,7 @@ export function DueGroupedList({
             {g.label} · {g.orders.length}
           </h2>
           <ul
-            className={`divide-y divide-border overflow-hidden rounded-2xl border ${tinted ? 'border-order-card-border bg-order-card' : 'border-border bg-surface'}`}
+            className={`stagger-in divide-y divide-border overflow-hidden rounded-2xl border ${tinted ? 'border-order-card-border bg-order-card' : 'border-border bg-surface'}`}
           >
             {g.orders.map(renderItem)}
           </ul>

@@ -1,6 +1,6 @@
 import { Link } from 'react-router-dom'
 import { Page } from '../../app/Page'
-import { EmptyState, ErrorState, Skeleton } from '../../components/ui'
+import { EmptyArt, EmptyState, ErrorState, Skeleton } from '../../components/ui'
 import { pluralize } from '../../lib/format'
 import { DueGroupedList } from '../orders/components/DueGroupedList'
 import { useOrders } from '../orders/hooks/useOrders'
@@ -25,6 +25,7 @@ export function DeliveryPage() {
           <ErrorState error={orders.error} onRetry={() => void orders.refetch()} />
         ) : orders.data.length === 0 ? (
           <EmptyState
+            art={<EmptyArt />}
             title="Nothing to deliver"
             description="Orders you mark ready on Home show up here."
             action={
