@@ -62,6 +62,11 @@
   --disabled-fg: #5c5c5c;
 
   /* Login screen (Figma "Code - /login"): lime action, photo-overlay inputs, gradient fallback behind the photo. */
+  /* Analytics (Figma "Code - /analytics"): the three featured number cards. */
+  --kpi-sales: #016247;
+  --kpi-outstanding: #cc089e;
+  --kpi-collected: #395afa;
+
   --lime: #cbd810;
   --lime-active: #b8c40d;
   --on-image-field: rgb(255 250 240 / 0.62);
@@ -132,6 +137,9 @@
   --color-ochre: var(--ochre);
   --color-mint: var(--mint);
   --color-coral: var(--coral);
+  --color-kpi-sales: var(--kpi-sales);
+  --color-kpi-outstanding: var(--kpi-outstanding);
+  --color-kpi-collected: var(--kpi-collected);
   --color-lime: var(--lime);
   --color-lime-active: var(--lime-active);
   --color-on-image-field: var(--on-image-field);
