@@ -1,7 +1,7 @@
 import { Phone } from 'lucide-react'
 import { useState } from 'react'
 import { Link } from 'react-router-dom'
-import { ActionButton } from '../../components/ui'
+import { AnimatedActionButton } from '../../components/ui'
 import { formatINR } from '../../lib/money'
 import { toTelLink } from '../../lib/phone'
 import { DueBadge, PaymentBadge } from '../orders/components/OrderBadges'
@@ -45,14 +45,15 @@ export function DeliveryCard({ order }: { order: OrderListRow }) {
             <Phone className="h-5 w-5" />
           </a>
         )}
-        <ActionButton
+        <AnimatedActionButton
           kind="delivered"
+          animation="delivery"
           className={order.customer_phone ? '' : 'ml-auto'}
           disabled={busy}
-          onClick={() => (paid ? deliver.mutate({ order, paid: null }) : setSheetOpen(true))}
+          onAction={() => (paid ? deliver.mutate({ order, paid: null }) : setSheetOpen(true))}
         >
           Delivered
-        </ActionButton>
+        </AnimatedActionButton>
       </div>
       <DeliverSheet order={order} open={sheetOpen} onClose={() => setSheetOpen(false)} />
     </li>

@@ -13,17 +13,17 @@ const loadAnimation = vi.fn(() => ({
 
 vi.mock('lottie-web/build/player/lottie_light', () => ({ default: { loadAnimation } }))
 
-import { PackingAnimation } from './PackingAnimation'
+import { ActionAnimation } from './ActionAnimation'
 
 afterEach(() => {
   cleanup()
   vi.clearAllMocks()
 })
 
-describe('PackingAnimation', () => {
+describe('ActionAnimation', () => {
   it('plays once and calls onDone exactly once when it completes', async () => {
     const onDone = vi.fn()
-    render(<PackingAnimation onDone={onDone} />)
+    render(<ActionAnimation kind="packing" onDone={onDone} />)
     await waitFor(() => expect(loadAnimation).toHaveBeenCalled())
     expect(onDone).not.toHaveBeenCalled()
     listeners.complete?.()
@@ -33,7 +33,7 @@ describe('PackingAnimation', () => {
 
   it('cleans up the player and never calls onDone after unmount', async () => {
     const onDone = vi.fn()
-    const { unmount } = render(<PackingAnimation onDone={onDone} />)
+    const { unmount } = render(<ActionAnimation kind="packing" onDone={onDone} />)
     await waitFor(() => expect(loadAnimation).toHaveBeenCalled())
     unmount()
     expect(destroy).toHaveBeenCalled()
