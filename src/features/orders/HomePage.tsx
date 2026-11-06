@@ -1,7 +1,7 @@
 import { Search } from 'lucide-react'
 import { Link, useSearchParams } from 'react-router-dom'
 import headerBg from '../../assets/home/header-bg.png'
-import { EmptyState, ErrorState, Skeleton, UnderlineTabs } from '../../components/ui'
+import { EmptyArt, EmptyState, ErrorState, Skeleton, UnderlineTabs } from '../../components/ui'
 import { DueGroupedList } from './components/DueGroupedList'
 import { HomeOverview } from './components/HomeOverview'
 import { FAB_CLEARANCE, NewOrderFab } from './components/NewOrderFab'
@@ -92,6 +92,7 @@ function NewOrders() {
   if (orders.data.length === 0) {
     return (
       <EmptyState
+        art={<EmptyArt />}
         title="No new orders"
         description="Orders you add show up here until you mark them ready."
       />
