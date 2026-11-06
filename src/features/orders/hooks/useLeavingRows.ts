@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react'
+import { prefersReducedMotion } from '../../../lib/motion'
 
 /** How long a removed row stays on screen while it fades and collapses (ms). Matches `row-out` in index.css. */
 export const LEAVE_MS = 450
@@ -7,13 +8,6 @@ export const LEAVE_MS = 450
 export function removedItems<T extends { id: string }>(prev: T[], next: T[]): T[] {
   const ids = new Set(next.map((o) => o.id))
   return prev.filter((o) => !ids.has(o.id))
-}
-
-function reducedMotion(): boolean {
-  return (
-    typeof window.matchMedia === 'function' &&
-    window.matchMedia('(prefers-reduced-motion: reduce)').matches
-  )
 }
 
 /**
@@ -27,7 +21,7 @@ export function useLeavingRows<T extends { id: string }>(items: T[]): T[] {
   // Compare with the previous list while rendering (adjusting state, not an effect).
   if (prev !== items) {
     setPrev(items)
-    const gone = reducedMotion() ? [] : removedItems(prev, items)
+    const gone = prefersReducedMotion() ? [] : removedItems(prev, items)
     const back = new Set(items.map((o) => o.id))
     setLeaving((l) => [...l.filter((o) => !back.has(o.id)), ...gone])
   }

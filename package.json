@@ -26,6 +26,7 @@
     "date-fns": "^4.4.0",
     "date-fns-tz": "^3.2.0",
     "html-to-image": "^1.11.13",
+    "lottie-web": "^5.13.0",
     "lucide-react": "^1.53.0",
     "react": "^19.3.0",
     "react-dom": "^19.3.0",

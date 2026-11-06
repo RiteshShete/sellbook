@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react'
+import { prefersReducedMotion } from './motion'
 
 /** Ease-out cubic: fast start, soft landing. `t` is 0..1. */
 export function easeOutCubic(t: number): number {
@@ -9,13 +10,6 @@ export function easeOutCubic(t: number): number {
 /** The value part-way from `from` to `to` (integers in, integer out, so money stays whole paise). */
 export function interpolate(from: number, to: number, t: number): number {
   return Math.round(from + (to - from) * easeOutCubic(t))
-}
-
-function prefersReducedMotion(): boolean {
-  return (
-    typeof window.matchMedia === 'function' &&
-    window.matchMedia('(prefers-reduced-motion: reduce)').matches
-  )
 }
 
 interface Roll {
