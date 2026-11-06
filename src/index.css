@@ -261,7 +261,7 @@ textarea {
 }
 
 .stagger-in > * {
-  animation: row-in 0.35s cubic-bezier(0.22, 0.8, 0.3, 1) both;
+  animation: row-in 0.35s cubic-bezier(0.22, 0.8, 0.3, 1) backwards;
 }
 .stagger-in > *:nth-child(2) {
   animation-delay: 0.05s;
