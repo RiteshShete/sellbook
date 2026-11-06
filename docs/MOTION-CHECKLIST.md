@@ -18,6 +18,15 @@ Dev server: `npm run dev`, open the Network URL on the phone. Tick each line aft
 - [ ] Delivery list does the same. Nothing overlaps or shifts after it lands.
 - [ ] OS "reduce motion" on: rows just appear.
 
+## 2b. Cards leave smoothly (Home and Delivery)
+
+- [ ] Home: tap Mark ready on a New order. The card fades, then its row collapses and the rows below slide up (about half a second). It does not blink away.
+- [ ] Tap Undo in the toast: the order comes back as a normal row at once.
+- [ ] Delivery: tap Delivered (and finish the payment sheet). The card fades and collapses the same way.
+- [ ] While it is leaving you cannot tap anything in it; the group count already shows the new number.
+- [ ] The last card in the list still disappears straight into the empty state (no collapse; known limit).
+- [ ] OS "reduce motion" on: the card just disappears.
+
 ## 3. Empty-state picture
 
 - [ ] Home with no New orders: a small card slides onto a stack, rests, slides back (loops slowly), above "No new orders".

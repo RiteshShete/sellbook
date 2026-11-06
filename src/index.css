@@ -287,3 +287,28 @@ textarea {
 .art-slide {
   animation: art-slide 5s ease-in-out infinite;
 }
+
+/*
+ * A row that just left the list (marked ready / delivered): fades, then its height collapses.
+ * Needs the grid-rows trick, so the card is wrapped in a min-h-0 box. Length matches LEAVE_MS.
+ */
+@keyframes row-out {
+  0% {
+    grid-template-rows: 1fr;
+    opacity: 1;
+  }
+  35% {
+    grid-template-rows: 1fr;
+    opacity: 0;
+  }
+  100% {
+    grid-template-rows: 0fr;
+    opacity: 0;
+  }
+}
+
+.row-out {
+  display: grid;
+  animation: row-out 0.45s ease-in-out both;
+  pointer-events: none;
+}
