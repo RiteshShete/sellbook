@@ -1,7 +1,7 @@
 import type { ButtonHTMLAttributes } from 'react'
 import { ACTION_STYLES, type ActionKind } from '../../lib/actionStyles'
 
-type Variant = 'primary' | 'secondary' | 'danger' | 'ghost' | ActionKind
+type Variant = 'primary' | 'secondary' | 'danger' | 'ghost' | 'lime' | ActionKind
 
 /** docs/DESIGN.md: button-primary / button-secondary / button-text-link. */
 const styles: Record<Variant, string> = {
@@ -10,6 +10,8 @@ const styles: Record<Variant, string> = {
   secondary: 'bg-surface text-text border border-border active:bg-surface-2 disabled:opacity-50',
   danger: 'bg-danger text-white active:opacity-90 disabled:opacity-50',
   ghost: 'bg-transparent text-text active:bg-surface-2 disabled:opacity-40',
+  // Login screen call-to-action on the photo background.
+  lime: 'bg-lime text-textactive:bg-lime-active disabled:opacity-60',
   // Action kinds (ready / delivered / paid / back / cancel): see lib/actionStyles.ts.
   ready: `${ACTION_STYLES.ready.className} disabled:opacity-50`,
   delivered: `${ACTION_STYLES.delivered.className} disabled:opacity-50`,

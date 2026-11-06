@@ -61,6 +61,28 @@
   /* Text on disabled primary buttons: spec muted (#6a6a6a) on #e5e5e5 is 4.29:1. */
   --disabled-fg: #5c5c5c;
 
+  /* Login screen (Figma "Code - /login"): lime action, photo-overlay inputs, gradient fallback behind the photo. */
+  --lime: #cbd810;
+  --lime-active: #b8c40d;
+  --on-image-field: rgb(255 250 240 / 0.62);
+  --on-image-border: rgb(8 79 62 / 0.58);
+  --login-from: #64a677;
+  --login-to: #00644b;
+
+  /* Home screen (Figma "Code - /"): overview card gradients, open-order card, tab underline. */
+  --card-prepare: linear-gradient(-36.5deg, #8966e5 18.8%, #ffffff 105%);
+  --card-deliver: linear-gradient(-38.4deg, #ffb084 16.9%, #fff1e9 104.6%);
+  --card-unpaid: linear-gradient(-38.4deg, #ff8484 16.9%, #ffe9e9 104.6%);
+  --order-card: #fdfeeb;
+  --order-card-border: #d7d73e;
+  --tab-line: #bcbcbc;
+  --home-header-fade: linear-gradient(
+    1.5deg,
+    #fffaf0 3%,
+    rgb(255 250 240 / 0.584) 59.4%,
+    rgb(255 250 240 / 0) 98.9%
+  );
+
   /* Chart series: deep lavender + brand pink, validated for colour-blind separation on canvas. */
   --chart-1: #7b61d9;
   --chart-2: #ff4d8b;
@@ -110,11 +132,20 @@
   --color-ochre: var(--ochre);
   --color-mint: var(--mint);
   --color-coral: var(--coral);
+  --color-lime: var(--lime);
+  --color-lime-active: var(--lime-active);
+  --color-on-image-field: var(--on-image-field);
+  --color-on-image-border: var(--on-image-border);
+  --color-login-from: var(--login-from);
+  --color-login-to: var(--login-to);
+  --color-order-card: var(--order-card);
+  --color-order-card-border: var(--order-card-border);
+  --color-tab-line: var(--tab-line);
   --color-chart-1: var(--chart-1);
   --color-chart-2: var(--chart-2);
-  /* Inter everywhere (self-hosted, see main.tsx); the spec's display face is not public. */
+  /* Hanken Grotesk everywhere (self-hosted, see main.tsx), per the Figma screens; Inter is the fallback. */
   --font-sans:
-    Inter, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Noto Sans',
+    'Hanken Grotesk', Inter, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Noto Sans',
     'Noto Sans Devanagari', 'Nirmala UI', 'Devanagari Sangam MN', Mukta, Arial, sans-serif;
 }
 
@@ -199,7 +230,8 @@ textarea {
 }
 
 .receipt-edge {
-  -webkit-mask: conic-gradient(from -45deg at bottom, #0000, #000 1deg 89deg, #0000 90deg) 50% / 14px 100%;
+  -webkit-mask: conic-gradient(from -45deg at bottom, #0000, #000 1deg 89deg, #0000 90deg) 50% /
+    14px 100%;
   mask: conic-gradient(from -45deg at bottom, #0000, #000 1deg 89deg, #0000 90deg) 50% / 14px 100%;
   padding-bottom: 7px;
   background: var(--canvas);
