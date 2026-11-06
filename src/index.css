@@ -312,6 +312,8 @@ textarea {
   100% {
     grid-template-rows: 0fr;
     opacity: 0;
+    margin-bottom: 0;
+    border-width: 0;
   }
 }
 

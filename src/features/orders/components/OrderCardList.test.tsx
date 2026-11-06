@@ -1,7 +1,7 @@
 import { act, cleanup, render, screen } from '@testing-library/react'
 import { afterEach, describe, expect, it, vi } from 'vitest'
 import type { OrderListRow } from '../schemas'
-import { DueGroupedList } from './DueGroupedList'
+import { OrderCardList } from './OrderCardList'
 
 const order = (id: string, no: number) =>
   ({ id, order_no: no, due_date: null, customer_name: `Cust ${no}` }) as unknown as OrderListRow
@@ -13,17 +13,16 @@ afterEach(() => {
   vi.useRealTimers()
 })
 
-describe('DueGroupedList leaving rows', () => {
+describe('OrderCardList leaving rows', () => {
   it('keeps a removed order for a moment (inert, hidden from screen readers), then drops it', () => {
     vi.useFakeTimers()
     const a = order('a', 1)
     const b = order('b', 2)
-    const { rerender } = render(<DueGroupedList orders={[a, b]} renderItem={renderItem} />)
-    rerender(<DueGroupedList orders={[b]} renderItem={renderItem} />)
+    const { rerender } = render(<OrderCardList orders={[a, b]} renderItem={renderItem} />)
+    rerender(<OrderCardList orders={[b]} renderItem={renderItem} />)
 
     const ghost = screen.getByText('Cust 1').closest('li.row-out')
     expect(ghost?.getAttribute('aria-hidden')).toBe('true')
-    expect(screen.getByText(/No due date · 1/)).toBeTruthy() // the count ignores the leaving row
 
     act(() => {
       vi.advanceTimersByTime(500)
@@ -36,9 +35,9 @@ describe('DueGroupedList leaving rows', () => {
     vi.useFakeTimers()
     const a = order('a', 1)
     const b = order('b', 2)
-    const { rerender } = render(<DueGroupedList orders={[a, b]} renderItem={renderItem} />)
-    rerender(<DueGroupedList orders={[b]} renderItem={renderItem} />)
-    rerender(<DueGroupedList orders={[a, b]} renderItem={renderItem} />)
+    const { rerender } = render(<OrderCardList orders={[a, b]} renderItem={renderItem} />)
+    rerender(<OrderCardList orders={[b]} renderItem={renderItem} />)
+    rerender(<OrderCardList orders={[a, b]} renderItem={renderItem} />)
     expect(screen.getByText('Cust 1').closest('li.row-out')).toBeNull()
   })
 })

@@ -2,7 +2,7 @@ import { Search } from 'lucide-react'
 import { Link, useSearchParams } from 'react-router-dom'
 import headerBg from '../../assets/home/header-bg.png'
 import { EmptyArt, EmptyState, ErrorState, Skeleton, UnderlineTabs } from '../../components/ui'
-import { DueGroupedList } from './components/DueGroupedList'
+import { OrderCardList } from './components/OrderCardList'
 import { HomeOverview } from './components/HomeOverview'
 import { FAB_CLEARANCE, NewOrderFab } from './components/NewOrderFab'
 import { NewOrderCard } from './components/NewOrderCard'
@@ -99,7 +99,7 @@ function NewOrders() {
     )
   }
   return (
-    <DueGroupedList
+    <OrderCardList
       tinted
       orders={orders.data}
       renderItem={(o) => <NewOrderCard key={o.id} order={o} />}
