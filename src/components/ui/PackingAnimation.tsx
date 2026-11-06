@@ -1,14 +1,32 @@
 import { useEffect, useRef } from 'react'
+import { hexToRgb, recolorLottie, type Rgb } from '../../lib/lottieColors'
 
 /** The 3 s crate animation played 2.5x faster (about 1.2 s): long enough to enjoy, short enough to not block. */
 const SPEED = 2.5
 
+const WHITE: Rgb = [1, 1, 1]
+
+/** A colour token (e.g. "--info") as Lottie RGB, so the crate's solid faces match the button behind it. */
+function tokenRgb(name: string, fallback: Rgb): Rgb {
+  const v = getComputedStyle(document.documentElement).getPropertyValue(name)
+  return hexToRgb(v) ?? fallback
+}
+
 /**
- * The crate being packed (src/assets/animations/packing.json), played once. `onDone` fires exactly
- * once when it finishes, or at once if the player cannot load, so the action behind it never gets stuck.
+ * The crate being packed (src/assets/animations/packing.json), played once in white line-art over
+ * the colour token `onToken` (default the blue action fill). `onDone` fires exactly once when it
+ * finishes, or at once if the player cannot load, so the action behind it never gets stuck.
  * lottie-web (light, SVG) is loaded on first use and is not part of the startup bundle.
  */
-export function PackingAnimation({ onDone }: { onDone: () => void }) {
+export function PackingAnimation({
+  onDone,
+  onToken = '--info',
+  className = 'size-24',
+}: {
+  onDone: () => void
+  onToken?: string
+  className?: string
+}) {
   const box = useRef<HTMLDivElement>(null)
   const done = useRef(onDone)
   const fired = useRef(false)
@@ -36,7 +54,10 @@ export function PackingAnimation({ onDone }: { onDone: () => void }) {
           renderer: 'svg',
           loop: false,
           autoplay: true,
-          animationData: data.default,
+          animationData: recolorLottie(data.default, {
+            stroke: WHITE,
+            fill: tokenRgb(onToken, [0.114, 0.306, 0.847]),
+          }),
         })
         anim.setSpeed(SPEED)
         anim.addEventListener('complete', finish)
@@ -50,7 +71,7 @@ export function PackingAnimation({ onDone }: { onDone: () => void }) {
       cancelled = true
       destroy?.()
     }
-  }, [])
+  }, [onToken])
 
-  return <div ref={box} aria-hidden className="size-24" />
+  return <div ref={box} aria-hidden className={className} />
 }
