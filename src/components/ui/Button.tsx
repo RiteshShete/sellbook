@@ -11,7 +11,7 @@ const styles: Record<Variant, string> = {
   danger: 'bg-danger text-white active:opacity-90 disabled:opacity-50',
   ghost: 'bg-transparent text-text active:bg-surface-2 disabled:opacity-40',
   // Login screen call-to-action on the photo background.
-  lime: 'bg-lime text-textactive:bg-lime-active disabled:opacity-60',
+  lime: 'bg-lime text-text active:bg-lime-active disabled:opacity-60',
   // Action kinds (ready / delivered / paid / back / cancel): see lib/actionStyles.ts.
   ready: `${ACTION_STYLES.ready.className} disabled:opacity-50`,
   delivered: `${ACTION_STYLES.delivered.className} disabled:opacity-50`,
