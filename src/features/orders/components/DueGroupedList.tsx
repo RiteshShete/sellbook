@@ -9,9 +9,12 @@ import type { OrderListRow } from '../schemas'
 export function DueGroupedList({
   orders,
   renderItem,
+  tinted = false,
 }: {
   orders: OrderListRow[]
   renderItem: (order: OrderListRow) => ReactNode
+  /** Home's pale-yellow cards (open orders); Delivery keeps the plain surface. */
+  tinted?: boolean
 }) {
   return (
     <div className="flex flex-col gap-5">
@@ -22,7 +25,9 @@ export function DueGroupedList({
           >
             {g.label} · {g.orders.length}
           </h2>
-          <ul className="divide-y divide-border overflow-hidden rounded-2xl border border-border bg-surface">
+          <ul
+            className={`divide-y divide-border overflow-hidden rounded-2xl border ${tinted ? 'border-order-card-border bg-order-card' : 'border-border bg-surface'}`}
+          >
             {g.orders.map(renderItem)}
           </ul>
         </section>

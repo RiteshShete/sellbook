@@ -9,7 +9,7 @@ export function NewOrderFab() {
   return (
     <Link
       to="/orders/new"
-      className="fixed right-4 bottom-[calc(3.5rem+env(safe-area-inset-bottom)+1rem)] z-30 inline-flex min-h-14 items-center gap-2 rounded-full bg-primary pr-6 pl-5 font-semibold text-primary-fg shadow-lg active:bg-primary-active"
+      className="fixed right-4 bottom-[calc(3.5rem+env(safe-area-inset-bottom)+1rem)] z-30 inline-flex min-h-14 items-center gap-2 rounded-full bg-lime pr-6 pl-5 font-semibold text-text shadow-lg active:bg-lime-active"
     >
       <Plus className="h-5 w-5" /> New order
     </Link>

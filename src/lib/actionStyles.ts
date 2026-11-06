@@ -62,6 +62,20 @@ export type BadgeKind =
  * Status badges. Each carries its text label too. Ready is blue and Due today is amber (they were
  * both yellow before); Overdue is a solid deep red so it never reads as the soft red Not paid.
  */
+/** Outlined badges (Home order cards): transparent, coloured text and border from the same hues. */
+export const BADGE_OUTLINE_STYLES: Record<BadgeKind, string> = {
+  neutral: 'border-border-strong text-muted',
+  info: 'border-info-ink text-info-ink',
+  new: 'border-info-ink text-info-ink',
+  ready: 'border-info-ink text-info-ink',
+  delivered: 'border-success-ink text-success-ink',
+  cancelled: 'border-border-strong text-muted',
+  paid: 'border-teal text-teal',
+  notPaid: 'border-danger-ink text-danger-ink',
+  dueToday: 'border-warning text-warning',
+  overdue: 'border-danger-deep text-danger-deep',
+}
+
 export const BADGE_STYLES: Record<BadgeKind, string> = {
   neutral: 'bg-surface-2 text-text',
   info: 'bg-info-soft text-info-ink',
