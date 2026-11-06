@@ -42,3 +42,12 @@ Dev server: `npm run dev`, open the Network URL on the phone. Tick each line aft
 - One piece: `git revert <commit>` (each feature is its own commit, see `git log --oneline motion-polish`).
 - Everything from this round: `git checkout next-task` (or `git reset --hard baseline-before-motion` on this branch).
 - Never merge to `main` until the owner has ticked this list.
+
+## 5. Button animations (Mark ready, Delivered)
+
+- [ ] Home: tap **Mark ready**. The label fades, the icon slides to the centre, a white crate is packed on the same blue, then the order moves to Ready (Undo toast works).
+- [ ] Delivery, an already-paid order: tap **Delivered**. The label fades, the icon centres, a courier on a scooter rides across the green button, then the order is delivered.
+- [ ] Delivery, an unpaid order: same animation, then the payment sheet opens (Paid cash / Paid online / Not paid yet).
+- [ ] A second tap while it plays does nothing. If an action fails (toast), the button comes back.
+- [ ] OS "reduce motion" on: no animation; the action happens at once.
+- [ ] The animation art is "Free delivery Animation by Canon" (LottieFiles Simple License); keep it in mind if the licence matters to you.
