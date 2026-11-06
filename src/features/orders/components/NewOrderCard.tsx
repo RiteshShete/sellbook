@@ -16,13 +16,13 @@ export function NewOrderCard({ order }: { order: OrderListRow }) {
       <Link to={`/orders/${order.id}`} className="flex flex-col gap-1">
         <div className="flex items-center justify-between gap-3">
           <span className="min-w-0 truncate text-lg font-semibold">
-            <span className="font-medium text-muted">#{order.order_no}</span> {order.customer_name}
+            <span className="text-base font-medium text-muted">#{order.order_no}</span> {order.customer_name}
           </span>
           <span className="shrink-0">
             <DueBadge order={order} outline />
           </span>
         </div>
-        <p className="text-sm text-muted">
+        <p className="text-sm">
           {order.itemsSummary || 'No items yet'}
           {order.weight.text && ` · ${order.weight.text}`}
         </p>
