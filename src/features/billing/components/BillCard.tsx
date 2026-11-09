@@ -1,4 +1,5 @@
 import { Link } from 'react-router-dom'
+import { qrMode } from '../../../lib/upi'
 import { Button, ErrorState, Skeleton } from '../../../components/ui'
 import type { OrderWithItems } from '../../orders/schemas'
 import { useSettings } from '../../settings/hooks/useSettings'
@@ -49,13 +50,13 @@ export function BillCard({ order }: { order: OrderWithItems }) {
             </Button>
           </>
         )}
-        {!s.qr_path && (
+        {qrMode(s) === 'none' && (
           <p className="text-sm text-muted">
-            Tip: add your payment QR in{' '}
+            Tip: add your UPI ID and payee name in{' '}
             <Link to="/settings" className="font-medium underline underline-offset-4">
               Settings
             </Link>{' '}
-            so the bill shows “Scan to pay”.
+            so the bill shows a QR that pays the exact amount.
           </p>
         )}
       </section>
