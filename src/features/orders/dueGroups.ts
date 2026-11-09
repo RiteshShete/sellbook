@@ -27,6 +27,15 @@ export function dueGroup(due: string | null, today: string): DueGroupKey {
   return 'later'
 }
 
+/** Earliest due date first (no due date last), then by order number. */
+export function sortByDue<T extends { due_date: string | null; order_no: number }>(
+  orders: T[],
+): T[] {
+  return [...orders].sort(
+    (a, b) => (a.due_date ?? '9999').localeCompare(b.due_date ?? '9999') || a.order_no - b.order_no,
+  )
+}
+
 /** Groups orders by due date (IST calendar days), earliest first inside each group. */
 export function groupByDue<T extends { due_date: string | null; order_no: number }>(
   orders: T[],

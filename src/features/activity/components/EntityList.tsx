@@ -4,7 +4,7 @@ import { Link } from 'react-router-dom'
 import { Badge, Button, EmptyState, ErrorState, Skeleton } from '../../../components/ui'
 import { useDebouncedValue } from '../../../lib/useDebouncedValue'
 import type { EntityKind } from '../api/activityApi'
-import { useEntityList } from '../hooks'
+import { useEntityList } from '../hooks/useActivity'
 
 const COPY: Record<EntityKind, { empty: string; placeholder: string }> = {
   order: { empty: 'No orders found', placeholder: 'Search #number or customer' },
