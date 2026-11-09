@@ -1,7 +1,7 @@
 import { Download } from 'lucide-react'
 import { Link, useSearchParams } from 'react-router-dom'
 import { Page } from '../../app/Page'
-import { Button, EmptyState, ErrorState, Skeleton } from '../../components/ui'
+import { EmptyState, ErrorState, Skeleton } from '../../components/ui'
 import { formatMonth, formatMonthShort, isMonthKey, isoMonth, previousMonth } from '../../lib/dates'
 import { useSettings } from '../settings/hooks/useSettings'
 import { Breakdown } from './components/Breakdown'
@@ -25,25 +25,44 @@ export function AnalyticsPage() {
   const settings = useSettings()
   const exportCsv = useExportCsv()
 
+  const pick = (m: string) => setParams(m === latest ? {} : { month: m }, { replace: true })
+
   const csvButton = (
-    <Button
-      variant="secondary"
+    <button
+      type="button"
+      aria-label="Download CSV"
       disabled={!settings.data || exportCsv.isPending}
       onClick={() =>
         settings.data && exportCsv.mutate({ month, billPrefix: settings.data.bill_prefix })
       }
+      className="inline-flex min-h-11 min-w-11 items-center justify-center gap-2 rounded-xl border border-border bg-surface px-3 text-sm font-semibold active:bg-surface-2 disabled:opacity-50"
     >
-      <Download className="h-5 w-5" /> {exportCsv.isPending ? 'Saving…' : 'CSV'}
-    </Button>
+      <Download className="h-5 w-5" />
+      <span className="max-[359px]:sr-only">{exportCsv.isPending ? 'Saving…' : 'CSV'}</span>
+    </button>
+  )
+
+  // The month pill sits in the header; phones narrower than 360px get it under the title instead.
+  const headerActions = (
+    <div className="flex items-center gap-3">
+      <MonthPicker
+        month={month}
+        latest={latest}
+        onChange={pick}
+        className="hidden min-[360px]:flex"
+      />
+      {csvButton}
+    </div>
   )
 
   return (
-    <Page title="Analytics" action={csvButton}>
+    <Page title="Analytics" action={headerActions}>
       <div className="flex flex-col gap-4">
         <MonthPicker
           month={month}
           latest={latest}
-          onChange={(m) => setParams(m === latest ? {} : { month: m }, { replace: true })}
+          onChange={pick}
+          className="flex min-[360px]:hidden"
         />
         {current.isPending ? (
           <div className="flex flex-col gap-3" role="status" aria-label="Loading">

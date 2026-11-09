@@ -4,7 +4,7 @@ import { Button, EmptyState, ErrorState, Skeleton } from '../../../components/ui
 import { dayLabel, formatDateTime, isoDay } from '../../../lib/dates'
 import type { ActivityTab, AuditRow } from '../api/activityApi'
 import { describeActivity, type ActivityKind, type ActivityLine } from '../describe'
-import { useActivityFeed } from '../hooks'
+import { useActivityFeed } from '../hooks/useActivity'
 
 const ICONS: Record<ActivityKind, LucideIcon> = {
   order: ReceiptText,

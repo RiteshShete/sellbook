@@ -4,7 +4,7 @@ import { Button, EmptyState, ErrorState, SegmentedControl, Skeleton } from '../.
 import { formatDateTime } from '../../lib/dates'
 import { formatINR } from '../../lib/money'
 import type { TrashTab } from './api/trashApi'
-import { useRestore, useTrashList } from './useTrash'
+import { useRestore, useTrashList } from './hooks/useTrash'
 
 const TABS: { value: TrashTab; label: string }[] = [
   { value: 'orders', label: 'Orders' },

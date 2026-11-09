@@ -1,36 +1,46 @@
 import { ChevronLeft, ChevronRight } from 'lucide-react'
-import { Button } from '../../../components/ui'
-import { formatMonth, nextMonth, previousMonth } from '../../../lib/dates'
+import { formatMonthShort, nextMonth, previousMonth } from '../../../lib/dates'
 
 interface Props {
   month: string
   /** The current IST month: you cannot step past it. */
   latest: string
   onChange: (month: string) => void
+  className?: string
 }
 
-export function MonthPicker({ month, latest, onChange }: Props) {
+const STEP =
+  'flex min-h-11 min-w-11 items-center justify-center rounded-xl active:bg-surface-2 disabled:opacity-40'
+
+/** "‹ Nov 2026 ›" pill, shown in the Analytics header (and under it on very narrow phones). */
+export function MonthPicker({ month, latest, onChange, className = '' }: Props) {
   const atLatest = month >= latest // "YYYY-MM" strings sort like dates
   return (
-    <div className="flex items-center justify-between gap-2 rounded-2xl border border-border bg-surface p-1">
-      <Button
-        variant="ghost"
+    <div
+      className={`items-center rounded-xl border border-border bg-surface ${className}`}
+      role="group"
+      aria-label="Month"
+    >
+      <button
+        type="button"
         aria-label="Previous month"
+        className={STEP}
         onClick={() => onChange(previousMonth(month))}
       >
         <ChevronLeft className="h-5 w-5" />
-      </Button>
-      <p className="font-semibold" aria-live="polite">
-        {formatMonth(month)}
+      </button>
+      <p className="px-1 text-base font-semibold whitespace-nowrap" aria-live="polite">
+        {formatMonthShort(month)} {month.slice(0, 4)}
       </p>
-      <Button
-        variant="ghost"
+      <button
+        type="button"
         aria-label="Next month"
         disabled={atLatest}
+        className={STEP}
         onClick={() => onChange(nextMonth(month))}
       >
         <ChevronRight className="h-5 w-5" />
-      </Button>
+      </button>
     </div>
   )
 }

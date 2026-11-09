@@ -82,6 +82,11 @@ export const PAIRS = [
   P('text', 'KPI card label on mint (ink 70%)', 'text', 'mint', 0.7),
   P('text', 'KPI card label on peach (ink 70%)', 'text', 'peach', 0.7),
   P('text', 'Tab-bar count on coral', 'text', 'coral'),
+  P('text', 'Analytics card text on Sales green', 'on-solid', 'kpi-sales'),
+  P('text', 'Analytics card text on Outstanding magenta', 'on-solid', 'kpi-outstanding'),
+  P('text', 'Analytics card text on Collected blue', 'on-solid', 'kpi-collected'),
+  P('text', 'Analytics change (down) on cream card', 'danger-ink', 'surface-2'),
+  P('text', 'Analytics change (up) on cream card', 'success-ink', 'surface-2'),
   // Non-text
   P('ui', 'Input border on page', 'border-strong', 'bg'),
   P('ui', 'Input border on cream card', 'border-strong', 'surface-2'),
