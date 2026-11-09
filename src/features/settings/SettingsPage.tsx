@@ -21,8 +21,8 @@ export function SettingsPage() {
           <ShopDetailsForm settings={settings.data} />
           <AssetField
             kind="qr"
-            label="Payment QR"
-            hint="Printed on every bill as “Scan to pay”. Use a sharp, uncropped image."
+            label="Uploaded payment QR (fallback)"
+            hint="Used on bills when the dynamic QR is off or not set up yet. Use a sharp, uncropped image."
             settings={settings.data}
           />
           <AssetField

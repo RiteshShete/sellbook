@@ -6,6 +6,8 @@ const draft = (over: Partial<SettingsDraft> = {}): SettingsDraft => ({
   shop_address: 'Shop 4, MG Road\nPune',
   shop_phone: '+91 98765 43210',
   upi_id: 'asha@okicici',
+  payee_name: 'Asha Bakes',
+  use_dynamic_qr: true,
   bill_prefix: 'AB',
   bill_footer: '',
   ...over,
@@ -21,6 +23,8 @@ describe('validateSettings', () => {
         shop_address: 'Shop 4, MG Road\nPune',
         shop_phone: '+91 98765 43210',
         upi_id: null,
+        payee_name: 'Asha Bakes',
+        use_dynamic_qr: true,
         bill_prefix: 'AB',
         bill_footer: null,
       },
@@ -40,6 +44,20 @@ describe('validateSettings', () => {
         'upi_id',
       ])
     }
+  })
+
+  it('trims the UPI ID and accepts a Devanagari payee name', () => {
+    const r = validateSettings(draft({ upi_id: '  asha@okicici ', payee_name: ' आशा केक्स ' }))
+    expect(r.ok && r.patch.upi_id).toBe('asha@okicici')
+    expect(r.ok && r.patch.payee_name).toBe('आशा केक्स')
+  })
+
+  it('stores an empty payee name as null and rejects one over 50 characters', () => {
+    const empty = validateSettings(draft({ payee_name: '  ' }))
+    expect(empty.ok && empty.patch.payee_name).toBeNull()
+    const long = validateSettings(draft({ payee_name: 'x'.repeat(51) }))
+    expect(long.ok).toBe(false)
+    if (!long.ok) expect(Object.keys(long.errors)).toEqual(['payee_name'])
   })
 
   it('allows an empty bill prefix (DB allows 0-10 chars)', () => {
