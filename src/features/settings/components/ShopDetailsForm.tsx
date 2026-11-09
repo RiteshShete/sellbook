@@ -1,6 +1,7 @@
 import { useState, type FormEvent } from 'react'
 import { Button, Input, Textarea, toast } from '../../../components/ui'
 import { useUpdateSettings } from '../hooks/useSettings'
+import { UpiQrSection } from './UpiQrSection'
 import {
   draftFromSettings,
   validateSettings,
@@ -14,7 +15,7 @@ export function ShopDetailsForm({ settings }: { settings: Settings }) {
   const [errors, setErrors] = useState<SettingsErrors>({})
   const update = useUpdateSettings()
 
-  const field = (key: keyof SettingsDraft) => ({
+  const field = (key: Exclude<keyof SettingsDraft, 'use_dynamic_qr'>) => ({
     value: draft[key],
     error: errors[key],
     onChange: (e: { target: { value: string } }) =>
@@ -47,6 +48,20 @@ export function ShopDetailsForm({ settings }: { settings: Settings }) {
         autoCapitalize="none"
         placeholder="shop@okicici"
         {...field('upi_id')}
+      />
+      <Input
+        label="Payee name (shown in the customer's UPI app)"
+        autoComplete="organization"
+        placeholder="Asha Cakes"
+        maxLength={50}
+        {...field('payee_name')}
+      />
+      <UpiQrSection
+        upiId={draft.upi_id}
+        payeeName={draft.payee_name}
+        useDynamic={draft.use_dynamic_qr}
+        hasUploadedQr={settings.qr_path !== null}
+        onToggle={(on) => setDraft((d) => ({ ...d, use_dynamic_qr: on }))}
       />
       <div className="grid grid-cols-2 gap-2">
         <Input label="Bill prefix" autoCapitalize="characters" {...field('bill_prefix')} />

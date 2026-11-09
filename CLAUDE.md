@@ -17,6 +17,8 @@ Never claim a command passed unless it ran. If something was skipped or failed, 
    Item name + unit price are SNAPSHOTTED on the order. Name/phone autocomplete from past orders.
 3. Pipeline: new -> ready -> delivered, plus cancelled. `ready` orders = Delivery stack. Every move undoable.
 4. Bill: PNG with shop details, bill number, date, customer, lines, discount, total, payment QR ("Scan to pay").
+   The QR is a dynamic UPI QR per order (UPI ID + payee name from Settings, amount = order total; paid or zero
+   amount = no QR, PAID shown); the uploaded static QR is the fallback. Details: `docs/UPI_QR.md`.
    Shared via share sheet, stored in cloud storage, linked to the order. Re-generating after edits = new
    revision of the same bill number; old images kept.
 5. Payment: pending/paid by hand; when paid choose online|cash. App never verifies payments. Back to pending clears mode.
@@ -29,7 +31,7 @@ Never claim a command passed unless it ran. If something was skipped or failed, 
 ## Decisions (do NOT change without asking the user)
 
 - React + Vite + TypeScript (strict), Tailwind, React Router, TanStack Query, Recharts, html-to-image,
-  vite-plugin-pwa, zod, Vitest.
+  vite-plugin-pwa, zod, Vitest, qrcode (UPI QR images; approved by the owner with the dynamic-QR task).
 - Supabase free plan (Postgres, Auth, Storage, Realtime); Supabase CLI migrations in `supabase/migrations`.
 - Hosting: GitHub Pages at https://riteshshete.github.io/sellbook/ (public repo, free plan), deployed by
   `.github/workflows/deploy.yml` on every push to `main`; the build uses `BASE_PATH=/sellbook/`.
@@ -51,6 +53,8 @@ Never claim a command passed unless it ran. If something was skipped or failed, 
 - B7 Bill is "outdated" if items/discount/total changed after its latest revision; UI warns + offers Regenerate.
 - B8 Catalog edits/deletes never alter old orders.
 - B9 An order needs >= 1 item before moving to ready or delivered.
+- B10 Bill QR: dynamic (switch on + valid UPI ID + payee name) > uploaded image > none. Link built only by `buildUpiUri`
+  (`src/lib/upi.ts`: pa, pn, am from integer paise, cu=INR, tn; never tr/mc). The app never verifies a payment.
 
 ## Commands
 

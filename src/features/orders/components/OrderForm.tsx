@@ -17,6 +17,7 @@ import { CustomerFields } from './CustomerFields'
 import { DueChips } from './DueChips'
 import { LineItems } from './LineItems'
 import { ProductPicker } from './ProductPicker'
+import { UpiLimitWarning } from './UpiLimitWarning'
 
 /** New order (no `order`) or edit of an existing one. `notice` shows above the fields. */
 export function OrderForm({ order, notice }: { order?: OrderWithItems; notice?: ReactNode }) {
@@ -129,6 +130,8 @@ export function OrderForm({ order, notice }: { order?: OrderWithItems; notice?: 
             </div>
           </dl>
         )}
+
+        <UpiLimitWarning total={totals.total} />
 
         {/* Sticky: always visible above the tab bar, so Add order is one tap from anywhere in the form. */}
         <div className="sticky bottom-[calc(3.5rem+env(safe-area-inset-bottom))] -mx-4 flex items-center gap-3 border-t border-border bg-surface px-4 py-3">

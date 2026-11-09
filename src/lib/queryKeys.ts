@@ -2,6 +2,8 @@
 export const queryKeys = {
   settings: ['settings'] as const,
   asset: (path: string) => ['asset', path] as const,
+  /** A UPI QR image is a pure function of its link, so it is cached by link. */
+  upiQr: (uri: string) => ['upiQr', uri] as const,
   orders: {
     all: ['orders'] as const,
     list: (tab: string, search: string) => ['orders', 'list', tab, search] as const,
