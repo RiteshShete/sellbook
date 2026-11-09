@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { Link } from 'react-router-dom'
 import { ErrorState, Skeleton } from '../../../components/ui'
 import { ProductCard } from '../../catalog/components/ProductCard'
+import { ImportCardCompact } from '../../productImport/components/ImportEntryCards'
 import { ProductFilters, ProductGrid, sectionTitle } from '../../catalog/components/ProductGrid'
 import { useProductBrowser } from '../../catalog/hooks/useProductBrowser'
 import type { Product } from '../../catalog/schemas'
@@ -34,12 +35,15 @@ export function ProductPicker({ form }: { form: OrderDraftState }) {
   }
   if (b.all.length === 0) {
     return (
-      <p className="rounded-xl bg-surface-2 p-3 text-sm text-muted">
-        No active products.{' '}
-        <Link to="/catalog/new" className="font-medium underline underline-offset-4">
-          Add one in Products
-        </Link>
-      </p>
+      <div className="flex flex-col gap-3">
+        <p className="rounded-xl bg-surface-2 p-3 text-sm text-muted">
+          No active products.{' '}
+          <Link to="/catalog/new" className="font-medium underline underline-offset-4">
+            Add one in Products
+          </Link>
+        </p>
+        <ImportCardCompact />
+      </div>
     )
   }
 

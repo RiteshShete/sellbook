@@ -2,6 +2,7 @@ import { useMutation } from '@tanstack/react-query'
 import { useState, type FormEvent } from 'react'
 import { Navigate, useLocation } from 'react-router-dom'
 import { Button, Input, Skeleton } from '../../components/ui'
+import loginBg from '../../assets/login/login-bg.png'
 import { RotatingArt } from './components/RotatingArt'
 import { validateLogin, type LoginErrors } from './schemas'
 import { useAuth } from './useAuth'
@@ -52,41 +53,49 @@ export function LoginPage() {
   }
 
   return (
-    <main className="mx-auto flex min-h-dvh max-w-sm flex-col justify-end gap-6 px-6 pt-[max(2rem,env(safe-area-inset-top))] pb-[max(5rem,env(safe-area-inset-bottom))]">
-      <RotatingArt />
-      <div>
-        <h1 className="font-display text-5xl tracking-tight">Sellbook</h1>
-        <p className="text-muted">Owner sign-in</p>
-      </div>
-      <form onSubmit={onSubmit} noValidate className="flex flex-col gap-4">
-        <Input
-          label="Email"
-          type="email"
-          inputMode="email"
-          autoComplete="username"
-          autoCapitalize="none"
-          value={email}
-          onChange={(e) => {
-            setEmail(e.target.value)
-            clearError('email')
-          }}
-          error={errors.email}
-        />
-        <Input
-          label="Password"
-          type="password"
-          autoComplete="current-password"
-          value={password}
-          onChange={(e) => {
-            setPassword(e.target.value)
-            clearError('password')
-          }}
-          error={errors.password}
-        />
-        <Button type="submit" block disabled={login.isPending}>
-          {login.isPending ? 'Signing in…' : 'Sign in'}
-        </Button>
-      </form>
-    </main>
+    <div className="relative min-h-dvh overflow-hidden bg-gradient-to-b from-login-from to-login-to">
+      {/* Figma: photo is 470x940, centred, starting 114px above the top. Grows only to keep covering. */}
+      <img
+        src={loginBg}
+        alt=""
+        aria-hidden
+        className="pointer-events-none absolute top-[-114px] left-1/2 h-[max(940px,calc(100%+114px))] w-[max(470px,100%)] max-w-none -translate-x-1/2 object-cover"
+      />
+      <main className="relative mx-auto flex min-h-dvh max-w-sm flex-col justify-end gap-6 px-6 pt-[max(2rem,env(safe-area-inset-top))] pb-[max(5rem,env(safe-area-inset-bottom))]">
+        <RotatingArt />
+        <h1 className="font-display text-5xl tracking-tight text-white">Sellbook</h1>
+        <form onSubmit={onSubmit} noValidate className="flex flex-col gap-4">
+          <Input
+            onImage
+            label="Email"
+            type="email"
+            inputMode="email"
+            autoComplete="username"
+            autoCapitalize="none"
+            value={email}
+            onChange={(e) => {
+              setEmail(e.target.value)
+              clearError('email')
+            }}
+            error={errors.email}
+          />
+          <Input
+            onImage
+            label="Password"
+            type="password"
+            autoComplete="current-password"
+            value={password}
+            onChange={(e) => {
+              setPassword(e.target.value)
+              clearError('password')
+            }}
+            error={errors.password}
+          />
+          <Button type="submit" variant="lime" block disabled={login.isPending}>
+            {login.isPending ? 'Signing in…' : 'Sign in'}
+          </Button>
+        </form>
+      </main>
+    </div>
   )
 }

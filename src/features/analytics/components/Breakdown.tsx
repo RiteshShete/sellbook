@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { SegmentedControl } from '../../../components/ui'
+import { UnderlineTabs } from '../../../components/ui'
 import { pluralize } from '../../../lib/format'
 import { formatTotals, type MeasureTotals } from '../../../lib/measure'
 import { formatINR, type Paise } from '../../../lib/money'
@@ -29,7 +29,7 @@ export function Breakdown({ a }: { a: MonthAnalytics }) {
         <h2 className="font-semibold">What sold</h2>
         <p className="text-sm text-muted">Item amounts before order discounts</p>
       </div>
-      <SegmentedControl
+      <UnderlineTabs
         label="Group by"
         value={view}
         onChange={setView}
