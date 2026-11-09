@@ -7,6 +7,8 @@
 # pgtap extension) is always rolled back. Nothing is committed to the hosted database.
 #
 # Usage: bash scripts/test-db-linked.sh [name ...]   (default: every test file)
+# The CLI asks before running SQL on a hosted project; from an agent or CI pass the owner's consent:
+#   DB_QUERY_FLAGS=--yes bash scripts/test-db-linked.sh
 set -euo pipefail
 
 cd "$(dirname "$0")/.."
@@ -37,7 +39,7 @@ begin
 end $$;
 EOF
 
-  npx --no-install supabase db query --linked -f "$work/$t.sql" > "$work/$t.out" 2>&1 || true
+  npx --no-install supabase db query --linked ${DB_QUERY_FLAGS:-} -f "$work/$t.sql" > "$work/$t.out" 2>&1 || true
   if ! grep -q TAPSTART "$work/$t.out"; then
     echo "=== $t: ERROR (script did not reach the end)"
     head -c 1500 "$work/$t.out"; echo
