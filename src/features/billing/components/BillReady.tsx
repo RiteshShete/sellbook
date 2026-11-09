@@ -1,4 +1,5 @@
-import { AlertTriangle, Copy, MessageCircle, Share2 } from 'lucide-react'
+import { AlertTriangle, Copy, MessageCircle, RefreshCw, Share2 } from 'lucide-react'
+import { Link } from 'react-router-dom'
 import { useState } from 'react'
 import { Button, ConfirmDialog, Modal, Skeleton, toast } from '../../../components/ui'
 import type { OrderWithItems } from '../../orders/schemas'
@@ -19,6 +20,7 @@ import { ReceiptPrinter } from './ReceiptPrinter'
 import { formatDateTime } from '../../../lib/dates'
 import { toWaMeLink } from '../../../lib/phone'
 import { formatINR } from '../../../lib/money'
+import { isValidVpa, qrMode } from '../../../lib/upi'
 
 interface Props {
   order: OrderWithItems
@@ -50,6 +52,9 @@ export function BillReady({ order, settings, state, regenerating, onRegenerate }
   const alt = upiLink
     ? `Bill ${billNo}, scan to pay ${formatINR(latest.total_at_generation)}`
     : `Bill ${billNo}`
+
+  // A UPI ID without a payee name keeps bills on the uploaded QR: say so, with the way out.
+  const needsPayee = qrMode(settings) !== 'dynamic' && isValidVpa((settings.upi_id ?? '').trim())
 
   const copyLink = () => {
     if (!upiLink) return
@@ -124,6 +129,13 @@ export function BillReady({ order, settings, state, regenerating, onRegenerate }
             <MessageCircle className="h-5 w-5" /> Send payment message
           </a>
         )}
+        {!outdated && (
+          // Settings (QR mode, payee, UPI ID) are not part of the outdated check, so a bill made
+          // before they changed can be remade on purpose: same bill number, next revision.
+          <Button variant="secondary" disabled={regenerating} onClick={onRegenerate}>
+            <RefreshCw className="h-5 w-5" /> {regenerating ? 'Making bill…' : 'Regenerate bill'}
+          </Button>
+        )}
         {upiLink && !outdated && (
           <Button variant="secondary" onClick={copyLink}>
             <Copy className="h-5 w-5" /> Copy UPI payment link
@@ -134,6 +146,15 @@ export function BillReady({ order, settings, state, regenerating, onRegenerate }
         </Button>
       </div>
       {upiLink && <UpiNote />}
+      {needsPayee && (
+        <p className="text-sm text-muted">
+          This bill uses your uploaded QR. Add a payee name in{' '}
+          <Link to="/settings" className="font-medium underline underline-offset-4">
+            Settings
+          </Link>{' '}
+          for a QR that pays the exact amount, then regenerate.
+        </p>
+      )}
 
       <Modal open={zoom} onClose={() => setZoom(false)} title={`Bill ${billNo}`}>
         {image.url && <img src={image.url} alt={alt} className="w-full" />}
