@@ -57,6 +57,11 @@ export type BadgeKind =
   | 'notPaid'
   | 'dueToday'
   | 'overdue'
+  | 'importNew'
+  | 'importExists'
+  | 'importUpdate'
+  | 'importError'
+  | 'importCheck'
 
 /**
  * Status badges. Each carries its text label too. Ready is blue and Due today is amber (they were
@@ -73,4 +78,10 @@ export const BADGE_STYLES: Record<BadgeKind, string> = {
   notPaid: 'bg-danger-soft text-danger-ink',
   dueToday: 'bg-ochre text-text',
   overdue: 'bg-danger-deep text-white',
+  // Product import review: same colour pairs as Delivered / neutral / Ready / Not paid / Due today.
+  importNew: 'bg-success-soft text-success-ink',
+  importExists: 'bg-surface-2 text-text',
+  importUpdate: 'bg-info-soft text-info-ink',
+  importError: 'bg-danger-soft text-danger-ink',
+  importCheck: 'bg-ochre text-text',
 }
