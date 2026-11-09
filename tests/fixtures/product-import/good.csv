@@ -1,0 +1,6 @@
+product_name,category,variant_name,size,unit,price,cost_price,active,notes
+Poha,Breakfast,,500,g,60,,yes,
+Poha,Breakfast,,1,kg,115,,yes,
+Chai Masala,Tea,Retail,100,g,80,55,yes,
+Chai Masala,Tea,Wholesale,1,kg,700,520,yes,
+Sharbat,Drinks,,750,ml,140,,no,

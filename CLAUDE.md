@@ -31,7 +31,8 @@ Never claim a command passed unless it ran. If something was skipped or failed, 
 ## Decisions (do NOT change without asking the user)
 
 - React + Vite + TypeScript (strict), Tailwind, React Router, TanStack Query, Recharts, html-to-image,
-  vite-plugin-pwa, zod, Vitest, qrcode (UPI QR images; approved by the owner with the dynamic-QR task).
+  vite-plugin-pwa, zod, Vitest, qrcode (UPI QR images; approved by the owner with the dynamic-QR task),
+  papaparse (CSV import parsing; approved by the owner with the product-import task).
 - Supabase free plan (Postgres, Auth, Storage, Realtime); Supabase CLI migrations in `supabase/migrations`.
 - Hosting: GitHub Pages at https://riteshshete.github.io/sellbook/ (public repo, free plan), deployed by
   `.github/workflows/deploy.yml` on every push to `main`; the build uses `BASE_PATH=/sellbook/`.
@@ -131,6 +132,18 @@ phone = digits with country code, e.g. `919876543210` (`normalizePhone`, `toWaMe
 - **Names:** sort with `compareNames()` (Marathi collation); search with `normalizeSearch()`.
 - **Accessibility:** WCAG 2.2 AA. Dialogs trap focus; chips use aria-pressed; no horizontal scroll at 360 px or 200% text. `npm run e2e` (Playwright + axe, mocked API, see docs/ui-audit/README.md; not part of `check`).
 - Windows Git Bash rewrites `BASE_PATH=/sellbook/`: use `MSYS_NO_PATHCONV=1` or PowerShell.
+
+## Product import (CSV "Configure")
+
+`/catalog/configure`, code in `src/features/productImport/`, full notes in `docs/PRODUCT_IMPORT.md`.
+- **One schema:** `importSchema.ts` (`IMPORT_COLUMNS`, `HEADER_ALIASES`, `UNIT_SYNONYMS`, `LIMITS`, `EXAMPLE_ROWS`,
+  `AI_INSTRUCTIONS`) generates the guide, template, example, AI text and parser rules. Change a column there only.
+  Columns in order: product_name, category, variant_name, size, unit, price, cost_price, active, notes.
+- Pure and tested: `clean.ts`, `parseImport.ts`, `planImport.ts`. UI never parses or plans inline.
+- Strict UTF-8; stored names are never altered (zero-width joiners only ignored in duplicate keys).
+- Writes only through `apply_product_import` / `undo_product_import` (one transaction, `import_batches` record, SB410 on a
+  concurrent catalog change). Never delete; undo = Trash + restored values. Add new only is the default and idempotent.
+- Import status chips live in `BADGE_STYLES` (`import*` kinds) and `scripts/contrast.mjs`.
 
 ## Branch workflow
 

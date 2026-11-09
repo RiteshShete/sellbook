@@ -1,8 +1,9 @@
-import { Plus, Tags } from 'lucide-react'
+import { FileUp, Plus, Tags } from 'lucide-react'
 import { Link } from 'react-router-dom'
 import { Page } from '../../app/Page'
 import { Badge, EmptyState, ErrorState, Skeleton } from '../../components/ui'
 import { pluralize } from '../../lib/format'
+import { ImportEntryCards } from '../productImport/components/ImportEntryCards'
 import { ProductCard } from './components/ProductCard'
 import { ProductFilters, ProductGrid, sectionTitle } from './components/ProductGrid'
 import { useProductBrowser } from './hooks/useProductBrowser'
@@ -34,11 +35,13 @@ export function CatalogPage() {
       ) : b.products.isError ? (
         <ErrorState error={b.products.error} onRetry={() => void b.products.refetch()} />
       ) : b.all.length === 0 ? (
-        <EmptyState
-          title="No products yet"
-          description="Add the things you sell, with a price for each size or flavour."
-          action={addButton}
-        />
+        <div className="flex flex-col gap-4">
+          <EmptyState
+            title="No products yet"
+            description="Add the things you sell, with a price for each size or flavour."
+          />
+          <ImportEntryCards />
+        </div>
       ) : (
         <div className="flex flex-col gap-4">
           <ProductFilters
@@ -51,12 +54,20 @@ export function CatalogPage() {
           />
           <div className="flex items-center justify-between gap-2 text-sm text-muted">
             <p>{pluralize(b.all.length, 'product')}. Tap one to change prices or sizes.</p>
-            <Link
-              to="/catalog/categories"
-              className="inline-flex min-h-11 shrink-0 items-center gap-1 rounded-xl px-2 font-medium text-text underline underline-offset-4"
-            >
-              <Tags className="h-4 w-4" /> Categories
-            </Link>
+            <div className="flex shrink-0 items-center">
+              <Link
+                to="/catalog/categories"
+                className="inline-flex min-h-11 items-center gap-1 rounded-xl px-2 font-medium text-text underline underline-offset-4"
+              >
+                <Tags className="h-4 w-4" /> Categories
+              </Link>
+              <Link
+                to="/catalog/configure"
+                className="inline-flex min-h-11 items-center gap-1 rounded-xl px-2 font-medium text-text underline underline-offset-4"
+              >
+                <FileUp className="h-4 w-4" /> Configure
+              </Link>
+            </div>
           </div>
           {b.sections.length === 0 ? (
             <EmptyState title="No products match" description="Try a different word or category." />

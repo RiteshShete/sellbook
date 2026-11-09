@@ -71,6 +71,11 @@ export const PAIRS = [
   P('text', 'Badge: Not paid', 'danger-ink', 'danger-soft'),
   P('text', 'Badge: Due today', 'text', 'ochre'),
   P('text', 'Badge: Overdue', 'on-solid', 'danger-deep'),
+  P('text', 'Import chip: New', 'success-ink', 'success-soft'),
+  P('text', 'Import chip: Already exists', 'text', 'surface-2'),
+  P('text', 'Import chip: Will update', 'info-ink', 'info-soft'),
+  P('text', 'Import chip: Error', 'danger-ink', 'danger-soft'),
+  P('text', 'Import chip: Check', 'text', 'ochre'),
   // KPI cards (Home)
   P('text', 'KPI card label on lavender (ink 70%)', 'text', 'lavender', 0.7),
   P('text', 'KPI card value on lavender', 'text', 'lavender'),

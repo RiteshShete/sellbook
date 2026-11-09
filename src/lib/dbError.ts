@@ -3,6 +3,9 @@ import { ZodError } from 'zod'
 /** SQLSTATE raised by order RPCs when the caller's version_no is stale. */
 export const STALE_VERSION = 'SB409'
 
+/** SQLSTATE raised by the product import when the catalog changed since the review. */
+export const CATALOG_CHANGED = 'SB410'
+
 /** Shape shared by PostgrestError, StorageError and plain Errors. */
 export interface DbErrorLike {
   code?: string
@@ -17,6 +20,9 @@ export function readableDbError(error: DbErrorLike): string {
   if (error.code === '42501') return 'Not allowed. Try signing out and in again.'
   if (error.code === STALE_VERSION) {
     return 'This order was changed on another device. The latest version is loaded; check and try again.'
+  }
+  if (error.code === CATALOG_CHANGED) {
+    return 'The catalog changed while you were reviewing. Nothing was saved. Review the import again.'
   }
   if (error.code === '28000' || lower.includes('jwt')) return 'Your session expired. Sign in again.'
   if (error.code === 'PGRST202' || lower.includes('could not find the function')) {
