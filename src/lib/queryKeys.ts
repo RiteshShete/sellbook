@@ -37,6 +37,7 @@ export const queryKeys = {
   },
   pending: ['pending'] as const,
   categories: ['categories'] as const,
+  importBatches: ['importBatches'] as const,
   products: {
     all: ['products'] as const,
     list: () => ['products', 'list'] as const,

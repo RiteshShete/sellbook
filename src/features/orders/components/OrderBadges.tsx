@@ -24,12 +24,24 @@ export function PaymentBadge({ order }: { order: Pick<Order, 'payment_status' | 
 export function DueBadge({
   order,
   today = todayIST(),
+  outline = false,
 }: {
   order: Pick<Order, 'due_date' | 'status'>
   today?: string
+  outline?: boolean
 }) {
   if (!order.due_date || order.status === 'delivered' || order.status === 'cancelled') return null
-  if (order.due_date < today) return <Badge kind="overdue">Overdue</Badge>
-  if (order.due_date === today) return <Badge kind="dueToday">Due today</Badge>
-  return <Badge>Due {formatDayMonth(order.due_date)}</Badge>
+  if (order.due_date < today)
+    return (
+      <Badge kind="overdue" outline={outline}>
+        Overdue
+      </Badge>
+    )
+  if (order.due_date === today)
+    return (
+      <Badge kind="dueToday" outline={outline}>
+        Due today
+      </Badge>
+    )
+  return <Badge outline={outline}>Due {formatDayMonth(order.due_date)}</Badge>
 }

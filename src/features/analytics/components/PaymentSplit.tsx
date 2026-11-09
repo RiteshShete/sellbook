@@ -7,8 +7,8 @@ import type { MonthAnalytics } from '../schemas'
  */
 export function PaymentSplit({ a }: { a: MonthAnalytics }) {
   const parts = [
-    { label: 'Online', paise: a.collected_online, color: 'bg-chart-1' },
-    { label: 'Cash', paise: a.collected_cash, color: 'bg-chart-2' },
+    { label: 'Online', paise: a.collected_online, color: 'bg-kpi-collected' },
+    { label: 'Cash', paise: a.collected_cash, color: 'bg-kpi-outstanding' },
   ]
   // Round online only and give cash the rest, so the two never show 51% + 50%.
   const online = a.collected === 0 ? 0 : Math.round((a.collected_online / a.collected) * 100)

@@ -3,7 +3,7 @@ import { Page } from '../../app/Page'
 import { EmptyState, ErrorState, Skeleton } from '../../components/ui'
 import type { EntityKind } from './api/activityApi'
 import { ActivityFeed } from './components/ActivityFeed'
-import { useEntityItem } from './hooks'
+import { useEntityItem } from './hooks/useActivity'
 
 function asKind(value: string | undefined): EntityKind | null {
   return value === 'order' || value === 'product' || value === 'variant' ? value : null

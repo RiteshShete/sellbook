@@ -1,10 +1,11 @@
 import { MutationCache, QueryClient, QueryClientProvider } from '@tanstack/react-query'
-import { useState, type ReactNode } from 'react'
+import { useEffect, useState, type ReactNode } from 'react'
 import { Toast, toast } from '../components/ui'
 import { AuthProvider } from '../features/auth/AuthProvider'
 import { errorMessage } from '../lib/dbError'
 import type { Env } from '../lib/env'
 import { getSupabase } from '../lib/supabase'
+import { installGlobalErrorHandlers } from './globalErrors'
 
 export function Providers({ env, children }: { env: Env; children: ReactNode }) {
   const [queryClient] = useState(
@@ -15,6 +16,7 @@ export function Providers({ env, children }: { env: Env; children: ReactNode }) 
         defaultOptions: { queries: { staleTime: 30_000, retry: 1, refetchOnWindowFocus: true } },
       }),
   )
+  useEffect(() => installGlobalErrorHandlers(), [])
   return (
     <QueryClientProvider client={queryClient}>
       <AuthProvider client={getSupabase(env)}>{children}</AuthProvider>

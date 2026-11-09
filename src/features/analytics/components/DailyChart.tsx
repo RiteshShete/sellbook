@@ -1,3 +1,4 @@
+import { useState } from 'react'
 import { Bar, BarChart, CartesianGrid, ResponsiveContainer, Tooltip, XAxis, YAxis } from 'recharts'
 import { formatDate } from '../../../lib/dates'
 import { pluralize } from '../../../lib/format'
@@ -28,11 +29,22 @@ export function DailyChart({ daily }: { daily: MonthAnalytics['daily'] }) {
     paise: d.sales,
     orders: d.orders,
   }))
+  const [showTable, setShowTable] = useState(false)
   const busy = data.filter((d) => d.orders > 0)
 
   return (
     <section className="rounded-2xl border border-border bg-surface p-4">
-      <h2 className="font-semibold">Daily sales</h2>
+      <div className="flex items-center justify-between gap-3">
+        <h2 className="font-semibold">Daily sales</h2>
+        <button
+          type="button"
+          aria-expanded={showTable}
+          onClick={() => setShowTable((v) => !v)}
+          className="-my-3 min-h-11 text-sm font-medium underline underline-offset-4"
+        >
+          {showTable ? 'Hide table' : 'Show as table'}
+        </button>
+      </div>
       <p className="text-sm text-muted">Delivered orders by day</p>
       <div className="mt-3 h-52" role="img" aria-label="Bar chart of daily sales for the month">
         <ResponsiveContainer width="100%" height="100%">
@@ -69,33 +81,32 @@ export function DailyChart({ daily }: { daily: MonthAnalytics['daily'] }) {
           </BarChart>
         </ResponsiveContainer>
       </div>
-      <details className="mt-2">
-        <summary className="flex min-h-11 cursor-pointer items-center text-sm font-medium underline underline-offset-4">
-          Show as table
-        </summary>
-        {busy.length === 0 ? (
-          <p className="py-2 text-sm text-muted">No deliveries this month.</p>
-        ) : (
-          <table className="w-full text-sm tabular-nums">
-            <thead className="text-left text-muted">
-              <tr>
-                <th className="py-1 font-medium">Day</th>
-                <th className="py-1 text-right font-medium">Orders</th>
-                <th className="py-1 text-right font-medium">Sales</th>
-              </tr>
-            </thead>
-            <tbody>
-              {busy.map((d) => (
-                <tr key={d.date} className="border-t border-border">
-                  <td className="py-1.5">{formatDate(d.date)}</td>
-                  <td className="py-1.5 text-right">{d.orders}</td>
-                  <td className="py-1.5 text-right">{formatINR(d.paise)}</td>
+      {showTable && (
+        <div className="mt-2">
+          {busy.length === 0 ? (
+            <p className="py-2 text-sm text-muted">No deliveries this month.</p>
+          ) : (
+            <table className="w-full text-sm tabular-nums">
+              <thead className="text-left text-muted">
+                <tr>
+                  <th className="py-1 font-medium">Day</th>
+                  <th className="py-1 text-right font-medium">Orders</th>
+                  <th className="py-1 text-right font-medium">Sales</th>
                 </tr>
-              ))}
-            </tbody>
-          </table>
-        )}
-      </details>
+              </thead>
+              <tbody>
+                {busy.map((d) => (
+                  <tr key={d.date} className="border-t border-border">
+                    <td className="py-1.5">{formatDate(d.date)}</td>
+                    <td className="py-1.5 text-right">{d.orders}</td>
+                    <td className="py-1.5 text-right">{formatINR(d.paise)}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          )}
+        </div>
+      )}
     </section>
   )
 }
