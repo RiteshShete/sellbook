@@ -79,6 +79,11 @@ export const BADGE_OUTLINE_STYLES: Record<BadgeKind, string> = {
   notPaid: 'border-danger-ink text-danger-ink',
   dueToday: 'border-warning text-warning',
   overdue: 'border-danger-deep text-danger-deep',
+  importNew: 'border-success-ink text-success-ink',
+  importExists: 'border-border-strong text-muted',
+  importUpdate: 'border-info-ink text-info-ink',
+  importError: 'border-danger-ink text-danger-ink',
+  importCheck: 'border-warning text-warning',
 }
 
 export const BADGE_STYLES: Record<BadgeKind, string> = {
