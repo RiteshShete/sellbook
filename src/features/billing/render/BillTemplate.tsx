@@ -20,7 +20,10 @@ export interface BillData {
   }
   /** data: URLs (never remote URLs, so the canvas is not tainted). */
   logo: string | null
+  /** The pay QR: drawn per order (dynamic, carries the amount) or the uploaded image. Null: none. */
   qr: string | null
+  /** The order is already paid: show PAID, no QR. */
+  paid: boolean
 }
 
 const muted = 'text-[#6a6a6a]'
@@ -59,17 +62,23 @@ export function BillTemplate({ data }: { data: BillData }) {
             <span className="px-2">|</span>
             Date <span className="font-semibold text-[#0a0a0a]">{data.date}</span>
           </p>
-          {data.qr ? (
+          {data.qr && !data.paid ? (
             // White quiet zone around the code keeps it scannable.
             <div className="rounded-2xl bg-white p-3">
-              <img src={data.qr} alt="" className="h-56 w-56 object-contain" />
+              <img
+                src={data.qr}
+                alt={`QR code to pay ${formatINR(o.total)}`}
+                className="h-56 w-56 object-contain"
+              />
             </div>
           ) : null}
-          <p className="rounded-full bg-[#a4d4c5] px-4 py-1.5 text-[15px] font-semibold text-[#0a0a0a]">
-            {data.qr ? 'Scan to pay' : 'Amount due'} <span className="px-1">|</span>{' '}
-            {formatINR(o.total)}
+          <p
+            className={`rounded-full px-4 py-1.5 text-[15px] font-semibold text-[#0a0a0a] ${data.paid ? 'bg-[#d9f0dc]' : 'bg-[#a4d4c5]'}`}
+          >
+            {data.paid ? 'PAID' : data.qr ? 'Scan to pay' : 'Amount due'}{' '}
+            <span className="px-1">|</span> {formatINR(o.total)}
           </p>
-          {shop.upiId && <p className={`text-[13px] ${muted}`}>UPI: {shop.upiId}</p>}
+          {shop.upiId && !data.paid && <p className={`text-[13px] ${muted}`}>UPI: {shop.upiId}</p>}
         </section>
 
         <section
