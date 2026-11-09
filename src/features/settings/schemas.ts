@@ -1,4 +1,5 @@
 import { z } from 'zod'
+import { isValidVpa } from '../../lib/upi'
 
 export const SettingsSchema = z.object({
   id: z.guid(),
@@ -7,6 +8,10 @@ export const SettingsSchema = z.object({
   shop_address: z.string(),
   shop_phone: z.string(),
   upi_id: z.string().nullable(),
+  /** Name the customer's UPI app shows; required for the dynamic QR. Defaults keep an old DB readable. */
+  payee_name: z.string().nullable().default(null),
+  /** "Use dynamic QR" switch; the uploaded qr_path is the fallback. */
+  use_dynamic_qr: z.boolean().default(true),
   qr_path: z.string().nullable(),
   logo_path: z.string().nullable(),
   bill_prefix: z.string(),
@@ -25,13 +30,22 @@ export interface SettingsDraft {
   shop_address: string
   shop_phone: string
   upi_id: string
+  payee_name: string
+  use_dynamic_qr: boolean
   bill_prefix: string
   bill_footer: string
 }
 
 export type SettingsPatch = Pick<
   Settings,
-  'shop_name' | 'shop_address' | 'shop_phone' | 'upi_id' | 'bill_prefix' | 'bill_footer'
+  | 'shop_name'
+  | 'shop_address'
+  | 'shop_phone'
+  | 'upi_id'
+  | 'payee_name'
+  | 'use_dynamic_qr'
+  | 'bill_prefix'
+  | 'bill_footer'
 >
 
 export type SettingsErrors = Partial<Record<keyof SettingsDraft, string>>
@@ -42,6 +56,8 @@ export function draftFromSettings(s: Settings): SettingsDraft {
     shop_address: s.shop_address,
     shop_phone: s.shop_phone,
     upi_id: s.upi_id ?? '',
+    payee_name: s.payee_name ?? '',
+    use_dynamic_qr: s.use_dynamic_qr,
     bill_prefix: s.bill_prefix,
     bill_footer: s.bill_footer ?? '',
   }
@@ -58,7 +74,9 @@ const SettingsFormSchema = z.object({
   upi_id: z
     .string()
     .trim()
-    .regex(/^$|^[\w.-]{2,256}@[A-Za-z]{2,64}$/, 'Looks like name@bank, e.g. shop@okicici'),
+    .refine((v) => v === '' || isValidVpa(v), 'Looks like name@bank, e.g. shop@okicici'),
+  payee_name: z.string().trim().max(50, 'Keep it under 50 characters'),
+  use_dynamic_qr: z.boolean(),
   bill_prefix: z
     .string()
     .trim()
@@ -84,7 +102,12 @@ export function validateSettings(draft: SettingsDraft): SettingsValidation {
   const v = parsed.data
   return {
     ok: true,
-    patch: { ...v, upi_id: v.upi_id || null, bill_footer: v.bill_footer || null },
+    patch: {
+      ...v,
+      upi_id: v.upi_id || null,
+      payee_name: v.payee_name || null,
+      bill_footer: v.bill_footer || null,
+    },
   }
 }
 

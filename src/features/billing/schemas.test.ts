@@ -1,4 +1,5 @@
 import { describe, expect, it } from 'vitest'
+import type { Settings } from '../settings/schemas'
 import {
   BillSchema,
   BillSourceSchema,
@@ -86,21 +87,35 @@ describe('schemas', () => {
 })
 
 describe('billShareText', () => {
-  it('adds a UPI link for the bill amount when a UPI id is set', () => {
-    const t = billShareText(
-      { customer_name: 'Ravi' },
-      { shop_name: 'Asha Cakes', upi_id: 'shop@okicici' },
-      'INV-0007',
-      50000,
-    )
+  const settings: Pick<
+    Settings,
+    'shop_name' | 'upi_id' | 'payee_name' | 'use_dynamic_qr' | 'qr_path'
+  > = {
+    shop_name: 'Asha Cakes',
+    upi_id: 'shop@okicici',
+    payee_name: 'Asha Cakes',
+    use_dynamic_qr: true,
+    qr_path: null,
+  }
+  const unpaid = { customer_name: 'Ravi', payment_status: 'pending' } as const
+
+  it('adds the dynamic UPI link for the bill amount', () => {
+    const t = billShareText(unpaid, settings, 'INV-0007', 50000)
     expect(t).toContain('Amount: ₹500')
     expect(t).toContain(
       'upi://pay?pa=shop%40okicici&pn=Asha%20Cakes&am=500.00&cu=INR&tn=Bill%20INV-0007',
     )
   })
-  it('has no link without a UPI id', () => {
-    expect(
-      billShareText({ customer_name: 'Ravi' }, { shop_name: '', upi_id: null }, '0001', 100),
-    ).not.toContain('upi://')
+  it('has no link without a UPI id or payee name, or with the switch off', () => {
+    const none = (over: Partial<typeof settings>) =>
+      billShareText(unpaid, { ...settings, ...over }, '0001', 100)
+    expect(none({ upi_id: null })).not.toContain('upi://')
+    expect(none({ payee_name: null })).not.toContain('upi://')
+    expect(none({ use_dynamic_qr: false })).not.toContain('upi://')
+  })
+  it('has no link and says thanks when the order is paid', () => {
+    const t = billShareText({ ...unpaid, payment_status: 'paid' }, settings, '0001', 100)
+    expect(t).not.toContain('upi://')
+    expect(t).toContain('Payment received')
   })
 })

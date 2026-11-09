@@ -1,5 +1,7 @@
 import type { SupabaseClient } from '@supabase/supabase-js'
 import { formatDate, todayIST } from '../../lib/dates'
+import { qrMode, upiLinkForBill } from '../../lib/upi'
+import { upiQrDataUrl } from '../../lib/qrImage'
 import { downloadAsset } from '../settings/api/settingsApi'
 import type { Settings } from '../settings/schemas'
 import { BillStaleError, registerBill, reserveBill, uploadBillImage } from './api/billsApi'
@@ -25,9 +27,11 @@ export async function generateBill(
   settings: Settings,
   orderId: string,
 ): Promise<GeneratedBill> {
-  const [logo, qr, { renderBill }] = await Promise.all([
+  // The uploaded QR image is only fetched when it is the one bills use (dynamic mode draws its own).
+  const uploadedQr = qrMode(settings) === 'uploaded'
+  const [logo, uploaded, { renderBill }] = await Promise.all([
     assetDataUrl(client, settings.logo_path),
-    assetDataUrl(client, settings.qr_path),
+    assetDataUrl(client, uploadedQr ? settings.qr_path : null),
     import('./render/renderBill'), // html-to-image stays out of the main bundle
   ])
 
@@ -36,9 +40,15 @@ export async function generateBill(
     if (source.items.length > MAX_BILL_LINES) {
       throw new Error(`A bill can have up to ${MAX_BILL_LINES} lines.`)
     }
+    const billNo = formatBillNo(source.bill_prefix ?? settings.bill_prefix, source.bill_no)
+    const paid = source.payment_status === 'paid'
+    // Dynamic QR: the amount still payable is the order total as it is right now (same read as the
+    // content hash), so editing the total makes this bill outdated and the next revision a new QR.
+    const link = upiLinkForBill({ settings, billNo, amount: source.total, paid })
+    const qr = paid ? null : link ? await upiQrDataUrl(link) : uploaded
     const data: BillData = {
       source,
-      billNo: formatBillNo(source.bill_prefix ?? settings.bill_prefix, source.bill_no),
+      billNo,
       date: formatDate(todayIST()),
       shop: {
         name: settings.shop_name,
@@ -49,6 +59,7 @@ export async function generateBill(
       },
       logo,
       qr,
+      paid,
     }
     const png = await renderBill(data)
     const path = await uploadBillImage(client, settings.owner_id, orderId, png)
