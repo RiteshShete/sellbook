@@ -1,7 +1,7 @@
 import { z } from 'zod'
 import { dbMoney } from '../../lib/zodMoney'
 import { formatINR, type Paise } from '../../lib/money'
-import { billMessage, upiPayLink } from '../../lib/upi'
+import { billMessage, upiLinkForBill } from '../../lib/upi'
 import { OrderItemSchema, OrderSchema, type Order } from '../orders/schemas'
 import type { Settings } from '../settings/schemas'
 
@@ -55,26 +55,35 @@ export function isOutdated(state: BillState): boolean {
   return latest !== undefined && latest.items_hash !== state.currentHash
 }
 
-/** The message shared with the bill: amount plus a upi://pay link when a UPI id is set. */
+type PayOrder = Pick<Order, 'customer_name' | 'payment_status'>
+type PaySettings = Pick<
+  Settings,
+  'shop_name' | 'upi_id' | 'payee_name' | 'use_dynamic_qr' | 'qr_path'
+>
+
+/** The upi://pay link for a bill, or null (not in dynamic mode, already paid, or nothing to pay). */
+export function billUpiLink(
+  order: Pick<Order, 'payment_status'>,
+  settings: PaySettings,
+  billNo: string,
+  total: Paise,
+): string | null {
+  return upiLinkForBill({ settings, billNo, amount: total, paid: order.payment_status === 'paid' })
+}
+
+/** The message shared with the bill: amount plus a upi://pay link when the bill has a dynamic QR. */
 export function billShareText(
-  order: Pick<Order, 'customer_name'>,
-  settings: Pick<Settings, 'shop_name' | 'upi_id'>,
+  order: PayOrder,
+  settings: PaySettings,
   billNo: string,
   total: Paise,
 ): string {
-  const upiLink = settings.upi_id
-    ? upiPayLink({
-        upiId: settings.upi_id,
-        payeeName: settings.shop_name || 'Shop',
-        amount: total,
-        note: `Bill ${billNo}`,
-      })
-    : null
   return billMessage({
     customerName: order.customer_name,
     shopName: settings.shop_name,
     billNo,
     totalText: formatINR(total),
-    upiLink,
+    upiLink: billUpiLink(order, settings, billNo, total),
+    paid: order.payment_status === 'paid',
   })
 }

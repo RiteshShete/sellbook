@@ -1,15 +1,24 @@
-import { AlertTriangle, MessageCircle, Share2 } from 'lucide-react'
+import { AlertTriangle, Copy, MessageCircle, Share2 } from 'lucide-react'
 import { useState } from 'react'
-import { Button, ConfirmDialog, Modal, Skeleton } from '../../../components/ui'
+import { Button, ConfirmDialog, Modal, Skeleton, toast } from '../../../components/ui'
 import type { OrderWithItems } from '../../orders/schemas'
 import type { Settings } from '../../settings/schemas'
 import { useBillImage } from '../hooks/useBills'
 import { useShareBill } from '../hooks/useShareBill'
-import { billShareText, type BillState, billFileName, formatBillNo, isOutdated } from '../schemas'
+import {
+  billShareText,
+  billUpiLink,
+  type BillState,
+  billFileName,
+  formatBillNo,
+  isOutdated,
+} from '../schemas'
 import { BillRevisions } from './BillRevisions'
+import { UpiNote } from './UpiNote'
 import { ReceiptPrinter } from './ReceiptPrinter'
 import { formatDateTime } from '../../../lib/dates'
 import { toWaMeLink } from '../../../lib/phone'
+import { formatINR } from '../../../lib/money'
 
 interface Props {
   order: OrderWithItems
@@ -36,6 +45,19 @@ export function BillReady({ order, settings, state, regenerating, onRegenerate }
   const fileName = billFileName(prefix, latest.bill_no)
   const text = billShareText(order, settings, billNo, latest.total_at_generation)
   const wa = order.customer_phone ? toWaMeLink(order.customer_phone, text) : null
+  // The dynamic QR on this bill pays this link (null: uploaded/no QR, or the order is paid).
+  const upiLink = billUpiLink(order, settings, billNo, latest.total_at_generation)
+  const alt = upiLink
+    ? `Bill ${billNo}, scan to pay ${formatINR(latest.total_at_generation)}`
+    : `Bill ${billNo}`
+
+  const copyLink = () => {
+    if (!upiLink) return
+    navigator.clipboard.writeText(upiLink).then(
+      () => toast.success('UPI payment link copied'),
+      () => toast.error('Could not copy the link. Long-press the bill and share it instead.'),
+    )
+  }
 
   const doShare = () => {
     if (image.blob) share({ blob: image.blob, fileName, title: `Bill ${billNo}`, text })
@@ -69,7 +91,7 @@ export function BillReady({ order, settings, state, regenerating, onRegenerate }
           disabled={!image.url}
         >
           {image.url ? (
-            <img src={image.url} alt={`Bill ${billNo}`} className="w-full" />
+            <img src={image.url} alt={alt} className="w-full" />
           ) : image.error ? (
             <p className="p-4 text-sm text-danger">{image.error.message}</p>
           ) : (
@@ -102,13 +124,19 @@ export function BillReady({ order, settings, state, regenerating, onRegenerate }
             <MessageCircle className="h-5 w-5" /> Send payment message
           </a>
         )}
+        {upiLink && !outdated && (
+          <Button variant="secondary" onClick={copyLink}>
+            <Copy className="h-5 w-5" /> Copy UPI payment link
+          </Button>
+        )}
         <Button variant="ghost" className="ml-auto" onClick={() => setRevisionsOpen(true)}>
           Revisions ({state.bills.length})
         </Button>
       </div>
+      {upiLink && <UpiNote />}
 
       <Modal open={zoom} onClose={() => setZoom(false)} title={`Bill ${billNo}`}>
-        {image.url && <img src={image.url} alt={`Bill ${billNo}`} className="w-full" />}
+        {image.url && <img src={image.url} alt={alt} className="w-full" />}
       </Modal>
       <ConfirmDialog
         open={confirmOld}
