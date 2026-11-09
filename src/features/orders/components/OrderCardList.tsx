@@ -28,7 +28,7 @@ export function OrderCardList({
   return (
     // Each <li> is its own card; the list's negative bottom margin cancels the last card's gap.
     <ul
-      className={`stagger-in -mb-3 flex flex-col [&>li]:mb-3 [&>li]:overflow-hidden [&>li]:rounded-2xl [&>li]:border ${tone}`}
+      className={`stagger-in -mb-3 flex flex-col lg:grid lg:grid-cols-2 lg:items-start lg:gap-x-3 [&>li]:mb-3 [&>li]:overflow-hidden [&>li]:rounded-2xl [&>li]:border ${tone}`}
     >
       {sortByDue([...orders, ...leaving]).map((o) =>
         leavingIds.has(o.id) ? (

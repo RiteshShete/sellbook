@@ -30,16 +30,16 @@ export function HomePage() {
     <>
       <div className="relative pt-[env(safe-area-inset-top)]">
         <HeaderBackdrop />
-        <header className="relative mx-auto flex min-h-14 max-w-2xl items-center justify-between gap-1 px-4">
+        <header className="relative mx-auto flex min-h-14 max-w-2xl lg:max-w-[75vw] items-center justify-between gap-1 px-4">
           <h1 className="font-display min-w-0 flex-1 truncate text-2xl leading-[1.6]">Sellbook</h1>
           <SearchLink />
         </header>
-        <div className="relative mx-auto w-full max-w-2xl min-w-0 px-4 pt-4">
+        <div className="relative mx-auto w-full max-w-2xl lg:max-w-[75vw] min-w-0 px-4 pt-4">
           <HomeOverview />
         </div>
       </div>
       <div
-        className={`mx-auto flex w-full max-w-2xl min-w-0 flex-col gap-4 px-4 pt-4 ${FAB_CLEARANCE}`}
+        className={`mx-auto flex w-full max-w-2xl lg:max-w-[75vw] min-w-0 flex-col gap-4 px-4 pt-4 ${FAB_CLEARANCE}`}
       >
         <UnderlineTabs label="Show" options={VIEWS} value={view} onChange={setView} />
         {view === 'prep' ? <PrepList /> : <NewOrders />}
@@ -68,7 +68,7 @@ function SearchLink() {
     <Link
       to="/orders"
       aria-label="Search all orders"
-      className="flex min-h-11 w-[183px] max-w-[55%] shrink-0 items-center gap-3 rounded-xl border border-border-strong bg-surface/60 px-3 text-sm font-medium text-body"
+      className="flex min-h-11 w-[183px] max-w-[55%] shrink-0 lg:w-[40%] lg:max-w-none items-center gap-3 rounded-xl border border-border-strong bg-surface/60 px-3 text-sm font-medium text-body"
     >
       <Search className="h-4 w-4 shrink-0" aria-hidden /> Search orders
     </Link>

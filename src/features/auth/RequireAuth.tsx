@@ -10,7 +10,7 @@ export function RequireAuth({ children }: { children: ReactNode }) {
 
   if (status === 'loading') {
     return (
-      <div className="mx-auto flex max-w-2xl flex-col gap-3 p-4" role="status" aria-label="Loading">
+      <div className="mx-auto flex max-w-2xl lg:max-w-[75vw] flex-col gap-3 p-4" role="status" aria-label="Loading">
         <Skeleton className="h-8 w-1/2" />
         <Skeleton className="h-24 w-full" />
       </div>
