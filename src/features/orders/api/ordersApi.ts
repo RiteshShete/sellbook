@@ -128,13 +128,13 @@ export async function suggestCustomers(
 }
 
 export async function fetchVersions(client: SupabaseClient, orderId: string): Promise<Version[]> {
-  const { data, error } = await client
-    .from('order_versions')
-    .select('version_no, reason, summary, created_at, snapshot')
-    .eq('order_id', orderId)
-    .order('version_no', { ascending: false })
+  // The server rebuilds the full state of "delta" versions (status / payment changes store only what changed).
+  const { data, error } = await client.rpc('list_order_versions', { p_order: orderId })
   throwIfError(error)
-  return z.array(VersionSchema).parse(data)
+  return z
+    .array(VersionSchema)
+    .parse(data)
+    .sort((a, b) => b.version_no - a.version_no)
 }
 
 export async function rollbackOrder(

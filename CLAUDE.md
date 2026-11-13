@@ -145,6 +145,12 @@ phone = digits with country code, e.g. `919876543210` (`normalizePhone`, `toWaMe
   concurrent catalog change). Never delete; undo = Trash + restored values. Add new only is the default and idempotent.
 - Import status chips live in `BADGE_STYLES` (`import*` kinds) and `scripts/contrast.mjs`.
 
+## History size (free-plan limit: 500 MB for ALL users together)
+
+Details in `docs/HISTORY_SLIMMING.md`. Status/payment/trash/restore versions are deltas (`snapshot._delta`);
+read versions only through `order_version_state()` / `list_order_versions()`, never straight from `order_versions.snapshot`.
+`order_snapshot()` is for bills only. `prune_order_history()` / `prune_audit_log()` run weekly by pg_cron; app users cannot call them.
+
 ## Branch workflow
 
 Work on a branch (`ui-round-2` style), small commits per task, PR into `main` with a test checklist + screenshots; the owner tests on the phone and merges. Never commit to or push `main` directly. Migrations are written on the branch and applied (`supabase db push`) by the owner after review. The deploy workflow only runs on `main`.
