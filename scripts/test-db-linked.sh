@@ -34,7 +34,9 @@ reset role;
 do $$
 declare r text;
 begin
-  select string_agg(line, E'\n' order by n) into r from pg_temp.tap_out;
+  -- The error text is cut at about 2 KB: keep ok lines short (no description), failures in full.
+  select string_agg(case when line like 'ok %' then regexp_replace(line, ' - .*$', '') else line end, E'\n' order by n)
+    into r from pg_temp.tap_out;
   raise exception E'TAPSTART\n%\nTAPEND', r;
 end $$;
 EOF
