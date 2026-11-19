@@ -1,7 +1,8 @@
-import type { FormEvent, ReactNode } from 'react'
+import { useState, type FormEvent, type ReactNode } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { Page } from '../../../app/Page'
 import { Button, Input, Textarea, toast } from '../../../components/ui'
+import { uuid } from '../../../lib/id'
 import { formatINR } from '../../../lib/money'
 import { weightSummary } from '../../../lib/variants'
 import { useCreateOrder, useUpdateOrder } from '../hooks/useOrders'
@@ -24,6 +25,7 @@ export function OrderForm({ order, notice }: { order?: OrderWithItems; notice?: 
   const navigate = useNavigate()
   const form = useOrderDraft(order ? draftFromOrder(order) : undefined)
   const create = useCreateOrder()
+  const [clientKey] = useState(uuid)
   const update = useUpdateOrder(order?.id ?? '')
   const busy = create.isPending || update.isPending
   const totals = draftTotals(form.draft.lines, form.draft.discount)
@@ -49,7 +51,10 @@ export function OrderForm({ order, notice }: { order?: OrderWithItems; notice?: 
         { onSuccess: (o) => done(o.id, 'Order saved') },
       )
     } else {
-      create.mutate(result.payload, { onSuccess: (o) => done(o.id, `Order #${o.order_no} added`) })
+      create.mutate(
+        { ...result.payload, client_key: clientKey },
+        { onSuccess: (o) => done(o.id, `Order #${o.order_no} added`) },
+      )
     }
   }
 
