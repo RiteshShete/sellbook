@@ -40,6 +40,11 @@ describe('BillTemplate payment block', () => {
     expect(screen.queryByText(/UPI:/)).toBeNull()
   })
 
+  it('prints the terms line on every bill, paid or not', () => {
+    render(<BillTemplate data={data({ paid: true })} />)
+    expect(screen.getByText(/issues a revised bill with the same number/)).toBeTruthy()
+  })
+
   it('shows "Amount due" without a QR', () => {
     render(<BillTemplate data={data({ qr: null })} />)
     expect(screen.getByText(/Amount due/).textContent).toContain('₹700')
