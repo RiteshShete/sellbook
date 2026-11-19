@@ -144,6 +144,8 @@ export interface OrderDraft {
 }
 
 export interface OrderPayload {
+  /** Create only: one per "New order" screen, so a retried save returns the same order (no duplicate). */
+  client_key?: string
   customer_name: string
   customer_phone: string | null
   order_date: string
