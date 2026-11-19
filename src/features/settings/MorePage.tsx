@@ -10,6 +10,7 @@ const LINKS = [
   { to: '/settings', label: 'Settings' },
   { to: '/trash', label: 'Trash' },
   { to: '/activity', label: 'Activity' },
+  { to: '/terms', label: 'Terms' },
 ]
 
 export function MorePage() {
