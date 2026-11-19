@@ -1,5 +1,6 @@
 import { formatPhone, pluralize } from '../../../lib/format'
 import { addMoney, formatINR } from '../../../lib/money'
+import { BILL_TERMS_LINE } from '../../legal/terms'
 import { itemVariantLabel } from '../../orders/schemas'
 import type { BillSource } from '../schemas'
 import { BILL_FONT } from './billFonts'
@@ -126,12 +127,11 @@ export function BillTemplate({ data }: { data: BillData }) {
           </div>
         </dl>
 
-        {(shop.address || shop.footer) && (
-          <footer className={`border-t px-6 py-4 text-center text-[13px] ${line} ${muted}`}>
-            {shop.address && <p className="whitespace-pre-line">{shop.address}</p>}
-            {shop.footer && <p className="mt-1 whitespace-pre-line">{shop.footer}</p>}
-          </footer>
-        )}
+        <footer className={`border-t px-6 py-4 text-center text-[13px] ${line} ${muted}`}>
+          {shop.address && <p className="whitespace-pre-line">{shop.address}</p>}
+          {shop.footer && <p className="mt-1 whitespace-pre-line">{shop.footer}</p>}
+          <p className="mt-2 text-[11px] leading-tight">{BILL_TERMS_LINE}</p>
+        </footer>
       </div>
     </div>
   )
