@@ -85,6 +85,7 @@ const routes: RouteObject[] = [
         path: 'settings',
         lazy: lazyPage(() => import('../features/settings/SettingsPage'), 'SettingsPage'),
       },
+      { path: 'terms', lazy: lazyPage(() => import('../features/legal/TermsPage'), 'TermsPage') },
       { path: 'trash', lazy: lazyPage(() => import('../features/trash/TrashPage'), 'TrashPage') },
       { path: '*', element: <NotFoundPage /> },
     ],
