@@ -162,3 +162,11 @@ Work on a branch (`ui-round-2` style), small commits per task, PR into `main` wi
   phone check), then merge to `main`. Never commit unfinished work straight to `main`.
 - If a requirement is ambiguous or conflicts with a decision above, ask the user; don't guess silently.
 - Report honestly: what changed, what was verified (real command output), what remains.
+
+## Voice order ("Speak the order")
+
+`src/features/orders/voice/`, New order screen only. Browser Web Speech API (no dependency, free): the phone's speech
+service (Google/Apple) hears the audio, so the Terms say so. `parseVoiceOrder.ts` is pure and tested: matches spoken
+text to the sellable catalog (names, sizes, quantities incl. Marathi/Hindi/English number words and Devanagari digits),
+a customer name and an Indian mobile. It only FILLS the form; nothing is saved without the owner's review.
+Needs HTTPS (works on the live site, not on the http dev Network URL) and Chrome on Android; hidden with a note elsewhere.
