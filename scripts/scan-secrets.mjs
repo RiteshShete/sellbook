@@ -28,6 +28,16 @@ const SERVICE = /service_role/i
 // Supabase's newer secret API keys are not JWTs: sb_secret_...
 const SB_SECRET = /sb_secret_[A-Za-z0-9_-]{10,}/
 
+// Other credentials that must never reach a public repo.
+const OTHER = [
+  [/-----BEGIN [A-Z ]*PRIVATE KEY-----/, 'private key block'],
+  [/\bgh[pousr]_[A-Za-z0-9]{30,}/, 'GitHub token'],
+  [/\bgithub_pat_[A-Za-z0-9_]{30,}/, 'GitHub fine-grained token'],
+  [/\bsbp_[a-f0-9]{30,}/, 'Supabase access token'],
+  [/\bAKIA[0-9A-Z]{16}\b/, 'AWS access key id'],
+  [/postgres(?:ql)?:\/\/[^:\s]+:[^@\s]{6,}@/, 'database URL with password'],
+]
+
 function git(args) {
   return execFileSync('git', args, { encoding: 'utf8' }).split('\n').filter(Boolean)
 }
@@ -52,6 +62,7 @@ for (const p of git(['ls-files', '--cached', '--others', '--exclude-standard']))
   if (text.match(JWT)) hits.push(`${p}: JWT-shaped token`)
   if (SERVICE.test(text)) hits.push(`${p}: mentions service_role`)
   if (SB_SECRET.test(text)) hits.push(`${p}: contains an sb_secret_ key`)
+  for (const [re, label] of OTHER) if (re.test(text)) hits.push(`${p}: ${label}`)
 }
 
 // 2. Git-ignored local env files: the anon key is fine, a service_role key is not.
