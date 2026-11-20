@@ -78,6 +78,7 @@ export const APP_TERMS: TermsSection[] = [
     points: [
       'Data is stored in your own Supabase project on its free plan, with no guarantee of uptime or retention. Keep your own backup: use the CSV export in Analytics regularly.',
       'Nothing is permanently deleted from the app screens (Trash can restore it). To stay inside the free storage limit, old edit history and the activity log are trimmed automatically; the latest orders, bills and totals are not.',
+      'Voice ordering uses your phone’s own speech service (Google on Android, Apple on iPhone), so what you say, including customer names and numbers, is sent to it. Speech can be mis-heard: always review the order before saving.',
       'Customer names and phone numbers are personal data. Share bills only with the customer they belong to, and protect the phone and login.',
     ],
   },
