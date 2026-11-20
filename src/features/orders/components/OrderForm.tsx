@@ -19,6 +19,7 @@ import { DueChips } from './DueChips'
 import { LineItems } from './LineItems'
 import { ProductPicker } from './ProductPicker'
 import { UpiLimitWarning } from './UpiLimitWarning'
+import { VoiceOrder } from '../voice/VoiceOrder'
 
 /** New order (no `order`) or edit of an existing one. `notice` shows above the fields. */
 export function OrderForm({ order, notice }: { order?: OrderWithItems; notice?: ReactNode }) {
@@ -65,6 +66,7 @@ export function OrderForm({ order, notice }: { order?: OrderWithItems; notice?: 
     >
       <form onSubmit={onSubmit} noValidate className="flex flex-col gap-4">
         {notice}
+        {!order && <VoiceOrder form={form} />}
         <CustomerFields form={form} />
         <div className="grid grid-cols-2 gap-2">
           <Input
