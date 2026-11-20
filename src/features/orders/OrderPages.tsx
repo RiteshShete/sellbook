@@ -74,11 +74,15 @@ export function OrderDetailPage() {
             </Link>
           }
         >
-          <div className="flex flex-col gap-4">
-            <OrderSummary order={o} />
-            <OrderActions order={o} />
-            <BillCard order={o} />
-            <OrderMoreActions order={o} />
+          <div className="grid grid-cols-1 items-start gap-4 lg:grid-cols-2">
+            <div className="flex min-w-0 flex-col gap-4">
+              <OrderSummary order={o} />
+              <OrderActions order={o} />
+            </div>
+            <div className="flex min-w-0 flex-col gap-4">
+              <BillCard order={o} />
+              <OrderMoreActions order={o} />
+            </div>
           </div>
         </Page>
       )}
