@@ -6,8 +6,9 @@ import { existsSync, readdirSync, readFileSync } from 'node:fs'
 import { basename, join } from 'node:path'
 import { gzipSync } from 'node:zlib'
 
-// The plan's budget; set BUNDLE_BUDGET_KB to try another figure. (Not part of `npm run check` until the owner settles the figure.)
-const BUDGET = Number(process.env.BUNDLE_BUDGET_KB ?? 200) * 1024
+// Budget: the owner approved about 260 kB gzipped for now (the plan said 200). Set BUNDLE_BUDGET_KB to try another figure.
+// `--skip-if-missing`: a build without the storefront has no catalogue chunk; say so and pass (used by `npm run check`).
+const BUDGET = Number(process.env.BUNDLE_BUDGET_KB ?? 265) * 1024
 const dist = 'dist'
 const assets = join(dist, 'assets')
 if (!existsSync(join(dist, 'index.html'))) {
@@ -35,6 +36,10 @@ function closure(file, seen = new Set()) {
 
 const pageChunk = readdirSync(assets).find((f) => /^StoreCatalogPage-.*\.js$/.test(f))
 if (!pageChunk) {
+  if (process.argv.includes('--skip-if-missing')) {
+    console.log('Bundle size: skipped (this build has no storefront; set VITE_STOREFRONT_ENABLED=true to measure it).')
+    process.exit(0)
+  }
   console.error('No StoreCatalogPage chunk found: was the storefront built in?')
   process.exit(2)
 }

@@ -51,8 +51,8 @@ select throws_ok($$select public.save_push_subscription('https://push.example.te
 reset role;
 
 -- the trigger: with no Vault secrets it does nothing and never fails an order or a claim
-select lives_ok($$insert into public.orders (owner_id, customer_name, source, customer_user_id, fulfilment, payment_method) values ('a0000000-0000-4000-8000-000000000001', 'Asha', 'customer', 'c1000000-0000-4000-8000-000000000003', 'pickup', 'upi')$$, 'an order is saved without push secrets');
-select lives_ok($$update public.orders set payment_claim_status = 'claimed' where customer_name = 'Asha'$$, 'a payment claim is saved without push secrets');
+select lives_ok($$insert into public.orders (owner_id, customer_name, source, customer_user_id, fulfilment, payment_method) values ('a0000000-0000-4000-8000-000000000001', 'PushAsha', 'customer', 'c1000000-0000-4000-8000-000000000003', 'pickup', 'upi')$$, 'an order is saved without push secrets');
+select lives_ok($$update public.orders set payment_claim_status = 'claimed' where customer_name = 'PushAsha'$$, 'a payment claim is saved without push secrets');
 select is((select count(*)::int from pg_trigger where tgname = 'orders_push_to_owner' and not tgisinternal), 1, 'the push trigger exists');
 
 select * from finish();
