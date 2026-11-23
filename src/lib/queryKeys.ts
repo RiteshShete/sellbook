@@ -2,6 +2,10 @@
 export const queryKeys = {
   settings: ['settings'] as const,
   plan: ['plan'] as const,
+  /** Who the signed-in person is: owner of a shop, customer, or both (my_context). */
+  myContext: ['myContext'] as const,
+  /** The auth user (email verified or not), for the recovery-email prompt. */
+  authUser: ['authUser'] as const,
   planLimits: ['planLimits'] as const,
   admin: {
     all: ['admin'] as const,

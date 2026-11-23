@@ -30,7 +30,7 @@ describe('validateLogin', () => {
 
 describe('readableAuthError', () => {
   it('maps bad credentials', () => {
-    expect(readableAuthError('Invalid login credentials')).toBe('Wrong email or password.')
+    expect(readableAuthError('Invalid login credentials')).toBe('Wrong email, mobile number or password.')
   })
   it('maps network failures', () => {
     expect(readableAuthError('Failed to fetch')).toMatch(/internet/)
@@ -74,5 +74,25 @@ describe('readableAuthError for accounts', () => {
     expect(readableAuthError('New password should be different from the old password.')).toBe(
       'Choose a password you have not used here before.',
     )
+  })
+})
+
+describe('readableAuthError for storefront accounts', () => {
+  it('offers sign-in when the number or email is already registered', () => {
+    expect(readableAuthError('User already registered')).toMatch(/Try signing in/)
+    expect(readableAuthError('x', 'phone_exists')).toMatch(/Try signing in/)
+    expect(readableAuthError('x', 'email_exists')).toMatch(/Try signing in/)
+  })
+  it('explains a short password, a bad or expired code, a failed check', () => {
+    expect(readableAuthError('Password should be at least 8 characters')).toBe('Use at least 8 characters.')
+    expect(readableAuthError('Token has expired or is invalid')).toMatch(/wrong or has expired/)
+    expect(readableAuthError('x', 'otp_expired')).toMatch(/wrong or has expired/)
+    expect(readableAuthError('captcha verification process failed')).toMatch(/complete the check/)
+  })
+  it('says mobile sign-up is not open when the phone provider is off', () => {
+    expect(readableAuthError('Phone signups are disabled', 'phone_provider_disabled')).toMatch(/Use an email/)
+  })
+  it('keeps a rate-limit message for emails too', () => {
+    expect(readableAuthError('x', 'over_email_send_rate_limit')).toMatch(/Too many emails/)
   })
 })

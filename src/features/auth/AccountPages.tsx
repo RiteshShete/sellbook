@@ -2,7 +2,11 @@ import { useMutation } from '@tanstack/react-query'
 import { useState, type FormEvent, type ReactNode } from 'react'
 import { Link, Navigate, useNavigate } from 'react-router-dom'
 import { Button, Input, Skeleton, toast } from '../../components/ui'
-import { ForgotSchema, NewPasswordSchema, SignupSchema, validateForm } from './schemas'
+import { signUpWithId } from './authActions'
+import { Captcha, captchaRequired } from './components/Captcha'
+import { ForgotCodeFlow } from './ForgotCodeFlow'
+import { parseLoginId, type LoginId } from './loginId'
+import { NewPasswordSchema, validateForm } from './schemas'
 import { useAuth } from './useAuth'
 
 const link = 'font-medium underline underline-offset-4'
@@ -30,23 +34,29 @@ function AuthShell({ title, children }: { title: string; children: ReactNode }) 
   )
 }
 
-/** New shop: email + password + accepting the terms, then a confirmation email. The trial starts at sign-up. */
+/**
+ * New account: email or mobile number + password + accepting the terms. A mobile number is signed in at once and goes
+ * on to set up the shop; an email gets a confirmation link first. The trial starts at sign-up.
+ */
 export function SignupPage() {
-  const { status, signUp } = useAuth()
+  const { status, client } = useAuth()
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [accept, setAccept] = useState(false)
+  const [captcha, setCaptcha] = useState<string | null>(null)
   const { errors, setErrors, clear } = useFieldErrors()
   const signup = useMutation({
-    mutationFn: (v: { email: string; password: string }) => signUp(v.email, v.password),
+    mutationFn: (v: { id: LoginId; password: string }) =>
+      signUpWithId(client, v.id, v.password, captcha ?? undefined),
   })
 
+  if (signup.isSuccess && signup.data.signedIn) return <Navigate to="/create-shop" replace />
   if (status === 'signedIn') return <Navigate to="/" replace />
   if (signup.isSuccess) {
     return (
       <AuthShell title="Check your email">
         <p>
-          We sent a link to <span className="font-medium break-all">{signup.variables.email}</span>. Open it to
+          We sent a link to <span className="font-medium break-all">{signup.variables.id.kind === 'email' ? signup.variables.id.email : ''}</span>. Open it to
           start your free trial.
         </p>
         <p className="text-sm text-muted">
@@ -59,9 +69,14 @@ export function SignupPage() {
 
   function onSubmit(e: FormEvent) {
     e.preventDefault()
-    const result = validateForm(SignupSchema, { email, password, accept })
-    setErrors(result.ok ? {} : result.errors)
-    if (result.ok) signup.mutate(result.value)
+    const id = parseLoginId(email)
+    const pw = validateForm(NewPasswordSchema, { password })
+    const found: Record<string, string> = pw.ok ? {} : pw.errors
+    if (!id) found.email = email.trim() ? 'Enter a valid email or mobile number' : 'Enter your email or mobile number'
+    if (!accept) found.accept = 'Please accept the terms to continue'
+    if (captchaRequired && !captcha) found.captcha = 'Please complete the check first.'
+    setErrors(found)
+    if (id && pw.ok && accept && (!captchaRequired || captcha)) signup.mutate({ id, password: pw.value.password })
   }
 
   return (
@@ -69,11 +84,12 @@ export function SignupPage() {
       <p className="text-muted">Free for 30 days. No payment details needed to start.</p>
       <form onSubmit={onSubmit} noValidate className="flex flex-col gap-4">
         <Input
-          label="Email"
-          type="email"
+          label="Email or mobile number"
+          type="text"
           inputMode="email"
           autoComplete="username"
           autoCapitalize="none"
+          autoCorrect="off"
           value={email}
           onChange={(e) => {
             setEmail(e.target.value)
@@ -117,6 +133,8 @@ export function SignupPage() {
           </label>
           {errors.accept && <p className="mt-1 text-sm text-danger">{errors.accept}</p>}
         </div>
+        <Captcha onToken={setCaptcha} />
+        {errors.captcha && <p role="alert" className="text-sm text-danger">{errors.captcha}</p>}
         <Button type="submit" block disabled={signup.isPending}>
           {signup.isPending ? 'Creating…' : 'Create account'}
         </Button>
@@ -125,52 +143,11 @@ export function SignupPage() {
   )
 }
 
-/** Sends a reset link. The answer is the same whether or not the account exists. */
+/** Forgot password: a 6-digit code is emailed (the same answer whether or not the account exists). */
 export function ForgotPasswordPage() {
-  const { resetPassword } = useAuth()
-  const [email, setEmail] = useState('')
-  const { errors, setErrors, clear } = useFieldErrors()
-  const send = useMutation({ mutationFn: (v: { email: string }) => resetPassword(v.email) })
-
-  if (send.isSuccess) {
-    return (
-      <AuthShell title="Check your email">
-        <p>
-          If there is an account for <span className="font-medium break-all">{send.variables.email}</span>, we
-          sent a link to set a new password.
-        </p>
-        <p className="text-sm text-muted">It can take a minute; look in Spam too.</p>
-      </AuthShell>
-    )
-  }
-
-  function onSubmit(e: FormEvent) {
-    e.preventDefault()
-    const result = validateForm(ForgotSchema, { email })
-    setErrors(result.ok ? {} : result.errors)
-    if (result.ok) send.mutate(result.value)
-  }
-
   return (
     <AuthShell title="Forgot password">
-      <form onSubmit={onSubmit} noValidate className="flex flex-col gap-4">
-        <Input
-          label="Email"
-          type="email"
-          inputMode="email"
-          autoComplete="username"
-          autoCapitalize="none"
-          value={email}
-          onChange={(e) => {
-            setEmail(e.target.value)
-            clear('email')
-          }}
-          error={errors.email}
-        />
-        <Button type="submit" block disabled={send.isPending}>
-          {send.isPending ? 'Sending…' : 'Send reset link'}
-        </Button>
-      </form>
+      <ForgotCodeFlow doneTo="/" />
     </AuthShell>
   )
 }

@@ -4,10 +4,12 @@ import { Link } from 'react-router-dom'
 import { Page } from '../../app/Page'
 import { Button } from '../../components/ui'
 import { useIsAdmin } from '../admin/useAdmin'
+import { useMyContext } from '../auth/myContext'
 import { useAuth } from '../auth/useAuth'
 
 const LINKS = [
   { to: '/plan', label: 'Your plan' },
+  { to: '/account', label: 'Account & security' },
   { to: '/pending', label: 'Pending payments' },
   { to: '/settings', label: 'Settings' },
   { to: '/trash', label: 'Trash' },
@@ -19,7 +21,14 @@ const LINKS = [
 export function MorePage() {
   const { session, signOut } = useAuth()
   // Only the platform admin has this link (and the server only answers them).
-  const links = useIsAdmin().data ? [...LINKS, { to: '/admin', label: 'Admin' }] : LINKS
+  const isAdmin = useIsAdmin().data
+  // An account with no online shop yet is offered the set-up screen (it needs an invite code).
+  const noShop = useMyContext().data?.is_owner === false
+  const links = [
+    ...LINKS,
+    ...(noShop ? [{ to: '/create-shop', label: 'Set up your online shop' }] : []),
+    ...(isAdmin ? [{ to: '/admin', label: 'Admin' }] : []),
+  ]
   const logout = useMutation({
     mutationFn: signOut,
   })

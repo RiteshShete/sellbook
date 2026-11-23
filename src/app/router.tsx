@@ -1,7 +1,9 @@
-import { createBrowserRouter, type RouteObject } from 'react-router-dom'
+import { createBrowserRouter, Outlet, type RouteObject } from 'react-router-dom'
 import { RequireAuth } from '../features/auth/RequireAuth'
+import { RequireOwner } from '../features/auth/RequireOwner'
 import { ProGate } from '../features/plan/components/ProGate'
 import { WriteGate } from '../features/plan/components/WriteGate'
+import { STOREFRONT_ENABLED, storefrontRoutes } from '../features/storefront/routes'
 import { AppLayout } from './AppLayout'
 import { NotFoundPage } from './NotFoundPage'
 import { RouteError } from './RouteError'
@@ -62,7 +64,9 @@ const routes: RouteObject[] = [
     path: '/',
     element: (
       <RequireAuth>
-        <AppLayout />
+        <RequireOwner>
+          <AppLayout />
+        </RequireOwner>
       </RequireAuth>
     ),
     errorElement: <RouteError />,
@@ -144,6 +148,7 @@ const routes: RouteObject[] = [
       },
       { path: 'admin', lazy: lazyPage(() => import('../features/admin/AdminPage'), 'AdminPage') },
       { path: 'plan', lazy: lazyPage(() => import('../features/plan/PlanPage'), 'PlanPage') },
+      { path: 'account', lazy: lazyPage(() => import('../features/auth/OwnerAccountPage'), 'OwnerAccountPage') },
       { path: 'trash', lazy: lazyPage(() => import('../features/trash/TrashPage'), 'TrashPage') },
       { path: '*', element: <NotFoundPage /> },
     ],
@@ -166,10 +171,25 @@ const routes: RouteObject[] = [
     ],
   },
   {
+    // Signed in but no shop yet (sign-up just finished, or an invite code arrived later). Not behind RequireOwner.
+    path: '/create-shop',
+    element: (
+      <RequireAuth>
+        <Outlet />
+      </RequireAuth>
+    ),
+    errorElement: <RouteError />,
+    children: [
+      { index: true, lazy: lazyPage(() => import('../features/auth/CreateShopPage'), 'CreateShopPage') },
+    ],
+  },
+  {
     path: '/login',
     lazy: lazyPage(() => import('../features/auth/LoginPage'), 'LoginPage'),
     errorElement: <RouteError />,
   },
+  // Customer pages (/<shop>/login ...). Only when the build variable VITE_STOREFRONT_ENABLED is "true".
+  ...(STOREFRONT_ENABLED ? storefrontRoutes : []),
 ]
 
 /** Vite's base ("/sellbook/" on GitHub Pages, "/" locally) without the trailing slash. */

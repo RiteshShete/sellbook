@@ -4,6 +4,8 @@
 //   SCRATCH_URL=https://<test-ref>.supabase.co SCRATCH_ANON_KEY=<test anon key> \
 //   SCRATCH_EMAIL=<an inbox you can read> node scripts/auth-scratch.mjs
 //
+// LOCAL STACK, unattended: also set SCRATCH_MAIL_API=http://127.0.0.1:54324 (the local mail catcher) and the script
+// reads each 6-digit code itself instead of asking you. Never set it for a hosted project.
 // Anon (public) key only, never an admin or secret key. Test users stay on the TEST project afterwards.
 // It refuses to run against the URL in .env.local (the live project) and makes you type the host back.
 import { randomBytes } from 'node:crypto'
@@ -25,11 +27,14 @@ if (existsSync('.env.local')) {
   }
 }
 const rl = createInterface({ input: process.stdin, output: process.stdout })
-if ((await rl.question(`This will create test users on ${host}. Type that host to continue: `)).trim() !== host) {
+const confirmed = (await rl.question(`This will create test users on ${host}. Type that host to continue: `)).trim() === host
+if (!confirmed) {
   console.error('Host did not match. Nothing was done.')
-  process.exit(2)
+  rl.close()
+  process.exitCode = 2
 }
 
+async function run() {
 const rnd = (n) => Array.from(randomBytes(n), (b) => b % 10).join('')
 const phone1 = process.env.SCRATCH_PHONE ?? `+919${rnd(9)}`
 const phone2 = `+919${rnd(9)}`
@@ -38,7 +43,25 @@ const newPassword = randomBytes(12).toString('base64url')
 const fresh = () =>
   createClient(SCRATCH_URL, SCRATCH_ANON_KEY, { auth: { persistSession: false, autoRefreshToken: false } })
 const msg = (e) => (e ? `${e.status ?? ''} ${e.code ?? ''} ${e.message}`.trim() : 'no error')
-const code = async (what) => (await rl.question(`Enter the 6-digit code from the ${what} email: `)).trim()
+const mailApi = process.env.SCRATCH_MAIL_API
+const seenMail = new Set()
+/** Local mail catcher (Mailpit): newest message for the address that we have not used yet, 6-digit code from its text. */
+async function codeFromMailApi() {
+  for (let i = 0; i < 30; i++) {
+    const found = await (await fetch(`${mailApi}/api/v1/search?query=${encodeURIComponent(`to:${SCRATCH_EMAIL}`)}&limit=5`)).json()
+    const msg = (found.messages ?? []).find((m) => !seenMail.has(m.ID))
+    if (msg) {
+      seenMail.add(msg.ID)
+      const full = await (await fetch(`${mailApi}/api/v1/message/${msg.ID}`)).json()
+      const hit = /\b(\d{6})\b/.exec(full.Text ?? '')
+      if (hit) return hit[1]
+    }
+    await new Promise((r) => setTimeout(r, 1000))
+  }
+  throw new Error('no email with a 6-digit code arrived in 30 seconds')
+}
+const code = async (what) =>
+  mailApi ? codeFromMailApi() : (await rl.question(`Enter the 6-digit code from the ${what} email: `)).trim()
 
 const results = []
 async function step(id, name, fn) {
@@ -61,11 +84,13 @@ const a = await step('a', 'phone + password sign-up returns a session (no SMS)',
   return [Boolean(data.session), error ? msg(error) : `session=${Boolean(data.session)} user=${Boolean(data.user)}`]
 })
 
-await step('b', 'same number again gives a clear "already registered" signal', async () => {
-  const { data, error } = await fresh().auth.signUp({ phone: phone1, password })
-  // Supabase may hide the duplicate: record exactly what happens, the app must cope either way.
-  return [Boolean(error) || !data.session, error ? msg(error) : `no error, session=${Boolean(data.session)}`]
-})
+if (a) {
+  await step('b', 'same number again gives a clear "already registered" signal', async () => {
+    const { data, error } = await fresh().auth.signUp({ phone: phone1, password })
+    // Supabase may hide the duplicate: record exactly what happens, the app must cope either way.
+    return [Boolean(error) || !data.session, error ? msg(error) : `no error, session=${Boolean(data.session)}`]
+  })
+}
 
 if (a) {
   const sent = await step('c1', 'updateUser({email}) sends a code', async () => {
@@ -127,12 +152,17 @@ await step('g', 'reset for an unknown email looks the same as for a known one', 
   return [Boolean(k.error) === Boolean(u.error), `known: ${msg(k.error)} | unknown: ${msg(u.error)}`]
 })
 
-await step('h', 'Google provider is enabled (needs a browser to finish; this only gets the link)', async () => {
+await step('h', 'Google provider is enabled (the sign-in link redirects to Google; finishing needs a browser)', async () => {
   const { data, error } = await fresh().auth.signInWithOAuth({
     provider: 'google',
     options: { skipBrowserRedirect: true, redirectTo: 'http://localhost:5173/' },
   })
-  return [Boolean(data?.url), error ? msg(error) : `link host ${new URL(data.url).host}`]
+  if (error || !data?.url) return [false, msg(error)]
+  // Building the link proves nothing: follow the FIRST hop only. An enabled provider answers with a redirect to Google.
+  const res = await fetch(data.url, { redirect: 'manual' })
+  const where = res.headers.get('location')
+  const toGoogle = res.status >= 300 && res.status < 400 && where !== null && new URL(where).host.endsWith('google.com')
+  return [toGoogle, toGoogle ? 'redirects to Google' : `HTTP ${res.status}: ${(await res.text()).slice(0, 120)}`]
 })
 
 rl.close()
@@ -140,4 +170,6 @@ console.log('\nSummary')
 for (const r of results) console.log(`  ${r.ok ? 'PASS' : 'FAIL'}  ${r.id}  ${r.name}`)
 console.log('\nDecision rule (plan 8.1): if a or d FAIL, stop and ask the owner; do not switch silently.')
 console.log('Google: open the h link in a browser to prove the whole round trip; this script cannot.')
-process.exit(results.every((r) => r.ok) ? 0 : 1)
+process.exitCode = results.every((r) => r.ok) ? 0 : 1
+}
+if (confirmed) await run()

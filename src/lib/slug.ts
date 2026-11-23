@@ -4,7 +4,7 @@
  * when an owner-app route is not reserved (a shop could otherwise take the address of one of our screens).
  */
 export const RESERVED_SLUGS: readonly string[] = [
-  'login', 'signup', 'forgot', 'reset-password', 'orders', 'delivery', 'analytics', 'products', 'catalog', 'pricing',
+  'login', 'signup', 'create-shop', 'forgot', 'reset-password', 'orders', 'delivery', 'analytics', 'products', 'catalog', 'pricing',
   'offers', 'more', 'settings', 'trash', 'activity', 'pending', 'plan', 'admin', 'terms', 'privacy', 'help', 'support',
   'api', 'app', 'assets', 'static', 'public', 's', 'shop', 'shops', 'store', 'www', 'mail', 'status', 'about', 'contact',
   'loyalty', 'customers', 'reports', 'account', 'cart', 'checkout', 'sellbook', 'null', 'undefined', 'test',
@@ -20,4 +20,16 @@ export function slugProblem(slug: string): string | null {
   }
   if (RESERVED_SLUGS.includes(slug)) return 'That address is reserved. Please choose another.'
   return null
+}
+
+/** A first guess for the web address from the shop name: "Ritesh Foods & Co." -> "ritesh-foods-co". '' if too short. */
+export function suggestSlug(name: string): string {
+  const slug = name
+    .normalize('NFKD')
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, '-')
+    .replace(/^-+|-+$/g, '')
+    .slice(0, 30)
+    .replace(/-+$/g, '')
+  return slug.length >= 3 ? slug : ''
 }

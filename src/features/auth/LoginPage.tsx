@@ -4,7 +4,9 @@ import { Link, Navigate, useLocation } from 'react-router-dom'
 import { Button, Input, Skeleton } from '../../components/ui'
 import loginBg from '../../assets/login/login-bg.png'
 import { RotatingArt } from './components/RotatingArt'
-import { validateLogin, type LoginErrors } from './schemas'
+import { signInWithId } from './authActions'
+import { parseLoginId, type LoginId } from './loginId'
+import type { LoginErrors } from './schemas'
 import { useAuth } from './useAuth'
 
 /** Only allow in-app paths as a post-login target (no open redirects). */
@@ -18,14 +20,14 @@ function safeTarget(from: unknown): string {
 }
 
 export function LoginPage() {
-  const { status, signIn } = useAuth()
+  const { status, client } = useAuth()
   const location = useLocation()
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [errors, setErrors] = useState<LoginErrors>({})
 
   const login = useMutation({
-    mutationFn: (v: { email: string; password: string }) => signIn(v.email, v.password),
+    mutationFn: (v: { id: LoginId; password: string }) => signInWithId(client, v.id, v.password),
   })
 
   if (status === 'loading') {
@@ -47,9 +49,13 @@ export function LoginPage() {
 
   function onSubmit(e: FormEvent) {
     e.preventDefault()
-    const result = validateLogin({ email, password })
-    setErrors(result.ok ? {} : result.errors)
-    if (result.ok) login.mutate(result.value)
+    // The first field takes an email or an Indian mobile number; its error key stays "email".
+    const id = parseLoginId(email)
+    const found: LoginErrors = {}
+    if (!id) found.email = email.trim() ? 'Enter a valid email or mobile number' : 'Enter your email or mobile number'
+    if (!password) found.password = 'Enter your password'
+    setErrors(found)
+    if (id && password) login.mutate({ id, password })
   }
 
   return (
@@ -67,11 +73,12 @@ export function LoginPage() {
         <form onSubmit={onSubmit} noValidate className="flex flex-col gap-4">
           <Input
             onImage
-            label="Email"
-            type="email"
+            label="Email or mobile number"
+            type="text"
             inputMode="email"
             autoComplete="username"
             autoCapitalize="none"
+            autoCorrect="off"
             value={email}
             onChange={(e) => {
               setEmail(e.target.value)

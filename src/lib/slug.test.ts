@@ -1,7 +1,7 @@
 import { readFileSync } from 'node:fs'
 import { resolve } from 'node:path'
 import { describe, expect, it } from 'vitest'
-import { RESERVED_SLUGS, slugProblem } from './slug'
+import { RESERVED_SLUGS, slugProblem, suggestSlug } from './slug'
 
 const read = (file: string) => readFileSync(resolve(process.cwd(), file), 'utf8')
 
@@ -37,5 +37,28 @@ describe('slugProblem', () => {
   it('rejects reserved words', () => {
     expect(slugProblem('orders')).toMatch(/reserved/)
     expect(slugProblem('login')).toMatch(/reserved/)
+  })
+})
+
+describe('suggestSlug', () => {
+  it.each([
+    ['Ritesh Foods', 'ritesh-foods'],
+    ['  Ritesh Foods & Co.  ', 'ritesh-foods-co'],
+    ['Café 99', 'cafe-99'],
+    ['A'.repeat(40), 'a'.repeat(30)],
+  ])('suggests %j -> %j', (input, expected) => expect(suggestSlug(input)).toBe(expected))
+
+  it('gives nothing for a name that is too short or has no letters or digits', () => {
+    expect(suggestSlug('ab')).toBe('')
+    expect(suggestSlug('!!!')).toBe('')
+    expect(suggestSlug('')).toBe('')
+  })
+
+  it('never ends a long name with a hyphen', () => {
+    expect(suggestSlug('word '.repeat(10)).endsWith('-')).toBe(false)
+  })
+
+  it('a suggestion can still be reserved, so the form checks it', () => {
+    expect(slugProblem(suggestSlug('Orders'))).toMatch(/reserved/)
   })
 })

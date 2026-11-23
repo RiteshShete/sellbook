@@ -13,7 +13,7 @@ immutable
 set search_path = ''
 as $$
   select array[
-    'login','signup','forgot','reset-password','orders','delivery','analytics','products','catalog','pricing',
+    'login','signup','create-shop','forgot','reset-password','orders','delivery','analytics','products','catalog','pricing',
     'offers','more','settings','trash','activity','pending','plan','admin','terms','privacy','help','support',
     'api','app','assets','static','public','s','shop','shops','store','www','mail','status','about','contact',
     'loyalty','customers','reports','account','cart','checkout','sellbook','null','undefined','test'

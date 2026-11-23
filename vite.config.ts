@@ -38,11 +38,12 @@ function csp(): Plugin {
       const ws = host.replace(/^http/, 'ws')
       const policy = [
         "default-src 'self'",
-        "script-src 'self'",
+        "script-src 'self' https://challenges.cloudflare.com",
+        "frame-src https://challenges.cloudflare.com",
         "style-src 'self' 'unsafe-inline'",
         `img-src 'self' data: blob: ${host}`.trim(),
         "font-src 'self' data:",
-        `connect-src 'self' ${host} ${ws}`.trim(),
+        `connect-src 'self' ${host} ${ws} https://challenges.cloudflare.com`.trim(),
         "object-src 'none'",
         "base-uri 'self'",
         "form-action 'self'",

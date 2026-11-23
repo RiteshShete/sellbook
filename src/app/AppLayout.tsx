@@ -2,6 +2,7 @@ import { Suspense, useEffect, useRef } from 'react'
 import { Outlet } from 'react-router-dom'
 import { Skeleton } from '../components/ui'
 import { useTidyBillImages } from '../features/billing/hooks/useBills'
+import { RecoveryEmailBanner } from '../features/auth/RecoveryEmail'
 import { LimitBanner, LockedWall, useLockedWall } from '../features/plan/components/PlanChrome'
 import { TabBar } from './TabBar'
 
@@ -28,6 +29,7 @@ export function AppLayout() {
   return (
     <div className="flex min-h-dvh min-w-0 flex-col">
       <main className="min-w-0 flex-1 pb-[calc(3.5rem+env(safe-area-inset-bottom))]">
+        <RecoveryEmailBanner to="/account" />
         <LimitBanner />
         <Suspense fallback={<PageFallback />}>{locked ? <LockedWall /> : <Outlet />}</Suspense>
       </main>
