@@ -1,7 +1,7 @@
 import { Download } from 'lucide-react'
 import { Link, useSearchParams } from 'react-router-dom'
 import { Page } from '../../app/Page'
-import { EmptyState, ErrorState, Skeleton } from '../../components/ui'
+import { EmptyState, ErrorState, SegmentedControl, Skeleton } from '../../components/ui'
 import { formatMonth, formatMonthShort, isMonthKey, isoMonth, previousMonth } from '../../lib/dates'
 import { usePro } from '../plan/hooks/usePlan'
 import { useSettings } from '../settings/hooks/useSettings'
@@ -11,7 +11,7 @@ import { KpiGrid } from './components/KpiGrid'
 import { MonthPicker } from './components/MonthPicker'
 import { PaymentSplit } from './components/PaymentSplit'
 import { useExportCsv, useMonthAnalytics } from './hooks/useAnalytics'
-import { isQuietMonth } from './schemas'
+import { isQuietMonth, type SalesSource } from './schemas'
 
 /** Monthly analytics (IST months). The month lives in the URL: /analytics?month=2026-09. */
 export function AnalyticsPage() {
@@ -23,12 +23,19 @@ export function AnalyticsPage() {
   const month = pro && isMonthKey(asked) && asked <= latest ? asked : latest
   const prevMonth = previousMonth(month)
 
-  const current = useMonthAnalytics(month, { keepPrevious: true })
-  const previous = useMonthAnalytics(prevMonth, { enabled: pro === true })
+  const askedSource = params.get('source')
+  const source: SalesSource | undefined = askedSource === 'owner' || askedSource === 'customer' ? askedSource : undefined
+  const current = useMonthAnalytics(month, { keepPrevious: true, source })
+  const previous = useMonthAnalytics(prevMonth, { enabled: pro === true, source })
   const settings = useSettings()
   const exportCsv = useExportCsv()
 
-  const pick = (m: string) => setParams(m === latest ? {} : { month: m }, { replace: true })
+  const keep = (next: Record<string, string>) => setParams({ ...(source ? { source } : {}), ...next }, { replace: true })
+  const pick = (m: string) => keep(m === latest ? {} : { month: m })
+  const pickSource = (v: 'all' | SalesSource) => {
+    const next: Record<string, string> = month === latest ? {} : { month }
+    setParams(v === 'all' ? next : { ...next, source: v }, { replace: true })
+  }
 
   const csvButton = (
     <button
@@ -36,7 +43,7 @@ export function AnalyticsPage() {
       aria-label="Download CSV"
       disabled={!settings.data || exportCsv.isPending}
       onClick={() =>
-        settings.data && exportCsv.mutate({ month, billPrefix: settings.data.bill_prefix })
+        settings.data && exportCsv.mutate({ month, billPrefix: settings.data.bill_prefix, source })
       }
       className="inline-flex min-h-11 min-w-11 items-center justify-center gap-2 rounded-xl border border-border bg-surface px-3 text-sm font-semibold active:bg-surface-2 disabled:opacity-50"
     >
@@ -61,6 +68,16 @@ export function AnalyticsPage() {
   return (
     <Page title="Analytics" action={pro ? headerActions : undefined}>
       <div className="flex flex-col gap-4">
+        <SegmentedControl
+          label="Where the order came from"
+          value={source ?? 'all'}
+          onChange={pickSource}
+          options={[
+            { value: 'all', label: 'All orders' },
+            { value: 'owner', label: 'Added by me' },
+            { value: 'customer', label: 'Online shop' },
+          ]}
+        />
         {pro ? (
           <MonthPicker
             month={month}

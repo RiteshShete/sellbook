@@ -1128,7 +1128,7 @@ export type Database = {
       }
       admin_set_config: { Args: { p_key: string; p_value: string }; Returns: undefined }
       admin_stats: { Args: Record<PropertyKey, never>; Returns: Json }
-      analytics_month: { Args: { p_month: string }; Returns: Json }
+      analytics_month: { Args: { p_month: string; p_source?: string }; Returns: Json }
       apply_product_import: { Args: { p: Json }; Returns: Json }
       bill_content_hash: { Args: { p_order: string }; Returns: string }
       bill_files_to_purge: {
@@ -1268,20 +1268,24 @@ export type Database = {
       end_offers: { Args: { p_variant_ids: string[] }; Returns: number }
       export_my_data: { Args: Record<PropertyKey, never>; Returns: Json }
       export_orders_csv_rows: {
-        Args: { p_month: string }
+        Args: { p_month: string; p_source?: string }
         Returns: {
           bill_no: number
           bill_prefix: string
           customer_name: string
           customer_phone: string
           delivered_at: string
+          delivery_fee: number
           discount: number
+          fulfilment: string
           items: string
           order_date: string
           order_no: number
           paid_at: string
+          payment_method: string
           payment_mode: Database['public']['Enums']['payment_mode']
           payment_status: Database['public']['Enums']['payment_status']
+          source: string
           total: number
           units: number
         }[]

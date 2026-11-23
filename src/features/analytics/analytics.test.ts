@@ -51,6 +51,10 @@ const month = {
     },
   ],
   daily: [{ date: '2026-09-01', sales: 900, orders: 1 }],
+  by_source: [
+    { source: 'owner', sales: 600, orders: 1 },
+    { source: 'customer', sales: 300, orders: 1 },
+  ],
 }
 
 describe('MonthAnalyticsSchema', () => {
@@ -137,15 +141,19 @@ describe('buildOrdersCsv', () => {
     payment_status: 'paid',
     payment_mode: 'online',
     paid_at: '2026-10-01T04:00:00+00:00',
+    source: 'customer',
+    fulfilment: 'delivery',
+    payment_method: 'upi',
+    delivery_fee: '30.00',
   })
 
   it('writes header, IST dates, plain decimals and escaped text', () => {
     const lines = buildOrdersCsv([row], 'INV').replace(BOM, '').split('\r\n')
     expect(lines[0]).toBe(
-      'Order no,Bill no,Order date,Delivered on,Customer,Phone,Items,Units,Discount (₹),Total (₹),Payment,Mode,Paid on',
+      'Order no,Bill no,Order date,Delivered on,Customer,Phone,Items,Units,Discount (₹),Total (₹),Payment,Mode,Paid on,Source,Fulfilment,Payment method,Delivery charge (₹)',
     )
     expect(lines[1]).toBe(
-      '12,INV-0007,2026-09-28,2026-09-30,"Asha, ""AK""",98765 43210,Cake 1 kg x 2; Bread Loaf x 1,3,60.00,940.50,paid,online,2026-10-01',
+      '12,INV-0007,2026-09-28,2026-09-30,"Asha, ""AK""",98765 43210,Cake 1 kg x 2; Bread Loaf x 1,3,60.00,940.50,paid,online,2026-10-01,online shop,delivery,upi,30.00',
     )
     expect(lines[2]).toBe('')
   })
@@ -163,10 +171,14 @@ describe('buildOrdersCsv', () => {
       ],
       'INV',
     )
-    expect(csv.split('\r\n')[1]).toMatch(/^12,,2026-09-28,2026-09-30,.*,,Cake.*,pending,,$/)
+    expect(csv.split('\r\n')[1]).toMatch(/^12,,2026-09-28,2026-09-30,.*,,Cake.*,pending,,,online shop,delivery,upi,30\.00$/)
   })
   it('starts with a BOM so Excel shows ₹', () => {
     expect(buildOrdersCsv([], 'INV').startsWith(BOM)).toBe(true)
+  })
+  it('says owner for orders the owner typed in', () => {
+    const csv = buildOrdersCsv([{ ...row, source: 'owner', fulfilment: null, payment_method: null, delivery_fee: 0 }], 'INV')
+    expect(csv.split('\r\n')[1]).toMatch(/,owner,,,0\.00$/)
   })
   it('names the file after the month', () => {
     expect(csvFileName('2026-09')).toBe('sellbook-orders-2026-09.csv')

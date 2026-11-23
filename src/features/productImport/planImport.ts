@@ -61,7 +61,13 @@ export interface ApplyPayload {
   file_name: string
   mode: ImportMode
   categories: string[]
-  products: { name: string; category: string | null; variants: ApplyVariant[] }[]
+  products: {
+    name: string
+    category: string | null
+    description: string | null
+    veg_type: 'veg' | 'non_veg' | 'egg' | null
+    variants: ApplyVariant[]
+  }[]
   add_variants: { product_id: string; variants: ApplyVariant[] }[]
   updates: { variant_id: string; price?: string; cost_price?: string; is_active?: boolean }[]
 }
@@ -262,7 +268,13 @@ export function planImport(
     const willCreate = toCreate.length > 0
     if (willCreate) {
       if (newCategory && !newCategories.has(catKey)) newCategories.set(catKey, catName)
-      payload.products.push({ name: first.productName, category: categoryName, variants: toCreate })
+      payload.products.push({
+        name: first.productName,
+        category: categoryName,
+        description: group.map((r) => r.description).find((d) => d !== '') ?? null,
+        veg_type: group.map((r) => r.vegType).find((v) => v !== null) ?? null,
+        variants: toCreate,
+      })
       variantsToCreate += toCreate.length
     }
     products.push({

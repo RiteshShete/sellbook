@@ -17,7 +17,7 @@ describe('one schema drives everything', () => {
   it('template is only the header row, UTF-8 with BOM', () => {
     expect(templateCsv()).toBe(`\uFEFF${COLUMN_NAMES.join(',')}\r\n`)
     expect(TEMPLATE_TEXT).toBe(
-      'product_name,category,variant_name,size,unit,price,cost_price,active,notes',
+      'product_name,category,variant_name,size,unit,price,cost_price,active,notes,description,veg_type',
     )
   })
 
