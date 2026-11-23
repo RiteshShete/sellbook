@@ -327,6 +327,12 @@ alter table public.order_versions add constraint order_versions_reason_check che
   reason in ('create', 'edit', 'status', 'payment', 'delete', 'restore', 'rollback',
              'confirm', 'decline', 'claim', 'verify', 'reject', 'customer_cancel'));
 
+-- The audit log records the same reasons (record_order_version writes both rows).
+alter table public.audit_log drop constraint audit_log_action_check;
+alter table public.audit_log add constraint audit_log_action_check check (
+  action in ('create', 'update', 'delete', 'restore', 'status', 'payment', 'rollback', 'bill',
+             'confirm', 'decline', 'claim', 'verify', 'reject', 'customer_cancel'));
+
 -- ---------------------------------------------------------------------------
 -- Back-fill: every existing owner gets one (unpublished) shop. Idempotent.
 -- ---------------------------------------------------------------------------
