@@ -149,6 +149,14 @@ const routes: RouteObject[] = [
       { path: 'admin', lazy: lazyPage(() => import('../features/admin/AdminPage'), 'AdminPage') },
       { path: 'plan', lazy: lazyPage(() => import('../features/plan/PlanPage'), 'PlanPage') },
       { path: 'account', lazy: lazyPage(() => import('../features/auth/OwnerAccountPage'), 'OwnerAccountPage') },
+      {
+        path: 'pricing',
+        lazy: writePage(() => import('../features/shop/PricingOffersPage'), 'PricingOffersPage', 'Prices & offers'),
+      },
+      {
+        path: 'more/shop',
+        lazy: writePage(() => import('../features/shop/ShopProfilePage'), 'ShopProfilePage', 'Online shop'),
+      },
       { path: 'trash', lazy: lazyPage(() => import('../features/trash/TrashPage'), 'TrashPage') },
       { path: '*', element: <NotFoundPage /> },
     ],

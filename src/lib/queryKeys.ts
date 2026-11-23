@@ -4,6 +4,9 @@ export const queryKeys = {
   plan: ['plan'] as const,
   /** Who the signed-in person is: owner of a shop, customer, or both (my_context). */
   myContext: ['myContext'] as const,
+  /** The shop's own online-shop settings (shops row) and its variants' offers. */
+  shop: ['shop'] as const,
+  offers: ['offers'] as const,
   /** The auth user (email verified or not), for the recovery-email prompt. */
   authUser: ['authUser'] as const,
   planLimits: ['planLimits'] as const,
@@ -54,5 +57,7 @@ export const queryKeys = {
     all: ['products'] as const,
     list: () => ['products', 'list'] as const,
     detail: (id: string) => ['products', 'detail', id] as const,
+    /** Online details and pictures of one product (under 'products', so catalog changes refresh it too). */
+    online: (id: string) => ['products', 'online', id] as const,
   },
 }

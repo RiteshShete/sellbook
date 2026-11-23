@@ -1,51 +1,16 @@
-import { execFileSync } from 'node:child_process'
-import { expect, test, type Page } from '@playwright/test'
+import { expect, test } from '@playwright/test'
+import { addRecoveryEmail, emailedCode, rand, sql } from './helpers'
 
 /**
  * STOREFRONT_PLAN S2 "definition of done", on a phone-sized screen against the local stack:
  * register an owner and create a shop with an invite; register a customer on that storefront; add and confirm an
  * email by code; reset a password by code; sign in again.
  */
-const MAIL = process.env.E2E_MAIL_API ?? 'http://127.0.0.1:54324'
-const rand = (n: number) => Array.from({ length: n }, () => Math.floor(Math.random() * 10)).join('')
 const stamp = Date.now().toString(36)
 
 const owner = { phone: `9${rand(9)}`, password: 'Owner-pass-1', email: `owner-${stamp}@example.test`, newPassword: 'Owner-pass-2' }
 const customer = { phone: `9${rand(9)}`, name: 'Asha Patil', password: 'Cust-pass-1', email: `cust-${stamp}@example.test` }
 const shop = { name: `E2E Foods ${stamp}`, slug: `e2e-${stamp}`.slice(0, 30), invite: `E2E${stamp.toUpperCase()}`.replace(/[^A-Z0-9]/g, '').padEnd(10, '0').slice(0, 10) }
-
-/** Runs SQL in the local database container (test setup only: creating the invite an admin would hand out). */
-function sql(statement: string): string {
-  return execFileSync('docker', ['exec', 'supabase_db_sellbook', 'psql', '-U', 'postgres', '-At', '-c', statement], {
-    encoding: 'utf8',
-  }).trim()
-}
-
-/** The newest 6-digit code mailed to an address (local mail catcher). */
-async function emailedCode(to: string): Promise<string> {
-  for (let i = 0; i < 30; i++) {
-    const found = (await (await fetch(`${MAIL}/api/v1/search?query=${encodeURIComponent(`to:${to}`)}&limit=1`)).json()) as {
-      messages?: { ID: string }[]
-    }
-    const id = found.messages?.[0]?.ID
-    if (id) {
-      const full = (await (await fetch(`${MAIL}/api/v1/message/${id}`)).json()) as { Text?: string }
-      const hit = /\b(\d{6})\b/.exec(full.Text ?? '')
-      if (hit?.[1]) return hit[1]
-    }
-    await new Promise((r) => setTimeout(r, 1000))
-  }
-  throw new Error(`no code arrived for ${to}`)
-}
-
-async function addRecoveryEmail(page: Page, email: string) {
-  await page.getByLabel('Email', { exact: true }).fill(email)
-  await page.getByRole('button', { name: 'Send code' }).click()
-  await expect(page.getByText(`We sent a code to`)).toBeVisible()
-  await page.getByLabel('Code from the email').fill(await emailedCode(email))
-  await page.getByRole('button', { name: 'Confirm email' }).click()
-  await expect(page.getByText(`${email} is confirmed.`)).toBeVisible()
-}
 
 test.describe.serial('S2 sign-in screens on the local stack', () => {
   test('owner: sign up by mobile, create the shop with an invite code', async ({ page }) => {

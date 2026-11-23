@@ -9,6 +9,8 @@ import { useAuth } from '../auth/useAuth'
 
 const LINKS = [
   { to: '/plan', label: 'Your plan' },
+  { to: '/more/shop', label: 'Online shop' },
+  { to: '/pricing', label: 'Prices & offers' },
   { to: '/account', label: 'Account & security' },
   { to: '/pending', label: 'Pending payments' },
   { to: '/settings', label: 'Settings' },

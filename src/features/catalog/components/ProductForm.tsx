@@ -11,6 +11,7 @@ import {
 } from '../hooks/useCatalog'
 import { useProductDraft } from '../hooks/useProductDraft'
 import { draftFromProduct, validateProductDraft, type Product, type VariantDraft } from '../schemas'
+import { ProductOnlineCard } from './ProductOnlineCard'
 import { VariantFields } from './VariantFields'
 
 type Pending = { kind: 'product' } | { kind: 'variant'; variant: VariantDraft } | null
@@ -121,6 +122,8 @@ export function ProductForm({ product }: { product?: Product }) {
           </Button>
         )}
       </form>
+
+      {product && <ProductOnlineCard productId={product.id} />}
 
       <ConfirmDialog
         open={confirm !== null}
