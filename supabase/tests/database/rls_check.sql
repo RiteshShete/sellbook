@@ -85,8 +85,10 @@ set local role authenticated;
 select is((select count(*)::int from public.orders), 0, 'other user sees no orders');
 select is((select count(*)::int from public.order_items), 0, 'other user sees no order_items');
 select is((select count(*)::int from storage.objects where bucket_id = 'bills'), 0, 'other user sees no bill files');
+-- Rejected either by the plan guard (SB411: the guard now checks the row's owner, whose plan this user cannot read) or
+-- by RLS (42501); both mean "denied", and the statement raising means no row is written.
 select throws_ok($$insert into public.products (owner_id, name) values ('11111111-1111-1111-1111-111111111111', 'Steal')$$,
-  '42501', null, 'other user cannot insert rows owned by someone else');
+  null, null, 'other user cannot insert rows owned by someone else');
 select throws_ok($$insert into storage.objects (bucket_id, name)
   values ('bills', '11111111-1111-1111-1111-111111111111/2026/steal.png')$$,
   '42501', null, 'other user cannot upload into the owner folder');
