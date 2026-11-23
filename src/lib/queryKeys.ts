@@ -4,6 +4,14 @@ export const queryKeys = {
   plan: ['plan'] as const,
   /** Who the signed-in person is: owner of a shop, customer, or both (my_context). */
   myContext: ['myContext'] as const,
+  /** The customer storefront (public shop, catalogue, a customer's orders and saved addresses). */
+  store: {
+    shop: (slug: string) => ['store', 'shop', slug] as const,
+    catalog: (slug: string) => ['store', 'catalog', slug] as const,
+    orders: (slug: string) => ['store', 'orders', slug] as const,
+    order: (id: string) => ['store', 'order', id] as const,
+    addresses: ['store', 'addresses'] as const,
+  },
   /** The shop's own online-shop settings (shops row) and its variants' offers. */
   shop: ['shop'] as const,
   offers: ['offers'] as const,

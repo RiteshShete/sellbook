@@ -26,10 +26,8 @@ export function groupByCategory(products: Product[], categories: Category[]): Pr
   return sections.filter((s) => s.products.length > 0)
 }
 
-/** Lower-cases and composes Unicode so "कण्हेरी" typed or pasted either way matches; Latin ignores case. */
-export function normalizeSearch(text: string): string {
-  return text.normalize('NFC').toLocaleLowerCase('mr').trim()
-}
+export { normalizeSearch } from '../../lib/search'
+import { normalizeSearch } from '../../lib/search'
 
 /** Category chip filter: 'all', 'none' (Uncategorised) or a category id. */
 export type CategoryFilter = 'all' | 'none' | (string & {})

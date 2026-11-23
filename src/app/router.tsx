@@ -1,10 +1,8 @@
 import { createBrowserRouter, Outlet, type RouteObject } from 'react-router-dom'
 import { RequireAuth } from '../features/auth/RequireAuth'
-import { RequireOwner } from '../features/auth/RequireOwner'
 import { ProGate } from '../features/plan/components/ProGate'
 import { WriteGate } from '../features/plan/components/WriteGate'
 import { STOREFRONT_ENABLED, storefrontRoutes } from '../features/storefront/routes'
-import { AppLayout } from './AppLayout'
 import { NotFoundPage } from './NotFoundPage'
 import { RouteError } from './RouteError'
 
@@ -62,13 +60,8 @@ function writePage<K extends string>(
 const routes: RouteObject[] = [
   {
     path: '/',
-    element: (
-      <RequireAuth>
-        <RequireOwner>
-          <AppLayout />
-        </RequireOwner>
-      </RequireAuth>
-    ),
+    // The owner frame loads on demand: shop visitors never download it.
+    lazy: lazyPage(() => import('./OwnerShell'), 'OwnerShell'),
     errorElement: <RouteError />,
     children: [
       { index: true, lazy: lazyPage(() => import('../features/orders/HomePage'), 'HomePage') },

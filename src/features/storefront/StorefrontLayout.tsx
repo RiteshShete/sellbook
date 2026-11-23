@@ -1,8 +1,15 @@
-import { useEffect, type ReactNode } from 'react'
+import { ShoppingBag, User } from 'lucide-react'
+import { Suspense, useEffect, type ReactNode } from 'react'
 import { Link, Outlet, useParams } from 'react-router-dom'
+import { RESERVED_SLUGS } from '../../lib/slug'
+import { Skeleton } from '../../components/ui'
 import { rememberShop } from '../auth/lastShop'
-import { storefrontPath } from './paths'
+import { cartCount } from './cart/cartStore'
+import { useCart } from './cart/useCart'
+import { ShopNotFound } from './components/ShopNotFound'
+import { useStoreShop } from './hooks/useStore'
 import { t } from './i18n'
+import { storefrontPath } from './paths'
 
 /** Keeps search engines away from pages that are personal (login, account, cart...). */
 export function useNoIndex() {
@@ -15,7 +22,7 @@ export function useNoIndex() {
   }, [])
 }
 
-/** The page every storefront account screen sits in: the shop link on top, a narrow centred column below. */
+/** The page every storefront account screen sits in: a narrow centred column. */
 export function StoreShell({ title, children }: { title: string; children: ReactNode }) {
   const { slug = '' } = useParams()
   useNoIndex()
@@ -30,21 +37,44 @@ export function StoreShell({ title, children }: { title: string; children: React
   )
 }
 
+function StoreHeader({ slug }: { slug: string }) {
+  const shop = useStoreShop(slug)
+  const { cart } = useCart(slug)
+  const count = cartCount(cart)
+  return (
+    <header className="sticky top-0 z-30 border-b border-border bg-surface pt-[env(safe-area-inset-top)]">
+      <div className="mx-auto flex min-h-14 max-w-2xl items-center justify-between gap-2 px-4">
+        <Link to={storefrontPath(slug)} className="min-w-0 truncate font-display text-xl">
+          {shop.data?.name || slug}
+        </Link>
+        <nav className="flex items-center" aria-label="Shop">
+          <Link to={storefrontPath(slug, 'cart')} className="relative grid h-11 w-11 place-items-center" aria-label={`${t('cart.view')}${count > 0 ? `, ${t('cart.items', { n: count })}` : ''}`}>
+            <ShoppingBag className="h-6 w-6" aria-hidden />
+            {count > 0 && <span className="absolute right-0 top-1 grid h-5 min-w-5 place-items-center rounded-full bg-primary px-1 text-xs text-primary-fg">{count}</span>}
+          </Link>
+          <Link to={storefrontPath(slug, 'account')} className="grid h-11 w-11 place-items-center" aria-label={t('account.title')}>
+            <User className="h-6 w-6" aria-hidden />
+          </Link>
+        </nav>
+      </div>
+    </header>
+  )
+}
+
 export function StorefrontLayout() {
   const { slug = '' } = useParams()
+  const reserved = RESERVED_SLUGS.includes(slug)
   useEffect(() => {
-    if (slug) rememberShop(slug)
-  }, [slug])
+    if (slug && !reserved) rememberShop(slug)
+  }, [slug, reserved])
+  // A reserved word (login, admin, ...) is never a shop: say so without asking the server anything.
+  if (reserved) return <ShopNotFound />
   return (
     <div className="min-h-dvh bg-bg">
-      <header className="sticky top-0 z-30 border-b border-border bg-surface pt-[env(safe-area-inset-top)]">
-        <div className="mx-auto flex min-h-14 max-w-2xl items-center px-4">
-          <Link to={storefrontPath(slug)} className="min-w-0 truncate font-display text-xl">
-            {slug}
-          </Link>
-        </div>
-      </header>
-      <Outlet />
+      <StoreHeader slug={slug} />
+      <Suspense fallback={<Skeleton className="m-4 h-40" />}>
+        <Outlet />
+      </Suspense>
     </div>
   )
 }
