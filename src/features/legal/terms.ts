@@ -1,4 +1,4 @@
-/**
+﻿/**
  * Terms wording, in ONE place: the Terms page and the bill PNG both read it.
  * Draft written from how Sellbook actually behaves (docs/PLAN.md business rules). It is not legal advice:
  * the operator should have a local advocate / CA confirm it (consumer, GST invoicing, DPDP data-protection
@@ -55,7 +55,7 @@ export const SHOP_TERMS: TermsSection[] = [
  * Which wording a new account agreed to; stored with the account at sign-up. Change it whenever
  * APP_TERMS or PRIVACY change in a way that matters to a shop.
  */
-export const TERMS_VERSION = '2026-11-20'
+export const TERMS_VERSION = '2026-11-23'
 
 /** For the shop owner: the terms of using Sellbook as a paid service. */
 export const APP_TERMS: TermsSection[] = [
@@ -137,6 +137,8 @@ export const PRIVACY: TermsSection[] = [
     points: [
       'About you: your sign-in email, the shop details you type in Settings, which plan you are on, and the payment reference (and UTR, if you give it) of each plan payment.',
       'About your customers: only what you enter for an order, which is a name, an optional phone number and what they ordered. You decide what goes in.',
+      'If you open an online shop: customers who sign up there give a name, a mobile number and/or email, a password (kept only in scrambled form) and delivery addresses. We show a customer only their own orders, and show you only the name, phone and address that belong to orders placed at your shop. A customer who orders from several shops has a separate record at each.',
+      'Payment claims: a customer can enter the 12-digit UTR of a UPI payment. It is a note for you to check in your own bank app. Sellbook never verifies or moves money.',
       'We do not keep your password in readable form, and we do not use advertising or tracking tools.',
     ],
   },

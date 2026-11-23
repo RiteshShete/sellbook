@@ -1,0 +1,33 @@
+﻿# Weekly database backup (schema + data) kept as a private workflow artifact for 30 days.
+# Needs ONE repository SECRET: BACKUP_DB_URL = the Supabase "Session pooler" connection string of the project (has the DB password).
+# That is a database password, not an API key. Without the secret the job stops with a clear message.
+# NOTE: the repo is public, so artifacts of a public repo are downloadable only by people with repo access, but a
+# private backup repo or storage is the better home once real customers exist (see docs/GO_LIVE_RUNBOOK.md).
+name: Backup
+
+on:
+  schedule:
+    - cron: '23 2 * * 0'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  dump:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Dump
+        env:
+          DB_URL: ${{ secrets.BACKUP_DB_URL }}
+        run: |
+          test -n "$DB_URL" || { echo "BACKUP_DB_URL secret is not set: no backup was taken"; exit 1; }
+          sudo apt-get install -y --no-install-recommends postgresql-client >/dev/null
+          pg_dump "$DB_URL" --no-owner --no-privileges --schema=public --schema=app_private --format=custom --file=sellbook.dump
+          test -s sellbook.dump
+          pg_restore --list sellbook.dump | wc -l
+      - uses: actions/upload-artifact@v4
+        with:
+          name: sellbook-db-${{ github.run_id }}
+          path: sellbook.dump
+          retention-days: 30
