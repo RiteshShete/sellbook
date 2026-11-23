@@ -18,6 +18,19 @@ export type OrderStatus = (typeof ORDER_STATUSES)[number]
 
 const DateOnly = z.string().regex(/^\d{4}-\d{2}-\d{2}$/)
 
+/** The delivery address as saved on the order (a snapshot, so it never changes if the customer edits theirs). */
+export const AddressSnapshotSchema = z.object({
+  name: z.string(),
+  phone: z.string(),
+  line1: z.string(),
+  line2: z.string().nullish(),
+  area: z.string().nullish(),
+  city: z.string(),
+  pincode: z.string(),
+  landmark: z.string().nullish(),
+})
+export type AddressSnapshot = z.infer<typeof AddressSnapshotSchema>
+
 export const OrderSchema = z.object({
   id: z.guid(),
   order_no: z.number().int(),
@@ -44,6 +57,20 @@ export const OrderSchema = z.object({
   paid_at: z.string().nullable(),
   cancelled_at: z.string().nullable(),
   cancelled_from: z.enum(ORDER_STATUSES).nullable(),
+  // Customer (storefront) orders. All optional: a database without the storefront migration returns none of them.
+  source: z.enum(['owner', 'customer']).nullish(),
+  fulfilment: z.enum(['delivery', 'pickup']).nullish(),
+  delivery_address: AddressSnapshotSchema.nullish().catch(null),
+  delivery_fee: dbMoney.nullish(),
+  confirmation_status: z.enum(['not_needed', 'pending', 'confirmed', 'declined']).nullish(),
+  decline_reason: z.string().nullish(),
+  payment_method: z.enum(['upi', 'cod']).nullish(),
+  payment_claim_status: z.enum(['none', 'claimed', 'verified', 'rejected']).nullish(),
+  payment_reference: z.string().nullish(),
+  payment_claimed_at: z.string().nullish(),
+  payment_verified_at: z.string().nullish(),
+  payment_reject_reason: z.string().nullish(),
+  claim_count: z.number().int().nullish(),
 })
 export type Order = z.infer<typeof OrderSchema>
 
@@ -59,6 +86,9 @@ export const OrderItemSchema = z.object({
   /** Size snapshot (base units); null when the variant had no size when ordered (B8). */
   size_amount: dbAmount.nullish(),
   size_unit: SizeUnitSchema.nullish(),
+  /** What the customer saw as the normal price, and the offer's name (storefront orders only). */
+  list_price: dbMoney.nullish(),
+  offer_label: z.string().nullish(),
 })
 export type OrderItem = z.infer<typeof OrderItemSchema>
 

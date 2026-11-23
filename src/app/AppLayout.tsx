@@ -3,6 +3,8 @@ import { Outlet } from 'react-router-dom'
 import { Skeleton } from '../components/ui'
 import { useTidyBillImages } from '../features/billing/hooks/useBills'
 import { RecoveryEmailBanner } from '../features/auth/RecoveryEmail'
+import { TellCustomerHost } from '../features/orders/components/tellCustomer'
+import { useOrderAlerts } from '../features/orders/hooks/useOrderAlerts'
 import { LimitBanner, LockedWall, useLockedWall } from '../features/plan/components/PlanChrome'
 import { TabBar } from './TabBar'
 
@@ -18,6 +20,7 @@ function PageFallback() {
 
 export function AppLayout() {
   const locked = useLockedWall()
+  useOrderAlerts() // live alerts and the page-title count (realtime)
   // Once per visit, quietly clear bill pictures past their plan's keep-days.
   const tidy = useTidyBillImages()
   const tidied = useRef(false)
@@ -31,6 +34,7 @@ export function AppLayout() {
       <main className="min-w-0 flex-1 pb-[calc(3.5rem+env(safe-area-inset-bottom))]">
         <RecoveryEmailBanner to="/account" />
         <LimitBanner />
+        <TellCustomerHost />
         <Suspense fallback={<PageFallback />}>{locked ? <LockedWall /> : <Outlet />}</Suspense>
       </main>
       <TabBar />

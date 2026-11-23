@@ -3,6 +3,7 @@ import { z } from 'zod'
 import { thumbPath } from '../../../lib/imageResize'
 import {
   AddressRowSchema,
+  ClaimPaymentRequest,
   CustomerOrderSchema,
   CustomerOrdersListResponse,
   PlaceOrderRequest,
@@ -63,6 +64,18 @@ export async function fetchOrder(client: SupabaseClient, id: string): Promise<Cu
 
 export async function cancelMyOrder(client: SupabaseClient, id: string): Promise<void> {
   const { error } = await client.rpc('cancel_my_order', { p_order_id: id })
+  if (error) fail(error)
+}
+
+/** "I have paid": tells the shop, with the bank reference when the customer has it. The shop confirms it, not the app. */
+export async function claimPayment(client: SupabaseClient, id: string, utr: string): Promise<void> {
+  const request = ClaimPaymentRequest.parse({ p_order_id: id, p_utr: utr === '' ? undefined : utr })
+  const { error } = await client.rpc('claim_payment', request)
+  if (error) fail(error)
+}
+
+export async function switchToCod(client: SupabaseClient, id: string): Promise<void> {
+  const { error } = await client.rpc('switch_to_cod', { p_order_id: id })
   if (error) fail(error)
 }
 

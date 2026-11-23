@@ -41,6 +41,15 @@ export function upiNote(billNo: string): string {
   return ascii.slice(0, NOTE_MAX).trim()
 }
 
+/** The note for a storefront order: "Order 12 Ritesh Foods", ASCII only and short (Marathi names drop out). */
+export function orderUpiNote(orderNo: number, shopName: string): string {
+  const ascii = `Order ${orderNo} ${shopName}`
+    .replace(/[^ -~]/g, '')
+    .replace(/\s+/g, ' ')
+    .trim()
+  return ascii.slice(0, NOTE_MAX).trim()
+}
+
 /**
  * The upi://pay deep link (NPCI format) the QR encodes: pa, pn, am, cu, tn. No tr or mc: those
  * are for registered merchants. Every value is percent-encoded (spaces are %20, never "+"), and the

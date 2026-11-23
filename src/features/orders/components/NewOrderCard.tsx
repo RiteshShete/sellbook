@@ -1,6 +1,7 @@
 import { Link } from 'react-router-dom'
 import { AnimatedActionButton } from '../../../components/ui'
 import { formatINR } from '../../../lib/money'
+import { isCustomerOrder } from '../customerOrders'
 import { useOrderBusy, useSetStatus } from '../hooks/useOrderActions'
 import type { OrderListRow } from '../schemas'
 import { DueBadge } from './OrderBadges'
@@ -13,6 +14,7 @@ export function NewOrderCard({ order }: { order: OrderListRow }) {
   const setStatus = useSetStatus()
   const busy = useOrderBusy(order.id)
   const empty = order.units === 0 // B9: needs at least one item before Ready
+  const waiting = isCustomerOrder(order) && order.confirmation_status === 'pending' // B11: confirm first
 
   return (
     <li className="flex flex-col gap-3 p-4">
@@ -26,6 +28,7 @@ export function NewOrderCard({ order }: { order: OrderListRow }) {
             <DueBadge order={order} outline />
           </span>
         </div>
+        {isCustomerOrder(order) && <p className="w-fit rounded-full bg-info-soft px-2 py-0.5 text-xs font-medium text-info-ink">Customer order</p>}
         <p className="text-sm">
           {order.itemsSummary || 'No items yet'}
           {order.weight.text && ` · ${order.weight.text}`}
@@ -33,7 +36,14 @@ export function NewOrderCard({ order }: { order: OrderListRow }) {
       </Link>
       <div className="flex items-center justify-between gap-3">
         <span className="text-xl font-semibold tabular-nums">{formatINR(order.total)}</span>
-        {empty ? (
+        {waiting ? (
+          <Link
+            to={`/orders/${order.id}`}
+            className="inline-flex min-h-11 items-center rounded-xl border border-border-strong px-4 text-sm font-semibold"
+          >
+            Confirm first
+          </Link>
+        ) : empty ? (
           <Link
             to={`/orders/${order.id}/edit`}
             className="inline-flex min-h-11 items-center rounded-xl border border-border-strong px-4 text-sm font-semibold"

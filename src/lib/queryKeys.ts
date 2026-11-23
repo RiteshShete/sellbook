@@ -36,6 +36,9 @@ export const queryKeys = {
     bills: (id: string) => ['orders', 'bills', id] as const,
     // Under 'orders' so creating, editing or moving any order refreshes the prep list.
     prep: ['orders', 'prep'] as const,
+    // Customer orders waiting for the shop (confirm, verify payment, refund reminder). Under 'orders': any order change refreshes it.
+    needs: ['orders', 'needs'] as const,
+    utr: (reference: string) => ['orders', 'utr', reference] as const,
   },
   /** Bill PNGs are immutable per path, so they are cached forever. */
   billImage: (path: string) => ['billImage', path] as const,

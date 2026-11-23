@@ -1,5 +1,6 @@
 import { Page } from '../../app/Page'
 import { ErrorState, Skeleton } from '../../components/ui'
+import { AlertSoundSwitch } from './components/AlertSoundSwitch'
 import { AssetField } from './components/AssetField'
 import { ShopDetailsForm } from './components/ShopDetailsForm'
 import { useSettings } from './hooks/useSettings'
@@ -19,6 +20,7 @@ export function SettingsPage() {
       ) : (
         <div className="flex flex-col gap-4">
           <ShopDetailsForm settings={settings.data} />
+          <AlertSoundSwitch />
           <AssetField
             kind="qr"
             label="Uploaded payment QR (fallback)"

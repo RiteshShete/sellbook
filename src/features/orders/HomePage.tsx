@@ -5,6 +5,7 @@ import { EmptyArt, EmptyState, ErrorState, Skeleton, UnderlineTabs } from '../..
 import { OrderCardList } from './components/OrderCardList'
 import { HomeOverview } from './components/HomeOverview'
 import { FAB_CLEARANCE, NewOrderFab } from './components/NewOrderFab'
+import { NeedsActionList } from './components/NeedsActionList'
 import { NewOrderCard } from './components/NewOrderCard'
 import { PrepList } from './components/PrepList'
 import { ProGate } from '../plan/components/ProGate'
@@ -42,6 +43,7 @@ export function HomePage() {
       <div
         className={`mx-auto flex w-full max-w-2xl lg:max-w-[75vw] min-w-0 flex-col gap-4 px-4 pt-4 ${FAB_CLEARANCE}`}
       >
+        <NeedsActionList />
         <UnderlineTabs label="Show" options={VIEWS} value={view} onChange={setView} />
         {view === 'prep' ? (
           <ProGate feature="To Prepare">

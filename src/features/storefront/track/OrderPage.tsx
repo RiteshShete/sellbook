@@ -1,20 +1,17 @@
-import { Copy, MessageCircle } from 'lucide-react'
+import { MessageCircle } from 'lucide-react'
 import { useState } from 'react'
 import { Link, Navigate, useLocation, useParams } from 'react-router-dom'
-import { Button, ConfirmDialog, ErrorState, Skeleton, toast } from '../../../components/ui'
+import { Button, ConfirmDialog, ErrorState, Skeleton } from '../../../components/ui'
 import { formatDate, formatDateTime } from '../../../lib/dates'
-import { formatINR, paiseToDecimalString } from '../../../lib/money'
+import { formatINR } from '../../../lib/money'
 import { toWaMeLink } from '../../../lib/phone'
 import { useAuth } from '../../auth/useAuth'
 import { useCancelOrder, useStoreOrder } from '../hooks/useStore'
 import { t } from '../i18n'
 import { storefrontPath } from '../paths'
 import { StoreShell } from '../StorefrontLayout'
+import { PaymentPanel } from './PaymentPanel'
 import { StatusTimeline } from './StatusTimeline'
-
-function copy(text: string) {
-  navigator.clipboard.writeText(text).then(() => toast.success(t('order.copied')), () => toast.error(t('order.copyFailed')))
-}
 
 /** /<shop>/orders/<id>: where the order is, what is in it, and (for UPI) what to pay. Checked again every 20 seconds. */
 export function OrderPage() {
@@ -31,7 +28,6 @@ export function OrderPage() {
   const o = order.data
   const wa = o.shop.whatsapp ? toWaMeLink(o.shop.whatsapp, t('order.waText', { no: o.order_no, total: formatINR(o.total), shop: o.shop.name })) : null
   const canCancel = o.confirmation_status === 'pending' && o.payment_claim_status === 'none' && o.status === 'new'
-  const unpaidUpi = o.payment.method === 'upi' && o.payment_status === 'pending' && o.payment.upi_id !== null
 
   return (
     <StoreShell title={t('order.no', { no: o.order_no })}>
@@ -59,14 +55,7 @@ export function OrderPage() {
         <p><span className="text-muted">{o.fulfilment === 'delivery' ? t('checkout.delivery') : t('checkout.pickup')}</span>{o.address ? `: ${[o.address.line1, o.address.city, o.address.pincode].join(', ')}` : ''}</p>
         <p><span className="text-muted">{t('checkout.payment')}</span> {o.payment.method === 'upi' ? t('checkout.payUpi') : t('checkout.payCod')} · {o.payment_status === 'paid' ? t('order.paid') : t('order.unpaid')}</p>
       </section>
-      {unpaidUpi && (
-        <section className="flex flex-col gap-2 rounded-2xl border border-border bg-surface p-4" aria-label={t('order.payTitle')}>
-          <h2 className="font-medium">{t('order.payTitle')}</h2>
-          <p className="text-sm">{t('order.payBody', { amount: formatINR(o.total), payee: o.payment.payee_name ?? '' })}</p>
-          <Button variant="secondary" onClick={() => copy(o.payment.upi_id ?? '')}><Copy className="h-5 w-5" /> {t('order.copyUpi')}: {o.payment.upi_id}</Button>
-          <Button variant="secondary" onClick={() => copy(paiseToDecimalString(o.total))}><Copy className="h-5 w-5" /> {t('order.copyAmount')}</Button>
-        </section>
-      )}
+      <PaymentPanel order={o} slug={slug} />
       {wa && (
         <a href={wa} target="_blank" rel="noreferrer" className="inline-flex min-h-11 items-center justify-center gap-2 rounded-xl border border-border-strong px-4 font-medium">
           <MessageCircle className="h-5 w-5" aria-hidden /> {t('order.messageShop')}

@@ -1,7 +1,7 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { queryKeys } from '../../../lib/queryKeys'
 import { useAuth } from '../../auth/useAuth'
-import { cancelMyOrder, fetchAddresses, fetchMyOrders, fetchOrder, fetchStoreCatalog, fetchStoreShop } from '../api/storefrontApi'
+import { cancelMyOrder, claimPayment, fetchAddresses, fetchMyOrders, fetchOrder, fetchStoreCatalog, fetchStoreShop, switchToCod } from '../api/storefrontApi'
 import { isOrderFinal } from '../track/timeline'
 
 const FIVE_MINUTES = 5 * 60_000
@@ -50,3 +50,19 @@ export function useCancelOrder(slug: string) {
       ]),
   })
 }
+
+/** "I have paid" and "pay on delivery instead": both change the order, so its page and the list are read again. */
+export function usePaymentActions(slug: string, orderId: string) {
+  const { client } = useAuth()
+  const queryClient = useQueryClient()
+  const refresh = () =>
+    Promise.all([
+      queryClient.invalidateQueries({ queryKey: queryKeys.store.order(orderId) }),
+      queryClient.invalidateQueries({ queryKey: queryKeys.store.orders(slug) }),
+    ])
+  return {
+    claim: useMutation({ mutationFn: (utr: string) => claimPayment(client, orderId, utr), onSuccess: refresh }),
+    cod: useMutation({ mutationFn: () => switchToCod(client, orderId), onSuccess: refresh }),
+  }
+}
+
