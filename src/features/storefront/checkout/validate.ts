@@ -57,14 +57,18 @@ export function validateCheckout(input: CheckoutInput, shop: StoreShop, today: s
 
   if (input.notes.trim().length > 300) e.notes = 'Keep the note under 300 characters'
 
-  if (input.fulfilment === 'delivery' && input.addressId === null) {
-    const a = input.address
-    if (a.name.trim().length < 1 || a.name.trim().length > 100) e.name = 'Enter the name for delivery'
-    if (normalizePhone(a.phone) === null) e.phone = 'Enter a valid 10-digit mobile number'
-    if (a.line1.trim().length < 1 || a.line1.trim().length > 200) e.line1 = 'Enter the address'
-    if (a.city.trim().length < 1 || a.city.trim().length > 100) e.city = 'Enter the city'
-    if (!/^[1-9][0-9]{5}$/.test(a.pincode.trim())) e.pincode = 'Enter the 6-digit pincode'
-  }
+  if (input.fulfilment === 'delivery' && input.addressId === null) Object.assign(e, validateAddress(input.address))
+  return e
+}
+
+/** The address checks alone (checkout and the saved-address form share them). */
+export function validateAddress(a: AddressInput): CheckoutErrors {
+  const e: CheckoutErrors = {}
+  if (a.name.trim().length < 1 || a.name.trim().length > 100) e.name = 'Enter the name for delivery'
+  if (normalizePhone(a.phone) === null) e.phone = 'Enter a valid 10-digit mobile number'
+  if (a.line1.trim().length < 1 || a.line1.trim().length > 200) e.line1 = 'Enter the address'
+  if (a.city.trim().length < 1 || a.city.trim().length > 100) e.city = 'Enter the city'
+  if (!/^[1-9][0-9]{5}$/.test(a.pincode.trim())) e.pincode = 'Enter the 6-digit pincode'
   return e
 }
 

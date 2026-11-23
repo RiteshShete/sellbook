@@ -1719,6 +1719,7 @@ export type Database = {
       trash_product: { Args: { p_id: string }; Returns: undefined }
       trash_variant: { Args: { p_id: string }; Returns: undefined }
       undo_product_import: { Args: { p_id: string }; Returns: Json }
+      update_my_profile: { Args: { p_name: string; p_phone: string }; Returns: Json }
       update_order: {
         Args: { p: Json; p_id: string; p_version: number }
         Returns: {

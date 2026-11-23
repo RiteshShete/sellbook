@@ -95,6 +95,11 @@ export async function saveAddress(client: SupabaseClient, address: z.input<typeo
   if (error) fail(error)
 }
 
+export async function deleteAddress(client: SupabaseClient, id: string): Promise<void> {
+  const { error } = await client.rpc('delete_address', { p_id: id })
+  if (error) fail(error)
+}
+
 /** Product and logo pictures are public files; the grid asks for the small one. */
 export const imageUrl = (client: SupabaseClient, path: string, thumb = false): string =>
   client.storage.from('catalog').getPublicUrl(thumb ? thumbPath(path) : path).data.publicUrl

@@ -18,6 +18,13 @@ export async function registerCustomer(client: SupabaseClient, input: { name: st
   if (error) throw new Error(sentence(error.message))
 }
 
+/** Changes the signed-in customer's name and mobile (digits with country code). Past orders keep what they were placed with. */
+export async function updateMyProfile(client: SupabaseClient, input: { name: string; phone: string }): Promise<void> {
+  const request = RegisterCustomerRequest.parse({ p_name: input.name.trim(), p_phone: input.phone })
+  const { error } = await client.rpc('update_my_profile', request)
+  if (error) throw new Error(sentence(error.message))
+}
+
 /** The signed-in customer's own profile (row-level security shows only this person's row). */
 export async function fetchCustomerProfile(client: SupabaseClient): Promise<CustomerProfile | null> {
   const { data, error } = await client.from('customer_profiles').select('name, phone').maybeSingle()

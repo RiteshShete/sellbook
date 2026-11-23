@@ -5,6 +5,8 @@ import { Button, ConfirmDialog, Skeleton, toast } from '../../../components/ui'
 import { ChangePasswordCard } from '../../auth/ChangePasswordCard'
 import { RecoveryEmailBanner, RecoveryEmailCard } from '../../auth/RecoveryEmail'
 import { useAuth } from '../../auth/useAuth'
+import { AccountDetails } from './AccountDetails'
+import { SavedAddresses } from './SavedAddresses'
 import { StoreShell } from '../StorefrontLayout'
 import { fetchCustomerProfile, requestAccountDeletion } from '../customerApi'
 import { t } from '../i18n'
@@ -42,13 +44,9 @@ export function StoreAccountPage() {
         {profile.isPending ? (
           <Skeleton className="h-16" />
         ) : profile.data ? (
-          <dl className="rounded-2xl border border-border bg-surface p-4">
-            <dt className="text-sm text-muted">{t('account.name')}</dt>
-            <dd className="mb-2 font-medium">{profile.data.name}</dd>
-            <dt className="text-sm text-muted">{t('account.phone')}</dt>
-            <dd className="font-medium">+{profile.data.phone}</dd>
-          </dl>
+          <AccountDetails profile={profile.data} />
         ) : null}
+        <SavedAddresses />
         <RecoveryEmailCard />
         <ChangePasswordCard />
         <Button variant="secondary" block disabled={out.isPending} onClick={() => out.mutate()}>
