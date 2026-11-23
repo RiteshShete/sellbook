@@ -4,7 +4,7 @@ import { queryKeys } from '../../../lib/queryKeys'
 import { useObjectUrl } from '../../../lib/useObjectUrl'
 import { useAuth } from '../../auth/useAuth'
 import type { Settings } from '../../settings/schemas'
-import { downloadBillImage, fetchBillState } from '../api/billsApi'
+import { downloadBillImage, fetchBillState, tidyBillImages } from '../api/billsApi'
 import { generateBill, type GeneratedBill } from '../generateBill'
 
 export function useBillState(orderId: string) {
@@ -42,5 +42,17 @@ export function useGenerateBill(orderId: string) {
       void queryClient.invalidateQueries({ queryKey: queryKeys.settings })
     },
     onSettled: () => invalidateOrders(queryClient),
+  })
+}
+
+/** Housekeeping, once per visit: removes old bill pictures so the shop stays inside its storage. Failures toast. */
+export function useTidyBillImages() {
+  const { client } = useAuth()
+  const queryClient = useQueryClient()
+  return useMutation({
+    mutationFn: () => tidyBillImages(client),
+    onSuccess: (count) => {
+      if (count > 0) void invalidateOrders(queryClient)
+    },
   })
 }

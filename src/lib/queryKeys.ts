@@ -1,6 +1,14 @@
 /** Every TanStack Query key in one place. Mutations invalidate by these prefixes. */
 export const queryKeys = {
   settings: ['settings'] as const,
+  plan: ['plan'] as const,
+  planLimits: ['planLimits'] as const,
+  admin: {
+    all: ['admin'] as const,
+    isAdmin: ['admin', 'is'] as const,
+    stats: ['admin', 'stats'] as const,
+    requests: (status: string) => ['admin', 'requests', status] as const,
+  },
   asset: (path: string) => ['asset', path] as const,
   /** A UPI QR image is a pure function of its link, so it is cached by link. */
   upiQr: (uri: string) => ['upiQr', uri] as const,

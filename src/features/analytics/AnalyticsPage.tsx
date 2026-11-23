@@ -3,6 +3,7 @@ import { Link, useSearchParams } from 'react-router-dom'
 import { Page } from '../../app/Page'
 import { EmptyState, ErrorState, Skeleton } from '../../components/ui'
 import { formatMonth, formatMonthShort, isMonthKey, isoMonth, previousMonth } from '../../lib/dates'
+import { usePro } from '../plan/hooks/usePlan'
 import { useSettings } from '../settings/hooks/useSettings'
 import { Breakdown } from './components/Breakdown'
 import { DailyChart } from './components/DailyChart'
@@ -17,11 +18,13 @@ export function AnalyticsPage() {
   const [params, setParams] = useSearchParams()
   const latest = isoMonth(new Date())
   const asked = params.get('month') ?? ''
-  const month = isMonthKey(asked) && asked <= latest ? asked : latest
+  // Other months, the comparison and the CSV are Pro; other plans always see the current month.
+  const pro = usePro()
+  const month = pro && isMonthKey(asked) && asked <= latest ? asked : latest
   const prevMonth = previousMonth(month)
 
   const current = useMonthAnalytics(month, { keepPrevious: true })
-  const previous = useMonthAnalytics(prevMonth)
+  const previous = useMonthAnalytics(prevMonth, { enabled: pro === true })
   const settings = useSettings()
   const exportCsv = useExportCsv()
 
@@ -56,14 +59,25 @@ export function AnalyticsPage() {
   )
 
   return (
-    <Page title="Analytics" action={headerActions}>
+    <Page title="Analytics" action={pro ? headerActions : undefined}>
       <div className="flex flex-col gap-4">
-        <MonthPicker
-          month={month}
-          latest={latest}
-          onChange={pick}
-          className="flex min-[360px]:hidden"
-        />
+        {pro ? (
+          <MonthPicker
+            month={month}
+            latest={latest}
+            onChange={pick}
+            className="flex min-[360px]:hidden"
+          />
+        ) : (
+          pro === false && (
+            <p className="text-sm text-muted">
+              {formatMonth(month)}. Other months, comparison and CSV export are Pro.{' '}
+              <Link to="/plan" className="font-medium underline underline-offset-4">
+                See plans
+              </Link>
+            </p>
+          )
+        )}
         {current.isPending ? (
           <div className="flex flex-col gap-3" role="status" aria-label="Loading">
             <Skeleton className="h-24 w-full" />

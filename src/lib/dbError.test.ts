@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 import { z } from 'zod'
-import { errorMessage, readableDbError, throwIfError } from './dbError'
+import { errorMessage, PLAN_LIMIT, readableDbError, throwIfError } from './dbError'
 
 describe('readableDbError', () => {
   it('maps known Postgres / PostgREST codes', () => {
@@ -8,6 +8,17 @@ describe('readableDbError', () => {
     expect(readableDbError({ code: '42501', message: 'permission denied' })).toMatch(/Not allowed/)
     expect(readableDbError({ code: 'PGRST202', message: 'x' })).toMatch(/migration/)
     expect(readableDbError({ code: 'SB409', message: 'x' })).toMatch(/another device/)
+  })
+
+  it('shows a plan-limit error as the sentence the database wrote', () => {
+    const message = 'the free trial allows 10 orders: choose a plan to add more'
+    expect(readableDbError({ code: PLAN_LIMIT, message })).toBe(
+      'The free trial allows 10 orders: choose a plan to add more',
+    )
+  })
+
+  it('explains a bill upload refused by the storage policy', () => {
+    expect(readableDbError({ message: 'new row violates row-level security policy' })).toMatch(/bill storage is full/)
   })
 
   it('maps network failures', () => {

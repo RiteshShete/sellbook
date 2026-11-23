@@ -1,5 +1,7 @@
 import { createBrowserRouter, type RouteObject } from 'react-router-dom'
 import { RequireAuth } from '../features/auth/RequireAuth'
+import { ProGate } from '../features/plan/components/ProGate'
+import { WriteGate } from '../features/plan/components/WriteGate'
 import { AppLayout } from './AppLayout'
 import { NotFoundPage } from './NotFoundPage'
 import { RouteError } from './RouteError'
@@ -7,6 +9,52 @@ import { RouteError } from './RouteError'
 /** Lazy-loads a named page export from a feature module. */
 function lazyPage<K extends string>(load: () => Promise<Record<K, React.ComponentType>>, name: K) {
   return async () => ({ Component: (await load())[name] })
+}
+
+/**
+ * Like lazyPage, for a Pro-only page: other plans see an upgrade message (the server enforces it too).
+ * `writes`: the page also adds or changes data, so a read-only (ended) plan sees a message instead.
+ */
+function proPage<K extends string>(
+  load: () => Promise<Record<K, React.ComponentType>>,
+  name: K,
+  feature: string,
+  writes = false,
+) {
+  return async () => {
+    const Inner: React.ComponentType = (await load())[name]
+    return {
+      Component: () => (
+        <ProGate feature={feature} page>
+          {writes ? (
+            <WriteGate title={feature}>
+              <Inner />
+            </WriteGate>
+          ) : (
+            <Inner />
+          )}
+        </ProGate>
+      ),
+    }
+  }
+}
+
+/** Like lazyPage, for a page that adds or changes data: a read-only (ended) plan sees a message instead. */
+function writePage<K extends string>(
+  load: () => Promise<Record<K, React.ComponentType>>,
+  name: K,
+  title: string,
+) {
+  return async () => {
+    const Inner: React.ComponentType = (await load())[name]
+    return {
+      Component: () => (
+        <WriteGate title={title}>
+          <Inner />
+        </WriteGate>
+      ),
+    }
+  }
 }
 
 const routes: RouteObject[] = [
@@ -26,7 +74,7 @@ const routes: RouteObject[] = [
       },
       {
         path: 'orders/new',
-        lazy: lazyPage(() => import('../features/orders/OrderPages'), 'OrderNewPage'),
+        lazy: writePage(() => import('../features/orders/OrderPages'), 'OrderNewPage', 'New order'),
       },
       {
         path: 'orders/:id',
@@ -34,19 +82,23 @@ const routes: RouteObject[] = [
       },
       {
         path: 'orders/:id/history',
-        lazy: lazyPage(() => import('../features/orders/OrderHistoryPage'), 'OrderHistoryPage'),
+        lazy: proPage(
+          () => import('../features/orders/OrderHistoryPage'),
+          'OrderHistoryPage',
+          'Order history',
+        ),
       },
       {
         path: 'activity',
-        lazy: lazyPage(() => import('../features/activity/ActivityPage'), 'ActivityPage'),
+        lazy: proPage(() => import('../features/activity/ActivityPage'), 'ActivityPage', 'Activity'),
       },
       {
         path: 'activity/:kind/:id',
-        lazy: lazyPage(() => import('../features/activity/EntityLogPage'), 'EntityLogPage'),
+        lazy: proPage(() => import('../features/activity/EntityLogPage'), 'EntityLogPage', 'Activity'),
       },
       {
         path: 'orders/:id/edit',
-        lazy: lazyPage(() => import('../features/orders/OrderPages'), 'OrderEditPage'),
+        lazy: writePage(() => import('../features/orders/OrderPages'), 'OrderEditPage', 'Edit order'),
       },
       {
         path: 'delivery',
@@ -70,24 +122,47 @@ const routes: RouteObject[] = [
       },
       {
         path: 'catalog/configure',
-        lazy: lazyPage(() => import('../features/productImport/ConfigurePage'), 'ConfigurePage'),
+        lazy: proPage(
+          () => import('../features/productImport/ConfigurePage'),
+          'ConfigurePage',
+          'Product import',
+          true,
+        ),
       },
       {
         path: 'catalog/new',
-        lazy: lazyPage(() => import('../features/catalog/ProductEditorPage'), 'ProductEditorPage'),
+        lazy: writePage(() => import('../features/catalog/ProductEditorPage'), 'ProductEditorPage', 'Product'),
       },
       {
         path: 'catalog/:productId',
-        lazy: lazyPage(() => import('../features/catalog/ProductEditorPage'), 'ProductEditorPage'),
+        lazy: writePage(() => import('../features/catalog/ProductEditorPage'), 'ProductEditorPage', 'Product'),
       },
       { path: 'more', lazy: lazyPage(() => import('../features/settings/MorePage'), 'MorePage') },
       {
         path: 'settings',
         lazy: lazyPage(() => import('../features/settings/SettingsPage'), 'SettingsPage'),
       },
-      { path: 'terms', lazy: lazyPage(() => import('../features/legal/TermsPage'), 'TermsPage') },
+      { path: 'admin', lazy: lazyPage(() => import('../features/admin/AdminPage'), 'AdminPage') },
+      { path: 'plan', lazy: lazyPage(() => import('../features/plan/PlanPage'), 'PlanPage') },
       { path: 'trash', lazy: lazyPage(() => import('../features/trash/TrashPage'), 'TrashPage') },
       { path: '*', element: <NotFoundPage /> },
+    ],
+  },
+  // Public: readable before signing in (sign-up links to the terms; emailed links land on reset-password).
+  {
+    errorElement: <RouteError />,
+    children: [
+      { path: '/terms', lazy: lazyPage(() => import('../features/legal/TermsPage'), 'TermsPage') },
+      { path: '/privacy', lazy: lazyPage(() => import('../features/legal/TermsPage'), 'PrivacyPage') },
+      { path: '/signup', lazy: lazyPage(() => import('../features/auth/AccountPages'), 'SignupPage') },
+      {
+        path: '/forgot',
+        lazy: lazyPage(() => import('../features/auth/AccountPages'), 'ForgotPasswordPage'),
+      },
+      {
+        path: '/reset-password',
+        lazy: lazyPage(() => import('../features/auth/AccountPages'), 'ResetPasswordPage'),
+      },
     ],
   },
   {

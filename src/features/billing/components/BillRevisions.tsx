@@ -56,11 +56,14 @@ function RevisionImage(props: {
   onBack: () => void
 }) {
   const { bill, billNo, fileName, onBack } = props
-  const image = useBillImage(bill.image_path)
+  const purged = bill.image_purged_at !== null
+  const image = useBillImage(purged ? null : bill.image_path)
   const share = useShareBill()
   return (
     <div className="flex flex-col gap-3 p-4">
-      {image.error ? (
+      {purged ? (
+        <p className="text-sm text-muted">This revision&apos;s picture was removed to save space.</p>
+      ) : image.error ? (
         <p role="alert" className="text-sm text-danger">
           {image.error.message}
         </p>

@@ -13,6 +13,9 @@ function renderAt(status: AuthStatus) {
     client: {} as SupabaseClient,
     signIn: async () => {},
     signOut: async () => {},
+    signUp: async () => {},
+    resetPassword: async () => {},
+    updatePassword: async () => {},
   }
   return render(
     <AuthContext.Provider value={value}>

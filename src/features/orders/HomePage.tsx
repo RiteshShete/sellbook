@@ -7,6 +7,7 @@ import { HomeOverview } from './components/HomeOverview'
 import { FAB_CLEARANCE, NewOrderFab } from './components/NewOrderFab'
 import { NewOrderCard } from './components/NewOrderCard'
 import { PrepList } from './components/PrepList'
+import { ProGate } from '../plan/components/ProGate'
 import { useOrders } from './hooks/useOrders'
 
 type View = 'orders' | 'prep'
@@ -42,7 +43,13 @@ export function HomePage() {
         className={`mx-auto flex w-full max-w-2xl lg:max-w-[75vw] min-w-0 flex-col gap-4 px-4 pt-4 ${FAB_CLEARANCE}`}
       >
         <UnderlineTabs label="Show" options={VIEWS} value={view} onChange={setView} />
-        {view === 'prep' ? <PrepList /> : <NewOrders />}
+        {view === 'prep' ? (
+          <ProGate feature="To Prepare">
+            <PrepList />
+          </ProGate>
+        ) : (
+          <NewOrders />
+        )}
       </div>
       <NewOrderFab />
     </>

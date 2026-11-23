@@ -54,8 +54,9 @@ export const PendingRowSchema = z.object({
   customer_phone: z.string().nullable(),
   total: dbMoney,
   delivered_at: z.string(),
-  age_days: count,
-  bucket: z.enum(AGE_BUCKETS),
+  /** Ageing is Pro: both are null on other plans. */
+  age_days: count.nullable(),
+  bucket: z.enum(AGE_BUCKETS).nullable(),
 })
 export type PendingRow = z.infer<typeof PendingRowSchema>
 

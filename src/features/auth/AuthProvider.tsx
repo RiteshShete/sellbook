@@ -1,8 +1,12 @@
 import { useQueryClient } from '@tanstack/react-query'
 import type { Session, SupabaseClient } from '@supabase/supabase-js'
 import { useEffect, useMemo, useState, type ReactNode } from 'react'
+import { TERMS_VERSION } from '../legal/terms'
 import { AuthContext, type AuthContextValue } from './authContext'
 import { readableAuthError } from './schemas'
+
+/** An address inside this app (works under /sellbook/ too); emailed links come back to it. */
+const appUrl = (path = '') => new URL(import.meta.env.BASE_URL + path, window.location.origin).toString()
 
 interface AuthState {
   loaded: boolean
@@ -40,6 +44,25 @@ export function AuthProvider({
       },
       signOut: async () => {
         const { error } = await client.auth.signOut()
+        if (error) throw new Error(readableAuthError(error.message))
+      },
+      signUp: async (email, password) => {
+        const { error } = await client.auth.signUp({
+          email,
+          password,
+          // The database records which terms were accepted (trigger on auth.users).
+          options: { emailRedirectTo: appUrl(), data: { terms_version: TERMS_VERSION } },
+        })
+        if (error) throw new Error(readableAuthError(error.message))
+      },
+      resetPassword: async (email) => {
+        const { error } = await client.auth.resetPasswordForEmail(email, {
+          redirectTo: appUrl('reset-password'),
+        })
+        if (error) throw new Error(readableAuthError(error.message))
+      },
+      updatePassword: async (password) => {
+        const { error } = await client.auth.updateUser({ password })
         if (error) throw new Error(readableAuthError(error.message))
       },
     }),

@@ -54,12 +54,26 @@ function PendingList(props: {
 }) {
   const { rows, bucket, onBucket } = props
   const shown = bucket ? rows.filter((r) => r.bucket === bucket) : rows
+  // Ageing is Pro: other plans get the plain list (the server sends no ages).
+  const aged = rows.every((r) => r.bucket !== null)
   return (
     <div className="flex flex-col gap-4">
       <p className="text-sm text-muted">
         {formatINR(addMoney(...rows.map((r) => r.total)))} across {pluralize(rows.length, 'order')}
       </p>
-      <div className="grid grid-cols-2 gap-2" role="group" aria-label="Filter by age">
+      {!aged && (
+        <p className="text-sm text-muted">
+          Grouping by age is Pro.{' '}
+          <Link to="/plan" className="font-medium underline underline-offset-4">
+            See plans
+          </Link>
+        </p>
+      )}
+      <div
+        className={aged ? 'grid grid-cols-2 gap-2' : 'hidden'}
+        role="group"
+        aria-label="Filter by age"
+      >
         {summarizeBuckets(rows).map((b) => (
           <button
             key={b.bucket}
@@ -84,8 +98,9 @@ function PendingList(props: {
                   #{r.order_no} {r.customer_name}
                 </span>
                 <span className="block text-sm text-muted">
-                  Delivered {formatDate(r.delivered_at)} ·{' '}
-                  {r.age_days === 0 ? 'today' : `${pluralize(r.age_days, 'day')} ago`}
+                  Delivered {formatDate(r.delivered_at)}
+                  {r.age_days !== null &&
+                    ` · ${r.age_days === 0 ? 'today' : `${pluralize(r.age_days, 'day')} ago`}`}
                 </span>
               </span>
               <span className="font-semibold tabular-nums">{formatINR(r.total)}</span>

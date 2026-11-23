@@ -1,11 +1,15 @@
 import { Plus } from 'lucide-react'
 import { Link } from 'react-router-dom'
+import { useCanWrite } from '../../plan/hooks/usePlan'
 
 /**
  * The app's main action, floating above the tab bar on Home and Delivery. It sits apart from the
  * header so it is never confused with a screen's own header action (e.g. "Add product").
  */
 export function NewOrderFab() {
+  // An ended plan cannot take orders: no button rather than a form that fails at the end.
+  const canWrite = useCanWrite()
+  if (!canWrite) return null
   return (
     <Link
       to="/orders/new"

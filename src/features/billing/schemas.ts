@@ -15,6 +15,8 @@ export const BillSchema = z.object({
   total_at_generation: dbMoney,
   items_hash: z.string(),
   generated_at: z.string(),
+  /** Set when the picture was deleted to save space (the bill itself stays and can be made again). */
+  image_purged_at: z.string().nullable().default(null),
 })
 export type Bill = z.infer<typeof BillSchema>
 

@@ -1,6 +1,8 @@
-import { Suspense } from 'react'
+import { Suspense, useEffect, useRef } from 'react'
 import { Outlet } from 'react-router-dom'
 import { Skeleton } from '../components/ui'
+import { useTidyBillImages } from '../features/billing/hooks/useBills'
+import { LimitBanner, LockedWall, useLockedWall } from '../features/plan/components/PlanChrome'
 import { TabBar } from './TabBar'
 
 function PageFallback() {
@@ -14,12 +16,20 @@ function PageFallback() {
 }
 
 export function AppLayout() {
+  const locked = useLockedWall()
+  // Once per visit, quietly clear bill pictures past their plan's keep-days.
+  const tidy = useTidyBillImages()
+  const tidied = useRef(false)
+  useEffect(() => {
+    if (tidied.current) return
+    tidied.current = true
+    tidy.mutate()
+  }, [tidy])
   return (
     <div className="flex min-h-dvh min-w-0 flex-col">
       <main className="min-w-0 flex-1 pb-[calc(3.5rem+env(safe-area-inset-bottom))]">
-        <Suspense fallback={<PageFallback />}>
-          <Outlet />
-        </Suspense>
+        <LimitBanner />
+        <Suspense fallback={<PageFallback />}>{locked ? <LockedWall /> : <Outlet />}</Suspense>
       </main>
       <TabBar />
     </div>

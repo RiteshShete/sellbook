@@ -6,6 +6,12 @@ export const STALE_VERSION = 'SB409'
 /** SQLSTATE raised by the product import when the catalog changed since the review. */
 export const CATALOG_CHANGED = 'SB410'
 
+/**
+ * SQLSTATE raised when a plan limit, an ended plan or a Pro-only feature stops a call. The message is
+ * already a sentence for the owner ("the free trial allows 10 orders: choose a plan to add more").
+ */
+export const PLAN_LIMIT = 'SB411'
+
 /** Shape shared by PostgrestError, StorageError and plain Errors. */
 export interface DbErrorLike {
   code?: string
@@ -25,6 +31,10 @@ export function readableDbError(error: DbErrorLike): string {
     return 'The catalog changed while you were reviewing. Nothing was saved. Review the import again.'
   }
   if (error.code === '28000' || lower.includes('jwt')) return 'Your session expired. Sign in again.'
+  // A Storage upload refused by the bill-storage policy (storage full, or the plan has ended).
+  if (lower.includes('row-level security')) {
+    return 'Cannot save: your plan has ended or your bill storage is full. See Your plan.'
+  }
   if (error.code === 'PGRST202' || lower.includes('could not find the function')) {
     return 'The database is missing an update. Apply the latest migration (supabase db push).'
   }

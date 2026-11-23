@@ -1,5 +1,12 @@
 import { describe, expect, it } from 'vitest'
-import { readableAuthError, validateLogin } from './schemas'
+import {
+  ForgotSchema,
+  NewPasswordSchema,
+  readableAuthError,
+  SignupSchema,
+  validateForm,
+  validateLogin,
+} from './schemas'
 
 describe('validateLogin', () => {
   it('accepts a valid email and password, trimming the email', () => {
@@ -30,5 +37,42 @@ describe('readableAuthError', () => {
   })
   it('passes unknown messages through', () => {
     expect(readableAuthError('Something odd')).toBe('Something odd')
+  })
+})
+
+describe('validateForm (sign-up, forgot, new password)', () => {
+  it('accepts a sign-up with a trimmed email, an 8+ character password and the terms ticked', () => {
+    const r = validateForm(SignupSchema, { email: ' new@shop.in ', password: 'longenough', accept: true })
+    expect(r).toEqual({ ok: true, value: { email: 'new@shop.in', password: 'longenough', accept: true } })
+  })
+
+  it('gives one message per field: bad email, short password, terms not ticked', () => {
+    const r = validateForm(SignupSchema, { email: 'nope', password: 'short', accept: false })
+    expect(r).toEqual({
+      ok: false,
+      errors: {
+        email: 'Enter a valid email',
+        password: 'Use at least 8 characters',
+        accept: 'Please accept the terms to continue',
+      },
+    })
+  })
+
+  it('checks the forgot and new-password forms the same way', () => {
+    expect(validateForm(ForgotSchema, { email: '' })).toEqual({ ok: false, errors: { email: 'Enter your email' } })
+    expect(validateForm(NewPasswordSchema, { password: 'x'.repeat(73) })).toEqual({
+      ok: false,
+      errors: { password: 'Use at most 72 characters' },
+    })
+    expect(validateForm(NewPasswordSchema, { password: '12345678' }).ok).toBe(true)
+  })
+})
+
+describe('readableAuthError for accounts', () => {
+  it('explains closed sign-ups and a reused password', () => {
+    expect(readableAuthError('Signups not allowed for this instance')).toBe('New accounts are not open yet.')
+    expect(readableAuthError('New password should be different from the old password.')).toBe(
+      'Choose a password you have not used here before.',
+    )
   })
 })

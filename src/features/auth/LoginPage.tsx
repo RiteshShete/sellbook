@@ -1,6 +1,6 @@
 import { useMutation } from '@tanstack/react-query'
 import { useState, type FormEvent } from 'react'
-import { Navigate, useLocation } from 'react-router-dom'
+import { Link, Navigate, useLocation } from 'react-router-dom'
 import { Button, Input, Skeleton } from '../../components/ui'
 import loginBg from '../../assets/login/login-bg.png'
 import { RotatingArt } from './components/RotatingArt'
@@ -94,6 +94,14 @@ export function LoginPage() {
           <Button type="submit" variant="lime" block disabled={login.isPending}>
             {login.isPending ? 'Signing in…' : 'Sign in'}
           </Button>
+          <div className="flex justify-between gap-4 text-sm font-medium text-white">
+            <Link to="/signup" className="inline-flex min-h-11 items-center underline underline-offset-4">
+              Create account
+            </Link>
+            <Link to="/forgot" className="inline-flex min-h-11 items-center underline underline-offset-4">
+              Forgot password?
+            </Link>
+          </div>
         </form>
       </main>
     </div>

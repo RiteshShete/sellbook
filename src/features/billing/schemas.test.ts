@@ -19,6 +19,7 @@ const bill = (revision: number, items_hash: string): Bill => ({
   total_at_generation: 50000,
   items_hash,
   generated_at: '2026-10-10T05:00:00+00:00',
+  image_purged_at: null,
 })
 
 describe('formatBillNo', () => {
@@ -117,5 +118,29 @@ describe('billShareText', () => {
     const t = billShareText({ ...unpaid, payment_status: 'paid' }, settings, '0001', 100)
     expect(t).not.toContain('upi://')
     expect(t).toContain('Payment received')
+  })
+})
+
+describe('BillSchema image_purged_at', () => {
+  const row = {
+    id: '00000000-0000-4000-8000-000000000001',
+    order_id: '00000000-0000-4000-8000-000000000000',
+    bill_no: 7,
+    revision: 1,
+    image_path: 'u/2026/bill-1.png',
+    total_at_generation: '500.00',
+    items_hash: 'h',
+    generated_at: '2026-10-10T05:00:00+00:00',
+  }
+
+  it('is null for a bill whose picture is still stored (and for a database without the column)', () => {
+    expect(BillSchema.parse(row).image_purged_at).toBeNull()
+    expect(BillSchema.parse({ ...row, image_purged_at: null }).image_purged_at).toBeNull()
+  })
+
+  it('carries the time the picture was removed', () => {
+    expect(BillSchema.parse({ ...row, image_purged_at: '2026-12-01T00:00:00Z' }).image_purged_at).toBe(
+      '2026-12-01T00:00:00Z',
+    )
   })
 })

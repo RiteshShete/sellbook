@@ -12,12 +12,16 @@ import { buildOrdersCsv, csvFileName } from '../exportCsv'
  * `keepPrevious`: month arrows keep the old numbers (dimmed) until the new ones land. Off for the
  * comparison month, whose stale data would be labelled with the wrong month.
  */
-export function useMonthAnalytics(month: string, { keepPrevious = false } = {}) {
+export function useMonthAnalytics(
+  month: string,
+  { keepPrevious = false, enabled = true } = {},
+) {
   const { client } = useAuth()
   return useQuery({
     queryKey: queryKeys.analytics.month(month),
     queryFn: () => fetchMonthAnalytics(client, month),
     placeholderData: keepPrevious ? keepPreviousData : undefined,
+    enabled,
   })
 }
 
