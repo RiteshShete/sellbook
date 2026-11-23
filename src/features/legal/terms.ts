@@ -138,6 +138,7 @@ export const PRIVACY: TermsSection[] = [
       'About you: your sign-in email, the shop details you type in Settings, which plan you are on, and the payment reference (and UTR, if you give it) of each plan payment.',
       'About your customers: only what you enter for an order, which is a name, an optional phone number and what they ordered. You decide what goes in.',
       'If you open an online shop: customers who sign up there give a name, a mobile number and/or email, a password (kept only in scrambled form) and delivery addresses. We show a customer only their own orders, and show you only the name, phone and address that belong to orders placed at your shop. A customer who orders from several shops has a separate record at each.',
+      'Phone alerts: if you switch them on, we keep your phone browser’s alert address (a random web address and keys, no name) so we can tell you about a new order. The alert goes through your phone maker’s push service (Google, Apple or Mozilla) and shows only the order number, the customer’s first name or name, and ‘check your bank’. Switch it off in Settings and the address is deleted.',
       'Payment claims: a customer can enter the 12-digit UTR of a UPI payment. It is a note for you to check in your own bank app. Sellbook never verifies or moves money.',
       'We do not keep your password in readable form, and we do not use advertising or tracking tools.',
     ],

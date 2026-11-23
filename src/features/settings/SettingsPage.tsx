@@ -1,5 +1,6 @@
-import { Page } from '../../app/Page'
+﻿import { Page } from '../../app/Page'
 import { ErrorState, Skeleton } from '../../components/ui'
+import { PushCard } from '../push/PushCard'
 import { AlertSoundSwitch } from './components/AlertSoundSwitch'
 import { AssetField } from './components/AssetField'
 import { ShopDetailsForm } from './components/ShopDetailsForm'
@@ -21,6 +22,7 @@ export function SettingsPage() {
         <div className="flex flex-col gap-4">
           <ShopDetailsForm settings={settings.data} />
           <AlertSoundSwitch />
+          <PushCard />
           <AssetField
             kind="qr"
             label="Uploaded payment QR (fallback)"

@@ -671,6 +671,34 @@ export type Database = {
           },
         ]
       }
+      push_subscriptions: {
+        Row: {
+          auth: string
+          created_at: string
+          endpoint: string
+          id: string
+          owner_id: string
+          p256dh: string
+        }
+        ComputedFields: never
+        Insert: {
+          auth: string
+          created_at?: string
+          endpoint: string
+          id?: string
+          owner_id: string
+          p256dh: string
+        }
+        Update: {
+          auth?: string
+          created_at?: string
+          endpoint?: string
+          id?: string
+          owner_id?: string
+          p256dh?: string
+        }
+        Relationships: []
+      }
       settings: {
         Row: {
           bill_footer: string | null
@@ -1226,6 +1254,7 @@ export type Database = {
       }
       decline_order: { Args: { p_id: string; p_reason: string; v: number }; Returns: Json }
       delete_address: { Args: { p_id: string }; Returns: undefined }
+      delete_push_subscription: { Args: { p_endpoint: string }; Returns: undefined }
       effective_price: {
         Args: {
           p_at?: string
@@ -1500,6 +1529,10 @@ export type Database = {
           isOneToOne: true
           isSetofReturn: false
         }
+      }
+      save_push_subscription: {
+        Args: { p_auth: string; p_endpoint: string; p_p256dh: string }
+        Returns: undefined
       }
       set_customer_block: { Args: { p_blocked: boolean; p_customer: string }; Returns: undefined }
       set_order_status: {
