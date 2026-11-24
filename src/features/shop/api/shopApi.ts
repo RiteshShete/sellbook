@@ -85,7 +85,7 @@ export async function endOffers(client: SupabaseClient, variantIds: string[] | n
 
 // ---- Product online details and pictures ------------------------------------------------------------------------------
 
-const DETAIL_COLUMNS = 'description, ingredients, allergens, veg_type, shelf_life, is_available, image_paths'
+const DETAIL_COLUMNS = 'description, ingredients, allergens, veg_type, shelf_life, is_available, image_paths, nutrition'
 
 export async function fetchOnlineDetails(client: SupabaseClient, productId: string): Promise<OnlineDetails> {
   const { data, error } = await client.from('products').select(DETAIL_COLUMNS).eq('id', productId).single()

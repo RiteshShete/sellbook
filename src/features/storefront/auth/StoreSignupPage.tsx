@@ -6,6 +6,7 @@ import { normalizePhone } from '../../../lib/phone'
 import { queryKeys } from '../../../lib/queryKeys'
 import { signUpWithId } from '../../auth/authActions'
 import { Captcha, captchaRequired } from '../../auth/components/Captcha'
+import { GoogleButton } from '../../auth/components/GoogleButton'
 import { useMyContext } from '../../auth/myContext'
 import { NewPasswordSchema, validateForm } from '../../auth/schemas'
 import { useAuth } from '../../auth/useAuth'
@@ -149,6 +150,7 @@ export function StoreSignupPage() {
         <Button type="submit" block disabled={submit.isPending}>
           {submit.isPending ? t('signup.submitting') : finishing ? t('signup.finishSubmit') : t('signup.submit')}
         </Button>
+        {!finishing && <GoogleButton returnTo={`${slug}/signup`} />}
         {!finishing && (
           <Link to={storefrontPath(slug, 'login')} state={{ from }} className={`inline-flex min-h-11 items-center ${link}`}>
             {t('signup.haveAccount')}

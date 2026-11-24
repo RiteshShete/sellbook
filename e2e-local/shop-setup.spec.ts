@@ -25,7 +25,7 @@ test('owner builds and publishes a shop', async ({ page }) => {
     await page.getByLabel('Product name').fill(name)
     await page.getByLabel('Selling price (₹)').fill(price)
     await page.getByRole('button', { name: 'Save', exact: true }).click()
-    await expect(page).toHaveURL(/\/catalog$/)
+    await expect(page).toHaveURL(/\/catalog\/[0-9a-f-]{36}$/) // a new product opens its own page (pictures and online details)
   }
 
   // online details and a picture for Chakli (picture resized in the browser, two sizes uploaded)

@@ -1,4 +1,5 @@
-import { Copy, ExternalLink, MessageCircle } from 'lucide-react'
+import { Copy, ExternalLink, MessageCircle, QrCode } from 'lucide-react'
+import { Link } from 'react-router-dom'
 import { Button, toast } from '../../../components/ui'
 import { useSettings } from '../../settings/hooks/useSettings'
 import type { Shop } from '../schemas'
@@ -33,6 +34,9 @@ export function ShareCard({ shop }: { shop: Shop }) {
         <a href={whatsapp} target="_blank" rel="noreferrer" className="inline-flex min-h-11 items-center justify-center gap-2 rounded-xl border border-border-strong px-4 font-medium">
           <MessageCircle className="h-5 w-5" /> Share on WhatsApp
         </a>
+        <Link to="/more/shop/poster" className="inline-flex min-h-11 items-center justify-center gap-2 rounded-xl border border-border-strong px-4 font-medium">
+          <QrCode className="h-5 w-5" /> QR poster to print
+        </Link>
         <a href={link} target="_blank" rel="noreferrer" className="inline-flex min-h-11 items-center justify-center gap-2 rounded-xl border border-border-strong px-4 font-medium">
           <ExternalLink className="h-5 w-5" /> Preview as a customer
         </a>

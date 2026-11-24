@@ -29,7 +29,7 @@ test('owner screens', async ({ page }) => {
   sql(`insert into public.variants (owner_id, product_id, name, price) select owner_id, id, 'Std', 150 from public.products where owner_id = '${ownerId}'`)
   sql(`insert into public.orders (owner_id, order_no, customer_name, customer_phone) values ('${ownerId}', 1, 'Asha Patil', '919876543210')`)
   const paths = ['/', '/delivery', '/analytics', '/pending', '/catalog', '/catalog/new', '/catalog/categories', '/catalog/configure', '/orders', '/orders/new',
-    '/activity', '/more', '/settings', '/more/shop', '/pricing', '/plan', '/trash', '/account']
+    '/activity', '/more', '/settings', '/more/shop', '/more/shop/poster', '/pricing', '/plan', '/trash', '/account']
   for (const path of paths) await scan(page, path)
   // an order page (the first one in the list)
   const id = sql(`select id from public.orders where owner_id = '${ownerId}' limit 1`)

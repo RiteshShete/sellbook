@@ -31,9 +31,10 @@ export function ProductForm({ product }: { product?: Product }) {
     form.setErrors(result.ok ? { byVariant: {} } : result.errors)
     if (!result.ok) return
     save.mutate(result.payload, {
-      onSuccess: () => {
-        toast.success(product ? 'Product saved' : 'Product added')
-        void navigate('/catalog')
+      onSuccess: (id) => {
+        // A new product opens its own page, so pictures and online details can be added straight away.
+        toast.success(product ? 'Product saved' : 'Product added. Add pictures and online details below.')
+        void navigate(product ? '/catalog' : `/catalog/${id}`)
       },
     })
   }

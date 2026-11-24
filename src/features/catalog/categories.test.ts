@@ -18,6 +18,7 @@ const product = (
   name,
   sort_order: n,
   is_active: true,
+  is_available: true,
   category_id,
   variants: variants.map((v, i) => ({
     id: id(200 + n * 10 + i),

@@ -3,6 +3,7 @@ import { useState, type FormEvent } from 'react'
 import { Link, Navigate, useLocation, useParams } from 'react-router-dom'
 import { Button, Input, Skeleton } from '../../../components/ui'
 import { signInWithId } from '../../auth/authActions'
+import { GoogleButton } from '../../auth/components/GoogleButton'
 import { parseLoginId, type LoginId } from '../../auth/loginId'
 import { useMyContext } from '../../auth/myContext'
 import { useAuth } from '../../auth/useAuth'
@@ -74,6 +75,7 @@ export function StoreLoginPage() {
         <Button type="submit" block disabled={login.isPending}>
           {login.isPending ? t('login.submitting') : t('login.submit')}
         </Button>
+        <GoogleButton returnTo={`${slug}/login`} />
         <div className="flex justify-between gap-4 text-sm">
           <Link to={storefrontPath(slug, 'signup')} state={{ from }} className={link}>
             {t('login.noAccount')}

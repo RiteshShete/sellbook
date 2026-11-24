@@ -3,6 +3,7 @@ import { useState, type FormEvent, type ReactNode } from 'react'
 import { Link, Navigate, useNavigate } from 'react-router-dom'
 import { Button, Input, Skeleton, toast } from '../../components/ui'
 import { signUpWithId } from './authActions'
+import { GoogleButton } from './components/GoogleButton'
 import { Captcha, captchaRequired } from './components/Captcha'
 import { ForgotCodeFlow } from './ForgotCodeFlow'
 import { parseLoginId, type LoginId } from './loginId'
@@ -138,6 +139,7 @@ export function SignupPage() {
         <Button type="submit" block disabled={signup.isPending}>
           {signup.isPending ? 'Creating…' : 'Create account'}
         </Button>
+        <GoogleButton returnTo="create-shop" />
       </form>
     </AuthShell>
   )

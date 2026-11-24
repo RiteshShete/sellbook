@@ -39,6 +39,7 @@ export function product(
     name,
     sort_order: 0,
     is_active: true,
+    is_available: true,
     category_id,
     variants: variants.map((v) => ({ ...v, product_id: pid })),
   }

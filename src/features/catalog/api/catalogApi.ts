@@ -13,7 +13,7 @@ import {
 
 const VARIANT_COLUMNS =
   'variants (id, product_id, name, price, cost_price, size_amount, size_unit, sort_order, is_active, deleted_at)'
-const PRODUCT_SELECT = `id, name, sort_order, is_active, category_id, ${VARIANT_COLUMNS}`
+const PRODUCT_SELECT = `id, name, sort_order, is_active, is_available, category_id, ${VARIANT_COLUMNS}`
 /** Without category_id: for a database where the categories migration is not applied yet. */
 const PRODUCT_SELECT_LEGACY = `id, name, sort_order, is_active, ${VARIANT_COLUMNS}`
 

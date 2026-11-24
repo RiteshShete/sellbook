@@ -150,6 +150,10 @@ const routes: RouteObject[] = [
         path: 'more/shop',
         lazy: writePage(() => import('../features/shop/ShopProfilePage'), 'ShopProfilePage', 'Online shop'),
       },
+      {
+        path: 'more/shop/poster',
+        lazy: lazyPage(() => import('../features/shop/ShopPosterPage'), 'ShopPosterPage'),
+      },
       { path: 'trash', lazy: lazyPage(() => import('../features/trash/TrashPage'), 'TrashPage') },
       { path: '*', element: <NotFoundPage /> },
     ],

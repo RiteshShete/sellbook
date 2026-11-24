@@ -1,11 +1,12 @@
 import { useMutation } from '@tanstack/react-query'
-import { Camera } from 'lucide-react'
+import { ArrowLeft, ArrowRight, Camera } from 'lucide-react'
 import { useRef } from 'react'
 import { Button, toast } from '../../../components/ui'
 import { thumbPath } from '../../../lib/imageResize'
 import { useAuth } from '../../auth/useAuth'
 import { catalogImageUrl, removeCatalogImages, uploadCatalogImage } from '../../shop/api/shopApi'
 import { useSaveOnlineDetails } from '../../shop/hooks/useShop'
+import { movePhoto } from '../photoOrder'
 
 const MAX = 5
 
@@ -48,6 +49,16 @@ export function ProductPhotos({ productId, paths }: { productId: string; paths: 
               ) : (
                 <Button variant="secondary" onClick={() => save.mutate({ image_paths: [p, ...paths.filter((x) => x !== p)] })}>
                   Make cover
+                </Button>
+              )}
+              {i > 0 && (
+                <Button variant="ghost" aria-label={`Move picture ${i + 1} earlier`} disabled={save.isPending} onClick={() => save.mutate({ image_paths: movePhoto(paths, i, -1) })}>
+                  <ArrowLeft className="h-5 w-5" />
+                </Button>
+              )}
+              {i < paths.length - 1 && (
+                <Button variant="ghost" aria-label={`Move picture ${i + 1} later`} disabled={save.isPending} onClick={() => save.mutate({ image_paths: movePhoto(paths, i, 1) })}>
+                  <ArrowRight className="h-5 w-5" />
                 </Button>
               )}
               <Button variant="ghost" className="text-danger" disabled={remove.isPending} onClick={() => remove.mutate(p)}>

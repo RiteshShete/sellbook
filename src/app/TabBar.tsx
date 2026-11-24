@@ -42,7 +42,7 @@ export function TabBar() {
   return (
     <nav
       aria-label="Main"
-      className="fixed inset-x-0 bottom-0 z-40 border-t border-border bg-surface pb-[env(safe-area-inset-bottom)]"
+      className="fixed inset-x-0 bottom-0 z-40 print:hidden border-t border-border bg-surface pb-[env(safe-area-inset-bottom)]"
     >
       <ul className="mx-auto flex max-w-2xl lg:max-w-[75vw]">
         {tabs.map((t) => {

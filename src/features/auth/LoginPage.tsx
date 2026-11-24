@@ -5,6 +5,7 @@ import { Button, Input, Skeleton } from '../../components/ui'
 import loginBg from '../../assets/login/login-bg.png'
 import { RotatingArt } from './components/RotatingArt'
 import { signInWithId } from './authActions'
+import { GoogleButton } from './components/GoogleButton'
 import { parseLoginId, type LoginId } from './loginId'
 import type { LoginErrors } from './schemas'
 import { useAuth } from './useAuth'
@@ -101,6 +102,7 @@ export function LoginPage() {
           <Button type="submit" variant="lime" block disabled={login.isPending}>
             {login.isPending ? 'Signing in…' : 'Sign in'}
           </Button>
+          <GoogleButton returnTo="" />
           <div className="flex justify-between gap-4 text-sm font-medium text-white">
             <Link to="/signup" className="inline-flex min-h-11 items-center underline underline-offset-4">
               Create account

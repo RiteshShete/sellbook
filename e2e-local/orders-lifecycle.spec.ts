@@ -166,4 +166,9 @@ test('a customer pays by UPI, the owner confirms and verifies, with every other 
   await page.reload()
   await expect(page.getByText('The shop could not take this order')).toBeVisible()
   expect(sql(`select status::text || '/' || confirmation_status from public.orders where owner_id = '${ownerId}' and order_no = 3`)).toBe('cancelled/declined')
+
+  // ---- the owner refunds by hand and says so: the reminder goes away (a claimed-only order could never clear it before)
+  await owner.getByRole('button', { name: 'I have refunded' }).click()
+  await expect(owner.getByRole('alert').filter({ hasText: 'declined after' })).toHaveCount(0)
+  expect(sql(`select refund_done_at is not null from public.orders where owner_id = '${ownerId}' and order_no = 3`)).toBe('t')
 })

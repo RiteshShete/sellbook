@@ -1,5 +1,5 @@
 import type { Session, SupabaseClient } from '@supabase/supabase-js'
-import { cleanup, render, screen } from '@testing-library/react'
+import { cleanup, fireEvent, render, screen } from '@testing-library/react'
 import { MemoryRouter } from 'react-router-dom'
 import { afterEach, describe, expect, it } from 'vitest'
 import { AuthContext, type AuthContextValue } from '../../auth/authContext'
@@ -62,5 +62,18 @@ describe('StoreProductCard', () => {
   it('has a text alternative for the veg mark', () => {
     card(chakli)
     expect(screen.getByText('Vegetarian')).toBeTruthy()
+  })
+
+  it('adds a single-variant product with one tap, and offers no button when there is a choice or it is sold out', () => {
+    const single = { ...ladoo, variants: [ladoo.variants[0] as StoreProduct['variants'][number]] }
+    card(single)
+    fireEvent.click(screen.getByRole('button', { name: /Add .* to cart/ }))
+    expect(window.localStorage.getItem('sb:cart:a-foods')).toContain(single.variants[0]?.id)
+    cleanup()
+    card({ ...ladoo, variants: [...ladoo.variants, { ...(ladoo.variants[0] as StoreProduct['variants'][number]), id: '00000000-0000-4000-8000-0000000000ff' }] })
+    expect(screen.queryByRole('button')).toBeNull()
+    cleanup()
+    card(soldOut)
+    expect(screen.queryByRole('button')).toBeNull()
   })
 })

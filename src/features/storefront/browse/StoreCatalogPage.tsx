@@ -1,10 +1,10 @@
 import { useState } from 'react'
 import { useParams } from 'react-router-dom'
-import { EmptyState, ErrorState, Skeleton } from '../../../components/ui'
+import { Button, EmptyState, ErrorState, Skeleton } from '../../../components/ui'
 import { ShopNotFound } from '../components/ShopNotFound'
 import { useStoreCatalog, useStoreShop } from '../hooks/useStore'
 import { t } from '../i18n'
-import { filterProducts } from './catalogView'
+import { filterProducts, firstPages } from './catalogView'
 import { CartBar } from './CartBar'
 import { CatalogFilters } from './CatalogFilters'
 import { ShopHeader } from './ShopHeader'
@@ -17,6 +17,7 @@ export function StoreCatalogPage() {
   const catalog = useStoreCatalog(slug)
   const [query, setQuery] = useState('')
   const [category, setCategory] = useState('all')
+  const [pages, setPages] = useState(1)
 
   if (shop.isPending || catalog.isPending) {
     return (
@@ -39,7 +40,8 @@ export function StoreCatalogPage() {
   }
   if (!shop.data || !catalog.data) return <ShopNotFound />
 
-  const shown = filterProducts(catalog.data, query, category)
+  const matches = filterProducts(catalog.data, query, category)
+  const { items: shown, more } = firstPages(matches, pages)
   return (
     <main className="mx-auto flex max-w-2xl flex-col gap-4 pb-24">
       <ShopHeader shop={shop.data} />
@@ -47,8 +49,8 @@ export function StoreCatalogPage() {
         <EmptyState title={t('catalog.empty.title')} description={t('catalog.empty.body')} />
       ) : (
         <>
-          <CatalogFilters catalog={catalog.data} query={query} category={category} onQuery={setQuery} onCategory={setCategory} />
-          {shown.length === 0 ? (
+          <CatalogFilters catalog={catalog.data} query={query} category={category} onQuery={(q) => { setQuery(q); setPages(1) }} onCategory={(c) => { setCategory(c); setPages(1) }} />
+          {matches.length === 0 ? (
             <p className="px-4 text-muted">{t('catalog.noMatch')}</p>
           ) : (
             <ul className="grid grid-cols-2 gap-3 px-4">
@@ -56,6 +58,11 @@ export function StoreCatalogPage() {
                 <StoreProductCard key={p.id} slug={slug} product={p} />
               ))}
             </ul>
+          )}
+          {more && (
+            <div className="px-4">
+              <Button variant="secondary" block onClick={() => setPages(pages + 1)}>{t('catalog.more')}</Button>
+            </div>
           )}
         </>
       )}

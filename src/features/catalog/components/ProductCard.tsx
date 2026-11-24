@@ -21,6 +21,8 @@ export interface ProductCardProps {
   /** One-variant products show − / + on the card once they are in the order. */
   stepper?: { onMinus: () => void; onPlus: () => void }
   extra?: ReactNode
+  /** Below the card, outside its link (a control must not sit inside a link). */
+  footer?: ReactNode
 }
 
 const body = 'flex min-h-24 w-full min-w-0 flex-col gap-1 p-3 text-left'
@@ -36,6 +38,7 @@ export function ProductCard({
   onSelect,
   stepper,
   extra,
+  footer,
 }: ProductCardProps) {
   const price = fromPrice(p)
   const inner = (
@@ -70,6 +73,7 @@ export function ProductCard({
           {inner}
         </button>
       )}
+      {footer && <div className="border-t border-border px-3">{footer}</div>}
       {stepper && quantity > 0 && (
         <div className="flex items-center justify-between border-t border-border px-2 py-1">
           <button

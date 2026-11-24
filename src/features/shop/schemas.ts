@@ -2,7 +2,7 @@ import { z } from 'zod'
 import type { ShopRules } from '../../lib/pricing'
 import { SizeUnitSchema, dbAmount } from '../../lib/measure'
 import { dbMoney, dbMoneyNullable } from '../../lib/zodMoney'
-import { DELIVERY_MODES, PublishChecklistItems } from '../storefront/contract'
+import { DELIVERY_MODES, NUTRITION_KEYS, PublishChecklistItems } from '../storefront/contract'
 
 /** The owner's own `shops` row (row-level security shows only theirs). */
 export const ShopSchema = z.object({
@@ -79,8 +79,36 @@ export const OnlineDetailsSchema = z.object({
   shelf_life: z.string().nullable(),
   is_available: z.boolean(),
   image_paths: z.array(z.string()),
+  nutrition: z.partialRecord(z.enum(NUTRITION_KEYS), z.number()).nullable(),
 })
 export type OnlineDetails = z.infer<typeof OnlineDetailsSchema>
+
+export type NutritionKey = (typeof NUTRITION_KEYS)[number]
+export const NUTRITION_FIELDS: { key: NutritionKey; label: string }[] = [
+  { key: 'energy_kcal', label: 'Energy (kcal)' },
+  { key: 'protein_g', label: 'Protein (g)' },
+  { key: 'carbs_g', label: 'Carbohydrates (g)' },
+  { key: 'sugars_g', label: 'Sugars (g)' },
+  { key: 'fat_g', label: 'Fat (g)' },
+  { key: 'fibre_g', label: 'Fibre (g)' },
+  { key: 'sodium_mg', label: 'Sodium (mg)' },
+]
+
+/**
+ * The nutrition boxes (text per field, blank = not given) as the stored object, or an error naming the first bad field.
+ * No box filled = null (nothing shown to customers).
+ */
+export function parseNutrition(draft: Partial<Record<NutritionKey, string>>): { ok: true; value: Partial<Record<NutritionKey, number>> | null } | { ok: false; error: string } {
+  const out: Partial<Record<NutritionKey, number>> = {}
+  for (const { key, label } of NUTRITION_FIELDS) {
+    const text = (draft[key] ?? '').trim().replace(',', '.')
+    if (text === '') continue
+    const n = Number(text)
+    if (!Number.isFinite(n) || n < 0 || n > 100000) return { ok: false, error: `${label}: enter a number from 0 to 100000` }
+    out[key] = n
+  }
+  return { ok: true, value: Object.keys(out).length > 0 ? out : null }
+}
 
 /** "nuts, milk , " -> ["nuts", "milk"]; at most 20 as the database allows. */
 export function parseAllergens(text: string): string[] {

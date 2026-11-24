@@ -1,4 +1,4 @@
-import { FileUp, Plus, Tags } from 'lucide-react'
+import { FileUp, Plus, Tags, Tag } from 'lucide-react'
 import { Link } from 'react-router-dom'
 import { Page } from '../../app/Page'
 import { Badge, EmptyState, ErrorState, Skeleton } from '../../components/ui'
@@ -6,6 +6,7 @@ import { pluralize } from '../../lib/format'
 import { useCanWrite } from '../plan/hooks/usePlan'
 import { ImportEntryCards } from '../productImport/components/ImportEntryCards'
 import { ProductCard } from './components/ProductCard'
+import { SoldOutSwitch } from './components/SoldOutSwitch'
 import { ProductFilters, ProductGrid, sectionTitle } from './components/ProductGrid'
 import { useProductBrowser } from './hooks/useProductBrowser'
 
@@ -63,6 +64,12 @@ export function CatalogPage() {
               >
                 <Tags className="h-4 w-4" /> Categories
               </Link>
+              <Link
+                to="/pricing"
+                className="inline-flex min-h-11 items-center gap-1 rounded-xl px-2 font-medium text-text underline underline-offset-4"
+              >
+                <Tag className="h-4 w-4" /> Prices &amp; offers
+              </Link>
               {canWrite && (
                 <Link
                   to="/catalog/configure"
@@ -87,6 +94,7 @@ export function CatalogPage() {
                       key={p.id}
                       product={p}
                       to={`/catalog/${p.id}`}
+                      footer={<SoldOutSwitch productId={p.id} name={p.name} available={p.is_available} />}
                       extra={
                         !p.is_active ? (
                           <span className="mt-1">

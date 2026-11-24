@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 import { PublishChecklistItems } from '../storefront/contract'
-import { MISSING_TEXT, OfferVariantSchema, ShopSchema, parseAllergens, shopRules } from './schemas'
+import { MISSING_TEXT, OfferVariantSchema, ShopSchema, parseAllergens, parseNutrition, shopRules } from './schemas'
 
 const shopRow = {
   slug: 'a-foods', tagline: null, banner_text: null, city: 'Pune', fssai_no: null, delivery_note: null,
@@ -49,5 +49,18 @@ describe('parseAllergens', () => {
   })
   it('keeps at most 20, as the database allows', () => {
     expect(parseAllergens(Array.from({ length: 30 }, (_, i) => `a${i}`).join(',')).length).toBe(20)
+  })
+})
+
+describe('parseNutrition', () => {
+  it('turns filled boxes into numbers and skips blank ones', () => {
+    expect(parseNutrition({ energy_kcal: '250', protein_g: ' 6,5 ', fat_g: '' })).toEqual({ ok: true, value: { energy_kcal: 250, protein_g: 6.5 } })
+  })
+  it('is null when nothing is filled in', () => {
+    expect(parseNutrition({})).toEqual({ ok: true, value: null })
+  })
+  it('names the first bad field', () => {
+    expect(parseNutrition({ sugars_g: 'lots' })).toEqual({ ok: false, error: 'Sugars (g): enter a number from 0 to 100000' })
+    expect(parseNutrition({ fat_g: '-1' }).ok).toBe(false)
   })
 })

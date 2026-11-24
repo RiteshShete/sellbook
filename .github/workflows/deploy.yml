@@ -36,6 +36,7 @@ jobs:
           VITE_SUPABASE_URL: ${{ vars.VITE_SUPABASE_URL }}
           VITE_SUPABASE_ANON_KEY: ${{ vars.VITE_SUPABASE_ANON_KEY }}
           VITE_VAPID_PUBLIC_KEY: ${{ vars.VITE_VAPID_PUBLIC_KEY }}
+          VITE_GOOGLE_LOGIN_ENABLED: ${{ vars.VITE_GOOGLE_LOGIN_ENABLED }}
       # GitHub Pages has no rewrites: serving index.html as the 404 page lets deep links
       # (/sellbook/orders/123, a refresh, the installed app) open the app, which then routes.
       - run: cp dist/index.html dist/404.html
