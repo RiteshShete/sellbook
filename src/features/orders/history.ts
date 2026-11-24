@@ -33,7 +33,7 @@ export const VersionSchema = z.object({
   // The last five are customer-order steps (confirm, decline, payment claim, verify, reject, customer cancel).
   reason: z.enum([
     'create', 'edit', 'status', 'payment', 'delete', 'restore', 'rollback',
-    'confirm', 'decline', 'claim', 'verify', 'reject', 'customer_cancel',
+    'confirm', 'decline', 'claim', 'verify', 'reject', 'customer_cancel', 'refund',
   ]),
   summary: z.string().nullable(),
   created_at: z.string(),

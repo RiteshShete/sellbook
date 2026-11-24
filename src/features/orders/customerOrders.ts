@@ -5,9 +5,9 @@ import type { AddressSnapshot, Order } from './schemas'
 /** An order the customer placed on the storefront (the shop owner's own orders have no confirmation step). */
 export const isCustomerOrder = (o: Pick<Order, 'source'>): boolean => o.source === 'customer'
 
-export type ActionReason = 'confirm' | 'verify' | 'refund'
+export type ActionReason = 'confirm' | 'verify' | 'refund' | 'collect'
 
-type OrderState = Pick<Order, 'source' | 'status' | 'confirmation_status' | 'payment_status' | 'payment_claim_status'>
+type OrderState = Pick<Order, 'source' | 'status' | 'confirmation_status' | 'payment_status' | 'payment_claim_status'> & Partial<Pick<Order, 'payment_method' | 'refund_done_at'>>
 
 /**
  * Why a customer order needs the shop: it waits to be confirmed, the customer says they paid (check your bank), or it
@@ -16,18 +16,27 @@ type OrderState = Pick<Order, 'source' | 'status' | 'confirmation_status' | 'pay
 export function actionReasons(o: OrderState): ActionReason[] {
   if (!isCustomerOrder(o)) return []
   if (o.confirmation_status === 'declined') {
-    return o.payment_status === 'paid' || o.payment_claim_status === 'claimed' ? ['refund'] : []
+    return !o.refund_done_at && (o.payment_status === 'paid' || o.payment_claim_status === 'claimed') ? ['refund'] : []
   }
   if (o.status === 'cancelled') return []
   const reasons: ActionReason[] = []
   if (o.confirmation_status === 'pending') reasons.push('confirm')
   if (o.payment_claim_status === 'claimed') reasons.push('verify')
+  // Pay on delivery and ready to hand over: remind the shop to collect the cash.
+  if (o.status === 'ready' && o.payment_method === 'cod' && o.payment_status === 'pending') reasons.push('collect')
   return reasons
 }
 
 /** Server-side filter (PostgREST or()) for the orders that may need action; actionReasons() makes the final call. */
 export const NEEDS_ACTION_FILTER =
-  'and(confirmation_status.eq.pending,status.neq.cancelled),payment_claim_status.eq.claimed,and(confirmation_status.eq.declined,payment_status.eq.paid)'
+  'and(confirmation_status.eq.pending,status.neq.cancelled),payment_claim_status.eq.claimed,and(confirmation_status.eq.declined,payment_status.eq.paid,refund_done_at.is.null),and(status.eq.ready,payment_method.eq.cod,payment_status.eq.pending)'
+
+/** "3 h" / "1 day" when a customer order has waited this long for confirmation (2 hours or more), else null. */
+export function waitedLabel(createdAt: string, now: number = Date.now()): string | null {
+  const hours = Math.floor((now - Date.parse(createdAt)) / 3_600_000)
+  if (!Number.isFinite(hours) || hours < 2) return null
+  return hours >= 24 ? `${Math.floor(hours / 24)} day${hours >= 48 ? 's' : ''}` : `${hours} h`
+}
 
 export const DECLINE_REASONS = [
   { value: 'Out of stock', label: 'Out of stock' },

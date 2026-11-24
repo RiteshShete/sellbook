@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 import { orderUpiNote } from '../../lib/upi'
-import { actionReasons, addressText, customerMessage, mapsLink, whatsappToCustomer } from './customerOrders'
+import { actionReasons, addressText, waitedLabel, customerMessage, mapsLink, whatsappToCustomer } from './customerOrders'
 
 type S = Parameters<typeof actionReasons>[0]
 const base: S = { source: 'customer', status: 'new', confirmation_status: 'pending', payment_status: 'pending', payment_claim_status: 'none' }
@@ -23,12 +23,31 @@ describe('actionReasons', () => {
     expect(reasons({ ...declined })).toEqual([])
     expect(reasons({ ...declined, payment_status: 'paid' })).toEqual(['refund'])
     expect(reasons({ ...declined, payment_claim_status: 'claimed' })).toEqual(['refund'])
+    // once the shop says it has refunded, the reminder is gone
+    expect(reasons({ ...declined, payment_status: 'paid', refund_done_at: '2026-11-24T10:00:00Z' })).toEqual([])
   })
 
   it('a customer-cancelled order and the shop owner\'s own orders never need action', () => {
     expect(reasons({ status: 'cancelled' })).toEqual([])
     expect(reasons({ source: 'owner' })).toEqual([])
     expect(reasons({ source: null })).toEqual([])
+  })
+})
+
+describe('collect and waiting', () => {
+  const cod = { confirmation_status: 'confirmed', status: 'ready', payment_method: 'cod' } as const
+  it('a ready pay-on-delivery order reminds the shop to collect', () => {
+    expect(reasons(cod)).toEqual(['collect'])
+    expect(reasons({ ...cod, payment_status: 'paid' })).toEqual([])
+    expect(reasons({ ...cod, payment_method: 'upi' })).toEqual([])
+    expect(reasons({ ...cod, status: 'delivered' })).toEqual([])
+  })
+  it('says how long an order has waited, from 2 hours', () => {
+    const now = Date.parse('2026-11-24T12:00:00Z')
+    expect(waitedLabel('2026-11-24T11:00:00Z', now)).toBeNull()
+    expect(waitedLabel('2026-11-24T09:30:00Z', now)).toBe('2 h')
+    expect(waitedLabel('2026-11-23T10:00:00Z', now)).toBe('1 day')
+    expect(waitedLabel('2026-11-21T10:00:00Z', now)).toBe('3 days')
   })
 })
 

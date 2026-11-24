@@ -437,6 +437,7 @@ export type Database = {
           payment_status: Database['public']['Enums']['payment_status']
           payment_verified_at: string | null
           ready_at: string | null
+          refund_done_at: string | null
           source: string
           status: Database['public']['Enums']['order_status']
           total: number
@@ -480,6 +481,7 @@ export type Database = {
           payment_status?: Database['public']['Enums']['payment_status']
           payment_verified_at?: string | null
           ready_at?: string | null
+          refund_done_at?: string | null
           source?: string
           status?: Database['public']['Enums']['order_status']
           total?: number
@@ -522,6 +524,7 @@ export type Database = {
           payment_status?: Database['public']['Enums']['payment_status']
           payment_verified_at?: string | null
           ready_at?: string | null
+          refund_done_at?: string | null
           source?: string
           status?: Database['public']['Enums']['order_status']
           total?: number
@@ -1182,6 +1185,7 @@ export type Database = {
           payment_status: Database['public']['Enums']['payment_status']
           payment_verified_at: string | null
           ready_at: string | null
+          refund_done_at: string | null
           source: string
           status: Database['public']['Enums']['order_status']
           total: number
@@ -1233,6 +1237,7 @@ export type Database = {
           payment_status: Database['public']['Enums']['payment_status']
           payment_verified_at: string | null
           ready_at: string | null
+          refund_done_at: string | null
           source: string
           status: Database['public']['Enums']['order_status']
           total: number
@@ -1344,6 +1349,58 @@ export type Database = {
         }[]
       }
       mark_bills_purged: { Args: { p_paths: string[] }; Returns: number }
+      mark_refunded: {
+        Args: { p_id: string; v: number }
+        Returns: {
+          bill_no: number | null
+          bill_prefix: string | null
+          cancelled_at: string | null
+          cancelled_from: Database['public']['Enums']['order_status'] | null
+          claim_count: number
+          client_key: string | null
+          confirmation_status: string
+          created_at: string
+          customer_name: string
+          customer_phone: string | null
+          customer_user_id: string | null
+          decline_reason: string | null
+          deleted_at: string | null
+          delivered_at: string | null
+          delivery_address: Json | null
+          delivery_fee: number
+          discount: number
+          due_date: string | null
+          fulfilment: string | null
+          id: string
+          idempotency_key: string | null
+          notes: string | null
+          order_date: string
+          order_no: number
+          owner_id: string
+          paid_at: string | null
+          payment_claim_status: string
+          payment_claimed_at: string | null
+          payment_method: string | null
+          payment_mode: Database['public']['Enums']['payment_mode'] | null
+          payment_reference: string | null
+          payment_reject_reason: string | null
+          payment_status: Database['public']['Enums']['payment_status']
+          payment_verified_at: string | null
+          ready_at: string | null
+          refund_done_at: string | null
+          source: string
+          status: Database['public']['Enums']['order_status']
+          total: number
+          updated_at: string
+          version_no: number
+        }
+        SetofOptions: {
+          from: '*'
+          to: 'orders'
+          isOneToOne: true
+          isSetofReturn: false
+        }
+      }
       month_window: { Args: { p_month: string }; Returns: Record<string, unknown> }
       my_context: { Args: Record<PropertyKey, never>; Returns: Json }
       my_customers: { Args: Record<PropertyKey, never>; Returns: Json }
@@ -1468,6 +1525,7 @@ export type Database = {
           payment_status: Database['public']['Enums']['payment_status']
           payment_verified_at: string | null
           ready_at: string | null
+          refund_done_at: string | null
           source: string
           status: Database['public']['Enums']['order_status']
           total: number
@@ -1521,6 +1579,7 @@ export type Database = {
           payment_status: Database['public']['Enums']['payment_status']
           payment_verified_at: string | null
           ready_at: string | null
+          refund_done_at: string | null
           source: string
           status: Database['public']['Enums']['order_status']
           total: number
@@ -1581,6 +1640,7 @@ export type Database = {
           payment_status: Database['public']['Enums']['payment_status']
           payment_verified_at: string | null
           ready_at: string | null
+          refund_done_at: string | null
           source: string
           status: Database['public']['Enums']['order_status']
           total: number
@@ -1637,6 +1697,7 @@ export type Database = {
           payment_status: Database['public']['Enums']['payment_status']
           payment_verified_at: string | null
           ready_at: string | null
+          refund_done_at: string | null
           source: string
           status: Database['public']['Enums']['order_status']
           total: number
@@ -1703,6 +1764,7 @@ export type Database = {
           payment_status: Database['public']['Enums']['payment_status']
           payment_verified_at: string | null
           ready_at: string | null
+          refund_done_at: string | null
           source: string
           status: Database['public']['Enums']['order_status']
           total: number
@@ -1758,6 +1820,7 @@ export type Database = {
           payment_status: Database['public']['Enums']['payment_status']
           payment_verified_at: string | null
           ready_at: string | null
+          refund_done_at: string | null
           source: string
           status: Database['public']['Enums']['order_status']
           total: number

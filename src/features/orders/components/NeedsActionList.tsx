@@ -1,7 +1,7 @@
 import { Link } from 'react-router-dom'
 import { ErrorState } from '../../../components/ui'
 import { formatINR } from '../../../lib/money'
-import { actionReasons, type ActionReason } from '../customerOrders'
+import { actionReasons, waitedLabel, type ActionReason } from '../customerOrders'
 import { useNeedsAction } from '../hooks/useCustomerOrders'
 import { CustomerOrderActions } from './CustomerOrderActions'
 
@@ -9,6 +9,7 @@ const WHY: Record<ActionReason, string> = {
   confirm: 'Waiting for you to confirm',
   verify: 'Check the payment',
   refund: 'Refund needed',
+  collect: 'Ready: collect cash on delivery',
 }
 
 /** The top of Home: customer orders that need the shop. Nothing is shown when there are none. */
@@ -31,7 +32,7 @@ export function NeedsActionList() {
               <span className="text-sm text-muted">{o.itemsSummary}</span>
               <span className="flex flex-wrap gap-2">
                 <span className="rounded-full bg-info-soft px-2 py-0.5 text-xs font-medium text-info-ink">Customer order</span>
-                {actionReasons(o).map((r) => (<span key={r} className="rounded-full bg-danger-soft px-2 py-0.5 text-xs font-medium text-danger-ink">{WHY[r]}</span>))}
+                {actionReasons(o).map((r) => (<span key={r} className="rounded-full bg-danger-soft px-2 py-0.5 text-xs font-medium text-danger-ink">{r === 'confirm' && waitedLabel(o.created_at) ? `${WHY[r]} (waiting ${waitedLabel(o.created_at)})` : WHY[r]}</span>))}
               </span>
             </Link>
             <CustomerOrderActions order={o} />

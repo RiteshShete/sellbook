@@ -1,7 +1,7 @@
 ﻿-- Web push: subscriptions are reachable only through the two functions, only by shop owners; the trigger never breaks an order.
 begin;
 create extension if not exists pgtap with schema extensions;
-select plan(11);
+select plan(14);
 
 insert into auth.users (id, email, email_confirmed_at) values
   ('a0000000-0000-4000-8000-000000000001', 'a@example.test', now()),
@@ -54,6 +54,15 @@ reset role;
 select lives_ok($$insert into public.orders (owner_id, customer_name, source, customer_user_id, fulfilment, payment_method) values ('a0000000-0000-4000-8000-000000000001', 'PushAsha', 'customer', 'c1000000-0000-4000-8000-000000000003', 'pickup', 'upi')$$, 'an order is saved without push secrets');
 select lives_ok($$update public.orders set payment_claim_status = 'claimed' where customer_name = 'PushAsha'$$, 'a payment claim is saved without push secrets');
 select is((select count(*)::int from pg_trigger where tgname = 'orders_push_to_owner' and not tgisinternal), 1, 'the push trigger exists');
+
+-- cleanup: old addresses go, recent ones stay, and app users cannot run it
+update public.push_subscriptions set created_at = now() - interval '100 days' where endpoint = 'https://push.example.test/d1';
+select is(app_private.prune_push_subscriptions(), 1, 'an address not seen for 90 days is removed');
+select is((select count(*)::int from public.push_subscriptions where endpoint = 'https://push.example.test/d2'), 1, 'a recent one stays');
+set local role authenticated;
+select set_config('request.jwt.claims', '{"sub":"a0000000-0000-4000-8000-000000000001","role":"authenticated"}', true);
+select throws_ok($$select app_private.prune_push_subscriptions()$$, '42501', null, 'an app user cannot run the cleanup');
+reset role;
 
 select * from finish();
 rollback;

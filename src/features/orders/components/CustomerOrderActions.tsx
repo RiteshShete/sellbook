@@ -1,11 +1,10 @@
 import { useState } from 'react'
-import { Link } from 'react-router-dom'
 import { Button, toast } from '../../../components/ui'
 import { formatDate } from '../../../lib/dates'
 import { formatINR } from '../../../lib/money'
 import { useSettings } from '../../settings/hooks/useSettings'
 import { actionReasons, customerMessage, whatsappToCustomer, type MessageKind } from '../customerOrders'
-import { useConfirmOrder, useDeclineOrder } from '../hooks/useCustomerOrders'
+import { useConfirmOrder, useDeclineOrder, useMarkRefunded } from '../hooks/useCustomerOrders'
 import type { Order } from '../schemas'
 import { ConfirmSheet } from './ConfirmSheet'
 import { ReasonSheet } from './ReasonSheet'
@@ -20,6 +19,7 @@ export function CustomerOrderActions({ order }: { order: Order }) {
   const shop = useSettings().data?.shop_name || 'our shop'
   const confirm = useConfirmOrder()
   const decline = useDeclineOrder()
+  const refunded = useMarkRefunded()
   const [asking, setAsking] = useState<'confirm' | 'decline' | null>(null)
   const reasons = actionReasons(order)
 
@@ -45,11 +45,10 @@ export function CustomerOrderActions({ order }: { order: Order }) {
       {reasons.includes('verify') && <VerificationCard order={order} onTell={showTell} tellLink={() => link('paid')} />}
       {reasons.includes('refund') && (
         <p role="alert" className="rounded-xl bg-danger-soft p-3 text-sm text-danger-ink">
-          This order was declined after {formatINR(order.total)} was {order.payment_status === 'paid' ? 'paid' : 'claimed'}. Refund the customer by hand, then{' '}
-          <Link to={`/orders/${order.id}`} className="font-medium underline">
-            set the payment back to pending
-          </Link>{' '}
-          so this reminder goes away.
+          This order was declined after {formatINR(order.total)} was {order.payment_status === 'paid' ? 'paid' : 'claimed'}. Refund the customer by hand (the app moves no money), then tell it you did.
+          <Button variant="secondary" block className="mt-2" disabled={refunded.blocked} onClick={() => refunded.mutate(order)}>
+            I have refunded
+          </Button>
         </p>
       )}
 

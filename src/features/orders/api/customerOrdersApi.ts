@@ -34,6 +34,12 @@ export async function declineOrder(client: SupabaseClient, id: string, reason: s
   return z.object({ refund_needed: z.boolean() }).parse(data).refund_needed
 }
 
+/** Remembers that the shop paid the customer back by hand (the app moves no money). */
+export async function markRefunded(client: SupabaseClient, id: string, version: number): Promise<void> {
+  const { error } = await client.rpc('mark_refunded', { p_id: id, v: version })
+  throwIfError(error)
+}
+
 /** Marks the order paid by UPI (the owner has seen the money in the bank). Returns the other order using the same UTR, if any. */
 export async function verifyPayment(client: SupabaseClient, id: string, version: number): Promise<number | null> {
   const { data, error } = await client.rpc('verify_payment', { p_id: id, v: version })

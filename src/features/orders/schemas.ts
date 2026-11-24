@@ -70,6 +70,7 @@ export const OrderSchema = z.object({
   payment_claimed_at: z.string().nullish(),
   payment_verified_at: z.string().nullish(),
   payment_reject_reason: z.string().nullish(),
+  refund_done_at: z.string().nullish(),
   claim_count: z.number().int().nullish(),
 })
 export type Order = z.infer<typeof OrderSchema>

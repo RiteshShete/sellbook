@@ -73,7 +73,7 @@ describe('versionDiff', () => {
 })
 
 describe('VersionSchema', () => {
-  it.each(['create', 'edit', 'status', 'payment', 'delete', 'restore', 'rollback', 'confirm', 'decline', 'claim', 'verify', 'reject', 'customer_cancel'])(
+  it.each(['create', 'edit', 'status', 'payment', 'delete', 'restore', 'rollback', 'confirm', 'decline', 'claim', 'verify', 'reject', 'customer_cancel', 'refund'])(
     'reads a version made for the reason "%s" (customer orders add confirm, decline, claim, verify, reject, customer_cancel)',
     (reason) => {
       const parsed = VersionSchema.safeParse({ version_no: 2, reason, summary: null, created_at: '2026-11-23T10:00:00Z', snapshot: base })

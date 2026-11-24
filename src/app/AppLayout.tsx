@@ -6,6 +6,7 @@ import { RecoveryEmailBanner } from '../features/auth/RecoveryEmail'
 import { TellCustomerHost } from '../features/orders/components/tellCustomer'
 import { useOrderAlerts } from '../features/orders/hooks/useOrderAlerts'
 import { LimitBanner, LockedWall, useLockedWall } from '../features/plan/components/PlanChrome'
+import { useKeepPushFresh } from '../features/push/useKeepPushFresh'
 import { TabBar } from './TabBar'
 
 function PageFallback() {
@@ -23,6 +24,7 @@ export function AppLayout() {
   useOrderAlerts() // live alerts and the page-title count (realtime)
   // Once per visit, quietly clear bill pictures past their plan's keep-days.
   const tidy = useTidyBillImages()
+  useKeepPushFresh()
   const tidied = useRef(false)
   useEffect(() => {
     if (tidied.current) return

@@ -19,6 +19,7 @@ const REASON: Record<Version['reason'], string> = {
   claim: 'Payment claimed',
   verify: 'Payment verified',
   reject: 'Payment not received',
+  refund: 'Refund done',
   customer_cancel: 'Cancelled by customer',
 }
 

@@ -1,9 +1,10 @@
-import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
+﻿import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
+import { toast } from '../../../components/ui'
 import { invalidateOrders } from '../../../lib/invalidate'
 import { queryKeys } from '../../../lib/queryKeys'
 import { useAuth } from '../../auth/useAuth'
 import { useCanWrite } from '../../plan/hooks/usePlan'
-import { confirmOrder, declineOrder, fetchNeedsAction, fetchOrdersWithUtr, rejectPayment, verifyPayment } from '../api/customerOrdersApi'
+import { confirmOrder, declineOrder, markRefunded, fetchNeedsAction, fetchOrdersWithUtr, rejectPayment, verifyPayment } from '../api/customerOrdersApi'
 import type { Order } from '../schemas'
 
 type Ref = Pick<Order, 'id' | 'version_no'>
@@ -53,6 +54,15 @@ export function useConfirmOrder() {
 export function useDeclineOrder() {
   const { client } = useAuth()
   return useAction((v: { order: Ref; reason: string }) => declineOrder(client, v.order.id, v.reason, v.order.version_no))
+}
+
+export function useMarkRefunded() {
+  const { client } = useAuth()
+  // The toast lives here: the card unmounts when the list refreshes, and a per-call onSuccess would then be skipped.
+  return useAction(async (order: Ref) => {
+    await markRefunded(client, order.id, order.version_no)
+    toast.success('Refund marked as done')
+  })
 }
 
 export function useVerifyPayment() {
