@@ -8,14 +8,16 @@ import {
   type ExportRow,
   type MonthAnalytics,
   type PendingRow,
+  type SalesSource,
 } from '../schemas'
 
 /** Monthly numbers for a "YYYY-MM" IST month (aggregated in the database). */
 export async function fetchMonthAnalytics(
   client: SupabaseClient,
   month: string,
+  source?: SalesSource,
 ): Promise<MonthAnalytics> {
-  const { data, error } = await client.rpc('analytics_month', { p_month: month })
+  const { data, error } = await client.rpc('analytics_month', { p_month: month, p_source: source ?? null })
   throwIfError(error)
   return MonthAnalyticsSchema.parse(data)
 }
@@ -28,8 +30,8 @@ export async function fetchPendingPayments(client: SupabaseClient): Promise<Pend
 }
 
 /** Rows for the month's CSV export (orders delivered in the month). */
-export async function fetchExportRows(client: SupabaseClient, month: string): Promise<ExportRow[]> {
-  const { data, error } = await client.rpc('export_orders_csv_rows', { p_month: month })
+export async function fetchExportRows(client: SupabaseClient, month: string, source?: SalesSource): Promise<ExportRow[]> {
+  const { data, error } = await client.rpc('export_orders_csv_rows', { p_month: month, p_source: source ?? null })
   throwIfError(error)
   return z.array(ExportRowSchema).parse(data)
 }

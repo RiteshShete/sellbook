@@ -35,6 +35,11 @@ export const ProductSchema = z
     name: z.string(),
     sort_order: z.number().int(),
     is_active: z.boolean(),
+    /** The online shop shows "Sold out" when false (missing before the storefront migration = available). */
+    is_available: z
+      .boolean()
+      .nullish()
+      .transform((v) => v ?? true),
     /** null / missing = Uncategorised (also while the categories migration is not applied). */
     category_id: z
       .guid()

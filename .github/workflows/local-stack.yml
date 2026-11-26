@@ -1,0 +1,38 @@
+﻿# Real-stack browser tests (e2e-local/) + pgTAP + the SQL-vs-contract test, on a LOCAL Supabase stack started inside the runner.
+# Never touches a hosted project. Slow (several minutes), so it runs on pull requests and by hand, not on every push.
+# NOTE: written 23 Nov 2026 and not yet run on GitHub; the same steps pass on the owner's machine.
+name: Local stack tests
+
+on:
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  local-stack:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    env:
+      SUPABASE_AUTH_SMS_TWILIO_AUTH_TOKEN: placeholder # turns phone sign-up on locally; no SMS is ever sent
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - uses: supabase/setup-cli@v1
+        with:
+          version: latest
+      - run: supabase start
+      - run: supabase test db
+      - name: Contract test and the browser specs
+        run: |
+          eval "$(supabase status -o env | sed 's/^/export /')"
+          export CONTRACT_URL=http://127.0.0.1:54321 CONTRACT_ANON_KEY="$ANON_KEY"
+          npx vitest run src/features/storefront/contract.db.test.ts
+          npx playwright install --with-deps chromium
+          export E2E_SUPABASE_URL=http://127.0.0.1:54321 E2E_ANON_KEY="$ANON_KEY" E2E_MAIL_API=http://127.0.0.1:54324 PW_CHANNEL=chromium
+          npx playwright test -c playwright.local.config.ts

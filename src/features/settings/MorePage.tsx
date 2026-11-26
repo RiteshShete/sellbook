@@ -3,18 +3,34 @@ import { ChevronRight } from 'lucide-react'
 import { Link } from 'react-router-dom'
 import { Page } from '../../app/Page'
 import { Button } from '../../components/ui'
+import { useIsAdmin } from '../admin/useAdmin'
+import { useMyContext } from '../auth/myContext'
 import { useAuth } from '../auth/useAuth'
 
 const LINKS = [
+  { to: '/plan', label: 'Your plan' },
+  { to: '/more/shop', label: 'Online shop' },
+  { to: '/pricing', label: 'Prices & offers' },
+  { to: '/account', label: 'Account & security' },
   { to: '/pending', label: 'Pending payments' },
   { to: '/settings', label: 'Settings' },
   { to: '/trash', label: 'Trash' },
   { to: '/activity', label: 'Activity' },
   { to: '/terms', label: 'Terms' },
+  { to: '/privacy', label: 'Privacy' },
 ]
 
 export function MorePage() {
   const { session, signOut } = useAuth()
+  // Only the platform admin has this link (and the server only answers them).
+  const isAdmin = useIsAdmin().data
+  // An account with no online shop yet is offered the set-up screen (it needs an invite code).
+  const noShop = useMyContext().data?.is_owner === false
+  const links = [
+    ...LINKS,
+    ...(noShop ? [{ to: '/create-shop', label: 'Set up your online shop' }] : []),
+    ...(isAdmin ? [{ to: '/admin', label: 'Admin' }] : []),
+  ]
   const logout = useMutation({
     mutationFn: signOut,
   })
@@ -22,7 +38,7 @@ export function MorePage() {
   return (
     <Page title="More">
       <ul className="divide-y divide-border overflow-hidden rounded-2xl border border-border bg-surface">
-        {LINKS.map((l) => (
+        {links.map((l) => (
           <li key={l.to}>
             <Link to={l.to} className="flex min-h-14 items-center justify-between px-4">
               <span>{l.label}</span>

@@ -7,17 +7,22 @@ import { downloadBlob } from '../../../lib/share'
 import { useAuth } from '../../auth/useAuth'
 import { fetchExportRows, fetchMonthAnalytics, fetchPendingPayments } from '../api/analyticsApi'
 import { buildOrdersCsv, csvFileName } from '../exportCsv'
+import type { SalesSource } from '../schemas'
 
 /**
  * `keepPrevious`: month arrows keep the old numbers (dimmed) until the new ones land. Off for the
  * comparison month, whose stale data would be labelled with the wrong month.
  */
-export function useMonthAnalytics(month: string, { keepPrevious = false } = {}) {
+export function useMonthAnalytics(
+  month: string,
+  { keepPrevious = false, enabled = true, source }: { keepPrevious?: boolean; enabled?: boolean; source?: SalesSource } = {},
+) {
   const { client } = useAuth()
   return useQuery({
-    queryKey: queryKeys.analytics.month(month),
-    queryFn: () => fetchMonthAnalytics(client, month),
+    queryKey: queryKeys.analytics.month(month, source),
+    queryFn: () => fetchMonthAnalytics(client, month, source),
     placeholderData: keepPrevious ? keepPreviousData : undefined,
+    enabled,
   })
 }
 
@@ -30,8 +35,8 @@ export function usePendingPayments() {
 export function useExportCsv() {
   const { client } = useAuth()
   return useMutation({
-    mutationFn: async ({ month, billPrefix }: { month: string; billPrefix: string }) => {
-      const rows = await fetchExportRows(client, month)
+    mutationFn: async ({ month, billPrefix, source }: { month: string; billPrefix: string; source?: SalesSource }) => {
+      const rows = await fetchExportRows(client, month, source)
       if (rows.length > 0) {
         const csv = buildOrdersCsv(rows, billPrefix)
         downloadBlob(new Blob([csv], { type: 'text/csv;charset=utf-8' }), csvFileName(month))

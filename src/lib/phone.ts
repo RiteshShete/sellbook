@@ -28,3 +28,9 @@ export function toWaMeLink(phone: string, text?: string): string | null {
   const base = `https://wa.me/${normalized}`
   return text ? `${base}?text=${encodeURIComponent(text)}` : base
 }
+
+/** What Supabase Auth stores and expects for phone sign-in: "+919876543210". null when not an Indian mobile number. */
+export function toAuthPhone(input: string): string | null {
+  const normalized = normalizePhone(input)
+  return normalized ? `+${normalized}` : null
+}

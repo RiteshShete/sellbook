@@ -16,3 +16,5 @@ jobs:
           cache: npm
       - run: npm ci
       - run: npm run check
+        env:
+          VITE_STOREFRONT_ENABLED: 'true' # so the bundle-size budget is measured on the real storefront build

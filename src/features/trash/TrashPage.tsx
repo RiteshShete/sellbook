@@ -4,6 +4,7 @@ import { Button, EmptyState, ErrorState, SegmentedControl, Skeleton } from '../.
 import { formatDateTime } from '../../lib/dates'
 import { formatINR } from '../../lib/money'
 import type { TrashTab } from './api/trashApi'
+import { useCanWrite } from '../plan/hooks/usePlan'
 import { useRestore, useTrashList } from './hooks/useTrash'
 
 const TABS: { value: TrashTab; label: string }[] = [
@@ -18,6 +19,7 @@ export function TrashPage() {
   const [tab, setTab] = useState<TrashTab>('orders')
   const list = useTrashList(tab)
   const restore = useRestore()
+  const canWrite = useCanWrite()
 
   return (
     <Page title="Trash" back="/more">
@@ -49,7 +51,7 @@ export function TrashPage() {
                 </div>
                 <Button
                   variant="secondary"
-                  disabled={restore.isPending}
+                  disabled={restore.isPending || !canWrite}
                   onClick={() => restore.mutate({ tab, row })}
                 >
                   Restore

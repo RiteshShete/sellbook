@@ -1,5 +1,5 @@
 import { Page } from '../../app/Page'
-import { APP_TERMS, SHOP_TERMS, type TermsSection } from './terms'
+import { APP_TERMS, PRIVACY, SHOP_TERMS, type TermsSection } from './terms'
 
 function Group({ heading, note, sections }: { heading: string; note: string; sections: TermsSection[] }) {
   return (
@@ -31,8 +31,21 @@ export function TermsPage() {
       />
       <Group
         heading="Using Sellbook (owner)"
-        note="What the app does, and what stays your responsibility."
+        note="The terms of the service: your account, plans, payments and your data."
         sections={APP_TERMS}
+      />
+    </Page>
+  )
+}
+
+/** Public (linked from sign-up): how personal data is handled. */
+export function PrivacyPage() {
+  return (
+    <Page title="Privacy" back="/more">
+      <Group
+        heading="Privacy policy"
+        note="What we keep about you and your customers, why, and your choices."
+        sections={PRIVACY}
       />
     </Page>
   )

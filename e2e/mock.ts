@@ -264,6 +264,18 @@ export async function mockApi(page: Page, opts: MockOptions = {}): Promise<void>
     if (path.startsWith('/rest/v1/rpc/')) {
       const fn = path.split('/').pop()
       if (fn === 'init_settings') return json(SETTINGS)
+      if (fn === 'my_plan') {
+        return json({
+          tier: 'pro',
+          status: 'active',
+          ends_at: '2099-01-01T00:00:00Z',
+          readonly_until: '2099-03-02T00:00:00Z',
+          can_write: true,
+          pro_features: true,
+          limits: { orders: 500, orders_scope: 'month', products: null },
+          usage: { orders: 3, products: 5 },
+        })
+      }
       if (fn === 'pending_payments') return json(PENDING)
       if (fn === 'analytics_month') return json(ANALYTICS)
       if (fn === 'bill_content_hash') return json('hash')

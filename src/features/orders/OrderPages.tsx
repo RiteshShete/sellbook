@@ -4,6 +4,7 @@ import { Page } from '../../app/Page'
 import { formatDate } from '../../lib/dates'
 import { Button, EmptyState, ErrorState, Skeleton } from '../../components/ui'
 import { BillCard } from '../billing/components/BillCard'
+import { CustomerOrderPanel } from './components/CustomerOrderPanel'
 import { OrderActions } from './components/OrderActions'
 import { OrderForm } from './components/OrderForm'
 import { OrderMoreActions } from './components/OrderMoreActions'
@@ -76,6 +77,7 @@ export function OrderDetailPage() {
         >
           <div className="grid grid-cols-1 items-start gap-4 lg:grid-cols-2">
             <div className="flex min-w-0 flex-col gap-4">
+              <CustomerOrderPanel order={o} />
               <OrderSummary order={o} />
               <OrderActions order={o} />
             </div>

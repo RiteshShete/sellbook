@@ -2,6 +2,7 @@ import { History, Trash2 } from 'lucide-react'
 import { useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { ActionButton, ConfirmDialog } from '../../../components/ui'
+import { useCanWrite } from '../../plan/hooks/usePlan'
 import { useTrashOrder } from '../hooks/useOrderHistory'
 import type { Order } from '../schemas'
 
@@ -9,6 +10,7 @@ import type { Order } from '../schemas'
 export function OrderMoreActions({ order }: { order: Pick<Order, 'id' | 'order_no'> }) {
   const navigate = useNavigate()
   const trash = useTrashOrder()
+  const canWrite = useCanWrite()
   const [confirm, setConfirm] = useState(false)
 
   return (
@@ -23,6 +25,7 @@ export function OrderMoreActions({ order }: { order: Pick<Order, 'id' | 'order_n
         kind="cancel"
         icon={Trash2}
         className="ml-auto"
+        disabled={!canWrite}
         onClick={() => setConfirm(true)}
       >
         Move to Trash

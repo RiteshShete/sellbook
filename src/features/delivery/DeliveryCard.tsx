@@ -1,10 +1,11 @@
-import { Phone } from 'lucide-react'
+import { MapPin, Phone } from 'lucide-react'
 import { useState } from 'react'
 import { Link } from 'react-router-dom'
 import { AnimatedActionButton } from '../../components/ui'
 import { formatINR } from '../../lib/money'
 import { toTelLink } from '../../lib/phone'
 import { DueBadge, PaymentBadge } from '../orders/components/OrderBadges'
+import { addressText, isCustomerOrder, mapsLink } from '../orders/customerOrders'
 import { useDeliver, useOrderBusy } from '../orders/hooks/useOrderActions'
 import type { OrderListRow } from '../orders/schemas'
 import { DeliverSheet } from './DeliverSheet'
@@ -32,15 +33,33 @@ export function DeliveryCard({ order }: { order: OrderListRow }) {
           {order.itemsSummary || 'No items'}
           {order.weight.text && ` · ${order.weight.text}`}
         </p>
+        {isCustomerOrder(order) && (
+          <p className="text-sm">
+            <span className="font-medium">{order.fulfilment === 'pickup' ? 'Pickup' : 'Delivery'}</span>
+            {order.delivery_address && `: ${addressText(order.delivery_address)}`}
+            {order.payment_method === 'cod' && order.payment_status !== 'paid' && ` · collect ${formatINR(order.total)}`}
+          </p>
+        )}
       </Link>
       <div className="flex items-center gap-2">
         <PaymentBadge order={order} />
         <DueBadge order={order} />
+        {order.delivery_address && (
+          <a
+            href={mapsLink(order.delivery_address)}
+            target="_blank"
+            rel="noreferrer"
+            aria-label={`Navigate to ${order.customer_name}`}
+            className="ml-auto inline-flex min-h-11 min-w-11 items-center justify-center rounded-xl border border-border-strong"
+          >
+            <MapPin className="h-5 w-5" />
+          </a>
+        )}
         {order.customer_phone && (
           <a
             href={toTelLink(order.customer_phone)}
             aria-label={`Call ${order.customer_name}`}
-            className="ml-auto inline-flex min-h-11 min-w-11 items-center justify-center rounded-xl border border-border-strong"
+            className={`${order.delivery_address ? '' : 'ml-auto '}inline-flex min-h-11 min-w-11 items-center justify-center rounded-xl border border-border-strong`}
           >
             <Phone className="h-5 w-5" />
           </a>
@@ -48,7 +67,7 @@ export function DeliveryCard({ order }: { order: OrderListRow }) {
         <AnimatedActionButton
           kind="delivered"
           animation="delivery"
-          className={order.customer_phone ? '' : 'ml-auto'}
+          className={order.customer_phone || order.delivery_address ? '' : 'ml-auto'}
           disabled={busy}
           onAction={() => (paid ? deliver.mutate({ order, paid: null }) : setSheetOpen(true))}
         >

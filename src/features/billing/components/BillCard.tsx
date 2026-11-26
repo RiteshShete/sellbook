@@ -2,6 +2,7 @@ import { Link } from 'react-router-dom'
 import { qrMode } from '../../../lib/upi'
 import { Button, ErrorState, Skeleton } from '../../../components/ui'
 import type { OrderWithItems } from '../../orders/schemas'
+import { useCanWrite } from '../../plan/hooks/usePlan'
 import { useSettings } from '../../settings/hooks/useSettings'
 import { useBillState, useGenerateBill } from '../hooks/useBills'
 import { BillReady } from './BillReady'
@@ -13,6 +14,7 @@ export function BillCard({ order }: { order: OrderWithItems }) {
   const settings = useSettings()
   const state = useBillState(order.id)
   const generate = useGenerateBill(order.id)
+  const canWrite = useCanWrite()
 
   if (state.isPending || settings.isPending) {
     return <Skeleton className="h-28 w-full" />
@@ -45,7 +47,7 @@ export function BillCard({ order }: { order: OrderWithItems }) {
             <p className="text-sm text-muted">
               No bill yet. Making one gives this order its bill number.
             </p>
-            <Button block disabled={generate.isPending} onClick={make}>
+            <Button block disabled={generate.isPending || !canWrite} onClick={make}>
               {busyLabel ?? 'Make bill'}
             </Button>
           </>

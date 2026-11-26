@@ -30,7 +30,11 @@ export type Snapshot = z.infer<typeof SnapshotSchema>
 
 export const VersionSchema = z.object({
   version_no: z.number().int(),
-  reason: z.enum(['create', 'edit', 'status', 'payment', 'delete', 'restore', 'rollback']),
+  // The last five are customer-order steps (confirm, decline, payment claim, verify, reject, customer cancel).
+  reason: z.enum([
+    'create', 'edit', 'status', 'payment', 'delete', 'restore', 'rollback',
+    'confirm', 'decline', 'claim', 'verify', 'reject', 'customer_cancel', 'refund',
+  ]),
   summary: z.string().nullable(),
   created_at: z.string(),
   snapshot: SnapshotSchema,

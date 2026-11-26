@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { normalizePhone, toNationalPhone, toTelLink, toWaMeLink } from './phone'
+import { normalizePhone, toAuthPhone, toNationalPhone, toTelLink, toWaMeLink } from './phone'
 
 describe('normalizePhone', () => {
   it('adds 91 to 10-digit numbers', () => {
@@ -51,4 +51,14 @@ describe('toNationalPhone / toTelLink', () => {
   it('leaves an unexpected value readable', () => {
     expect(toNationalPhone('123')).toBe('123')
   })
+})
+
+describe('toAuthPhone', () => {
+  it.each(['9876543210', '09876543210', '+91 98765-43210', '919876543210', '(+91) 98765 43210'])(
+    'turns %s into the + form Supabase Auth uses',
+    (input) => expect(toAuthPhone(input)).toBe('+919876543210'),
+  )
+  it.each(['12345', '5876543210', '', 'abc', '98765432101'])('rejects %s', (input) =>
+    expect(toAuthPhone(input)).toBeNull(),
+  )
 })

@@ -1,10 +1,12 @@
-import { FileUp, Plus, Tags } from 'lucide-react'
+import { FileUp, Plus, Tags, Tag } from 'lucide-react'
 import { Link } from 'react-router-dom'
 import { Page } from '../../app/Page'
 import { Badge, EmptyState, ErrorState, Skeleton } from '../../components/ui'
 import { pluralize } from '../../lib/format'
+import { useCanWrite } from '../plan/hooks/usePlan'
 import { ImportEntryCards } from '../productImport/components/ImportEntryCards'
 import { ProductCard } from './components/ProductCard'
+import { SoldOutSwitch } from './components/SoldOutSwitch'
 import { ProductFilters, ProductGrid, sectionTitle } from './components/ProductGrid'
 import { useProductBrowser } from './hooks/useProductBrowser'
 
@@ -17,6 +19,7 @@ const addLink =
 
 export function CatalogPage() {
   const b = useProductBrowser()
+  const canWrite = useCanWrite()
 
   const addButton = (
     <Link to="/catalog/new" className={addLink}>
@@ -25,7 +28,7 @@ export function CatalogPage() {
   )
 
   return (
-    <Page title="Products" action={addButton}>
+    <Page title="Products" action={canWrite ? addButton : undefined}>
       {b.products.isPending ? (
         <div className="grid grid-cols-2 gap-3" role="status" aria-label="Loading">
           {[0, 1, 2, 3].map((i) => (
@@ -40,7 +43,7 @@ export function CatalogPage() {
             title="No products yet"
             description="Add the things you sell, with a price for each size or flavour."
           />
-          <ImportEntryCards />
+          {canWrite && <ImportEntryCards />}
         </div>
       ) : (
         <div className="flex flex-col gap-4">
@@ -62,11 +65,19 @@ export function CatalogPage() {
                 <Tags className="h-4 w-4" /> Categories
               </Link>
               <Link
-                to="/catalog/configure"
+                to="/pricing"
                 className="inline-flex min-h-11 items-center gap-1 rounded-xl px-2 font-medium text-text underline underline-offset-4"
               >
-                <FileUp className="h-4 w-4" /> Configure
+                <Tag className="h-4 w-4" /> Prices &amp; offers
               </Link>
+              {canWrite && (
+                <Link
+                  to="/catalog/configure"
+                  className="inline-flex min-h-11 items-center gap-1 rounded-xl px-2 font-medium text-text underline underline-offset-4"
+                >
+                  <FileUp className="h-4 w-4" /> Configure
+                </Link>
+              )}
             </div>
           </div>
           {b.sections.length === 0 ? (
@@ -83,6 +94,7 @@ export function CatalogPage() {
                       key={p.id}
                       product={p}
                       to={`/catalog/${p.id}`}
+                      footer={<SoldOutSwitch productId={p.id} name={p.name} available={p.is_available} />}
                       extra={
                         !p.is_active ? (
                           <span className="mt-1">

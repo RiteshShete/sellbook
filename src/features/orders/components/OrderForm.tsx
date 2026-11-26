@@ -20,6 +20,7 @@ import { LineItems } from './LineItems'
 import { ProductPicker } from './ProductPicker'
 import { UpiLimitWarning } from './UpiLimitWarning'
 import { VoiceOrder } from '../voice/VoiceOrder'
+import { usePro } from '../../plan/hooks/usePlan'
 
 /** New order (no `order`) or edit of an existing one. `notice` shows above the fields. */
 export function OrderForm({ order, notice }: { order?: OrderWithItems; notice?: ReactNode }) {
@@ -27,6 +28,7 @@ export function OrderForm({ order, notice }: { order?: OrderWithItems; notice?: 
   const form = useOrderDraft(order ? draftFromOrder(order) : undefined)
   const create = useCreateOrder()
   const [clientKey] = useState(uuid)
+  const pro = usePro()
   const update = useUpdateOrder(order?.id ?? '')
   const busy = create.isPending || update.isPending
   const totals = draftTotals(form.draft.lines, form.draft.discount)
@@ -66,7 +68,7 @@ export function OrderForm({ order, notice }: { order?: OrderWithItems; notice?: 
     >
       <form onSubmit={onSubmit} noValidate className="flex flex-col gap-4">
         {notice}
-        {!order && <VoiceOrder form={form} />}
+        {!order && pro && <VoiceOrder form={form} />}
         <CustomerFields form={form} />
         <div className="grid grid-cols-2 gap-2">
           <Input

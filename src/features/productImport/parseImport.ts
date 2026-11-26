@@ -1,4 +1,4 @@
-import Papa from 'papaparse'
+﻿import Papa from 'papaparse'
 import { formatMeasure, parseSizeInput, type InputUnit, type SizeUnit } from '../../lib/measure'
 import { cleanSize, cleanText, mapUnit, normKey, parseActive, parseRupees } from './clean'
 import {
@@ -7,6 +7,7 @@ import {
   HEADER_ALIASES,
   LIMITS,
   REQUIRED_COLUMNS,
+  VEG_WORDS,
   type ImportColumnName,
 } from './importSchema'
 
@@ -31,6 +32,9 @@ export interface ImportRow {
   active: boolean | null
   /** The notes column; non-empty means the AI flagged this row. */
   flagged: string
+  /** Product-level, used only when the product is new. */
+  description: string
+  vegType: 'veg' | 'non_veg' | 'egg' | null
   errors: string[]
   warnings: string[]
 }
@@ -224,6 +228,14 @@ function cleanRow(line: number, cell: (c: ImportColumnName) => string): ImportRo
   const activeRaw = parseActive(cell('active'))
   if (activeRaw === undefined) errors.push('Active must be yes or no')
 
+  const description = cleanText(cell('description'))
+  if ([...description].length > LIMITS.description) {
+    errors.push(`Description is over ${LIMITS.description} characters`)
+  }
+  const vegRaw = cleanText(cell('veg_type')).toLowerCase().replace(/[\s-]+/g, '_')
+  const vegType = vegRaw === '' ? null : (VEG_WORDS[vegRaw] ?? null)
+  if (vegRaw !== '' && vegType === null) errors.push('Veg type must be veg, non_veg or egg')
+
   const flagged = cleanText(cell('notes'))
   return {
     line,
@@ -237,6 +249,8 @@ function cleanRow(line: number, cell: (c: ImportColumnName) => string): ImportRo
     costPaise,
     active: activeRaw ?? null,
     flagged,
+    description,
+    vegType,
     errors,
     warnings,
   }

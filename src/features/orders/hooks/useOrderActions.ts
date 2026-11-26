@@ -1,4 +1,4 @@
-import {
+﻿import {
   useIsMutating,
   useMutation,
   useQueryClient,
@@ -9,7 +9,10 @@ import { toast } from '../../../components/ui'
 import { invalidateOrders } from '../../../lib/invalidate'
 import { queryKeys } from '../../../lib/queryKeys'
 import { useAuth } from '../../auth/useAuth'
+import { useCanWrite } from '../../plan/hooks/usePlan'
 import { setOrderStatus, setPayment } from '../api/ordersApi'
+import { customerMessage, whatsappToCustomer } from '../customerOrders'
+import { showTell } from '../components/tellCustomer'
 import { moveMessage, paymentLabel, type PaymentState } from '../pipeline'
 import type { Order, OrderStatus, OrderWithItems } from '../schemas'
 
@@ -56,14 +59,18 @@ function isForOrder(variables: unknown, orderId: string): boolean {
   return typeof order === 'object' && order !== null && 'id' in order && order.id === orderId
 }
 
-/** True while a status or payment change for this order is running (and its refetch). */
+/**
+ * True while a status or payment change for this order is running (and its refetch), or while the plan is read-only:
+ * either way the order's action buttons must be off.
+ */
 export function useOrderBusy(orderId: string): boolean {
-  return (
+  const canWrite = useCanWrite()
+  const running =
     useIsMutating({
       mutationKey: ORDER_ACTION,
       predicate: (m) => isForOrder(m.state.variables, orderId),
     }) > 0
-  )
+  return running || !canWrite
 }
 
 /**
@@ -81,6 +88,11 @@ export function useSetStatus() {
       if (v.isUndo) {
         toast.success('Undone')
         return
+      }
+      // A customer's order that is now ready: one tap tells them on WhatsApp.
+      if (v.to === 'ready' && updated.source === 'customer') {
+        const link = whatsappToCustomer(updated.customer_phone, customerMessage('ready', { name: updated.customer_name, no: updated.order_no, shop: '', total: updated.total }))
+        if (link) showTell({ title: 'Tell the customer', link })
       }
       toast.success(moveMessage(updated.order_no, v.from, v.to), {
         action: {
@@ -160,7 +172,7 @@ export function useDeliver() {
         toast.success('Undone')
         return
       }
-      const payment = v.paid ? ` · ${paymentLabel(v.paid)}` : ''
+      const payment = v.paid ? ` Â· ${paymentLabel(v.paid)}` : ''
       toast.success(`#${updated.order_no} delivered${payment}`, {
         action: {
           label: 'Undo',

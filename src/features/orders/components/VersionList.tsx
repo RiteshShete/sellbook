@@ -14,6 +14,13 @@ const REASON: Record<Version['reason'], string> = {
   delete: 'Trashed',
   restore: 'Restored',
   rollback: 'Rollback',
+  confirm: 'Confirmed',
+  decline: 'Declined',
+  claim: 'Payment claimed',
+  verify: 'Payment verified',
+  reject: 'Payment not received',
+  refund: 'Refund done',
+  customer_cancel: 'Cancelled by customer',
 }
 
 export interface VersionListProps {

@@ -22,7 +22,7 @@ export interface PageProps {
 export function Page({ title, subtitle, wrapTitle = false, back, action, children }: PageProps) {
   return (
     <>
-      <header className="sticky top-0 z-30 border-b border-border bg-surface pt-[env(safe-area-inset-top)]">
+      <header className="sticky top-0 z-30 print:hidden border-b border-border bg-surface pt-[env(safe-area-inset-top)]">
         <div className="mx-auto flex min-h-14 max-w-2xl lg:max-w-[75vw] items-center gap-1 px-4">
           {back !== undefined && <BackButton fallback={back} />}
           <div className="min-w-0 flex-1 py-1">

@@ -79,6 +79,24 @@ export async function fetchBillState(client: SupabaseClient, orderId: string): P
   return { bills: z.array(BillSchema).parse(bills.data), currentHash: z.string().parse(hash.data) }
 }
 
+/**
+ * Deletes this shop's bill pictures that are past their plan's retention (and uploads that never became a bill),
+ * then marks the bills. Uses the shop's own session: a storage policy lets it delete only those files, so no
+ * privileged key is involved. Returns how many files were handled.
+ */
+export async function tidyBillImages(client: SupabaseClient): Promise<number> {
+  const { data, error } = await client.rpc('bill_files_to_purge')
+  throwIfError(error)
+  const paths = z.array(z.object({ path: z.string() })).parse(data).map((f) => f.path)
+  if (paths.length === 0) return 0
+  const removed = await client.storage.from(BUCKET).remove(paths)
+  throwIfError(removed.error)
+  // The database marks a bill only when its file is really gone, so passing every path is safe.
+  const marked = await client.rpc('mark_bills_purged', { p_paths: paths })
+  throwIfError(marked.error)
+  return paths.length
+}
+
 /** Private bucket: download with the owner's session (never a public URL). */
 export async function downloadBillImage(client: SupabaseClient, path: string): Promise<Blob> {
   const { data, error } = await client.storage.from(BUCKET).download(path)

@@ -19,6 +19,10 @@ const HEADER = [
   'Payment',
   'Mode',
   'Paid on',
+  'Source',
+  'Fulfilment',
+  'Payment method',
+  'Delivery charge (₹)',
 ]
 
 /** IST calendar day "YYYY-MM-DD": Excel and Sheets both read it as a date. */
@@ -50,6 +54,10 @@ export function buildOrdersCsv(rows: ExportRow[], fallbackPrefix: string): strin
       r.payment_status,
       r.payment_mode ?? '',
       r.paid_at ? istDay(r.paid_at) : '',
+      r.source === 'customer' ? 'online shop' : 'owner',
+      r.fulfilment ?? '',
+      r.payment_method ?? '',
+      paiseToDecimalString(r.delivery_fee),
     ]),
   ])
 }

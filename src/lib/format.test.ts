@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { compareNames, formatPhone, pluralize } from './format'
+import { compareNames, formatBytes, formatPhone, pluralize } from './format'
 
 describe('format', () => {
   it('formats phone numbers', () => {
@@ -30,5 +30,20 @@ describe('compareNames', () => {
       'Pack 9',
       'Pack 10',
     ])
+  })
+})
+
+describe('formatBytes', () => {
+  it('uses the largest unit that keeps the number small', () => {
+    expect(formatBytes(0)).toBe('0 B')
+    expect(formatBytes(512)).toBe('512 B')
+    expect(formatBytes(512_000)).toBe('500 KB')
+    expect(formatBytes(20 * 1024 * 1024)).toBe('20 MB')
+    expect(formatBytes(1.5 * 1024 * 1024)).toBe('1.5 MB')
+    expect(formatBytes(1024 ** 3)).toBe('1 GB')
+  })
+
+  it('never goes negative', () => {
+    expect(formatBytes(-5)).toBe('0 B')
   })
 })

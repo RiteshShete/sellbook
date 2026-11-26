@@ -5,6 +5,7 @@ import { Button, ConfirmDialog, Modal, Skeleton, toast } from '../../../componen
 import type { OrderWithItems } from '../../orders/schemas'
 import type { Settings } from '../../settings/schemas'
 import { useBillImage } from '../hooks/useBills'
+import { useCanWrite } from '../../plan/hooks/usePlan'
 import { useShareBill } from '../hooks/useShareBill'
 import {
   billShareText,
@@ -33,8 +34,12 @@ interface Props {
 export function BillReady({ order, settings, state, regenerating, onRegenerate }: Props) {
   // BillCard renders this only when at least one revision exists.
   const latest = state.bills[0]
-  const image = useBillImage(latest?.image_path ?? null)
+  // A picture removed to save space is not downloaded: the bill can be made again instead.
+  const purged = latest?.image_purged_at != null
+  const image = useBillImage(purged ? null : (latest?.image_path ?? null))
   const share = useShareBill()
+  // Making the picture again stores a file: off while the plan is read-only.
+  const canWrite = useCanWrite()
   const [zoom, setZoom] = useState(false)
   const [confirmOld, setConfirmOld] = useState(false)
   const [revisionsOpen, setRevisionsOpen] = useState(false)
@@ -87,26 +92,34 @@ export function BillReady({ order, settings, state, regenerating, onRegenerate }
         </div>
       )}
 
-      <ReceiptPrinter playKey={latest.id}>
-        <button
-          type="button"
-          className="block w-full"
-          onClick={() => setZoom(true)}
-          aria-label="View bill"
-          disabled={!image.url}
-        >
-          {image.url ? (
-            <img src={image.url} alt={alt} className="w-full" />
-          ) : image.error ? (
-            <p className="p-4 text-sm text-danger">{image.error.message}</p>
-          ) : (
-            <Skeleton className="h-72 w-full" />
-          )}
-        </button>
-      </ReceiptPrinter>
+      {purged ? (
+        // No picture to print out: say why, and the button below makes it again.
+        <p role="status" className="rounded-2xl bg-surface-2 p-4 text-sm text-muted">
+          The picture of this bill was removed to save space. Make it again to share it. The bill number stays the
+          same.
+        </p>
+      ) : (
+        <ReceiptPrinter playKey={latest.id}>
+          <button
+            type="button"
+            className="block w-full"
+            onClick={() => setZoom(true)}
+            aria-label="View bill"
+            disabled={!image.url}
+          >
+            {image.url ? (
+              <img src={image.url} alt={alt} className="w-full" />
+            ) : image.error ? (
+              <p className="p-4 text-sm text-danger">{image.error.message}</p>
+            ) : (
+              <Skeleton className="h-72 w-full" />
+            )}
+          </button>
+        </ReceiptPrinter>
+      )}
 
-      {outdated && (
-        <Button block disabled={regenerating} onClick={onRegenerate}>
+      {(outdated || purged) && (
+        <Button block disabled={regenerating || !canWrite} onClick={onRegenerate}>
           {regenerating ? 'Making bill…' : 'Regenerate bill'}
         </Button>
       )}
@@ -129,10 +142,10 @@ export function BillReady({ order, settings, state, regenerating, onRegenerate }
             <MessageCircle className="h-5 w-5" /> Send payment message
           </a>
         )}
-        {!outdated && (
+        {!outdated && !purged && (
           // Settings (QR mode, payee, UPI ID) are not part of the outdated check, so a bill made
           // before they changed can be remade on purpose: same bill number, next revision.
-          <Button variant="secondary" disabled={regenerating} onClick={onRegenerate}>
+          <Button variant="secondary" disabled={regenerating || !canWrite} onClick={onRegenerate}>
             <RefreshCw className="h-5 w-5" /> {regenerating ? 'Making bill…' : 'Regenerate bill'}
           </Button>
         )}

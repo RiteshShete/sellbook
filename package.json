@@ -13,7 +13,9 @@
     "format": "prettier --write .",
     "format:check": "prettier --check .",
     "scan-secrets": "node scripts/scan-secrets.mjs",
-    "check": "npm run scan-secrets && npm run typecheck && npm run lint && npm run test && npm run build",
+    "check": "npm run scan-secrets && npm run typecheck && npm run lint && npm run test && npm run build && npm run bundle-size",
+    "bundle-size": "node scripts/bundle-size.mjs --skip-if-missing",
+    "test:contract": "node scripts/contract-check.mjs",
     "e2e": "playwright test",
     "contrast": "node scripts/contrast.mjs"
   },

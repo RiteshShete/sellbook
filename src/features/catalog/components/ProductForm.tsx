@@ -11,6 +11,7 @@ import {
 } from '../hooks/useCatalog'
 import { useProductDraft } from '../hooks/useProductDraft'
 import { draftFromProduct, validateProductDraft, type Product, type VariantDraft } from '../schemas'
+import { ProductOnlineCard } from './ProductOnlineCard'
 import { VariantFields } from './VariantFields'
 
 type Pending = { kind: 'product' } | { kind: 'variant'; variant: VariantDraft } | null
@@ -30,9 +31,10 @@ export function ProductForm({ product }: { product?: Product }) {
     form.setErrors(result.ok ? { byVariant: {} } : result.errors)
     if (!result.ok) return
     save.mutate(result.payload, {
-      onSuccess: () => {
-        toast.success(product ? 'Product saved' : 'Product added')
-        void navigate('/catalog')
+      onSuccess: (id) => {
+        // A new product opens its own page, so pictures and online details can be added straight away.
+        toast.success(product ? 'Product saved' : 'Product added. Add pictures and online details below.')
+        void navigate(product ? '/catalog' : `/catalog/${id}`)
       },
     })
   }
@@ -121,6 +123,8 @@ export function ProductForm({ product }: { product?: Product }) {
           </Button>
         )}
       </form>
+
+      {product && <ProductOnlineCard productId={product.id} />}
 
       <ConfirmDialog
         open={confirm !== null}

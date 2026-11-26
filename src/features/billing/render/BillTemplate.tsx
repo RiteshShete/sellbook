@@ -40,6 +40,9 @@ const line = 'border-[#e5e5e5]'
 export function BillTemplate({ data }: { data: BillData }) {
   const { source: o, shop } = data
   const subtotal = addMoney(...o.items.map((i) => i.line_total))
+  const deliveryFee = o.delivery_fee ?? 0
+  // Offers are already in the unit prices; this only tells the customer how much they saved.
+  const saved = addMoney(...o.items.map((i) => (i.list_price != null && i.list_price > i.unit_price ? (i.list_price - i.unit_price) * i.quantity : 0)))
   return (
     <div
       style={{ width: BILL_WIDTH, fontFamily: BILL_FONT, backgroundColor: BILL_FRAME_BG }}
@@ -115,16 +118,14 @@ export function BillTemplate({ data }: { data: BillData }) {
         </ul>
 
         <dl className="flex flex-col gap-1 px-6 pt-3 pb-5">
-          {o.discount > 0 && (
-            <>
-              <Row label="Subtotal" value={formatINR(subtotal)} />
-              <Row label="Discount" value={`− ${formatINR(o.discount)}`} />
-            </>
-          )}
+          {(o.discount > 0 || deliveryFee > 0) && <Row label="Subtotal" value={formatINR(subtotal)} />}
+          {deliveryFee > 0 && <Row label="Delivery" value={`+ ${formatINR(deliveryFee)}`} />}
+          {o.discount > 0 && <Row label="Discount" value={`− ${formatINR(o.discount)}`} />}
           <div className="mt-2 flex items-center justify-between rounded-2xl bg-[#1a3a3a] px-4 py-3 text-white">
             <dt className="text-[15px]">Total amount</dt>
             <dd className="text-[22px] font-semibold">{formatINR(o.total)}</dd>
           </div>
+          {saved > 0 && <p className={`pt-1 text-right text-[13px] ${muted}`}>You saved {formatINR(saved)} with offers</p>}
         </dl>
 
         <footer className={`border-t px-6 py-4 text-center text-[13px] ${line} ${muted}`}>

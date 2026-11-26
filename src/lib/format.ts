@@ -16,3 +16,16 @@ const nameCollator = new Intl.Collator('mr', { sensitivity: 'base', numeric: tru
 export function compareNames(a: string, b: string): number {
   return nameCollator.compare(a, b)
 }
+
+/** Bytes for people: "512 KB", "20 MB", "1.5 GB". Binary units, like the storage dashboards use. */
+export function formatBytes(bytes: number): string {
+  const units = ['B', 'KB', 'MB', 'GB']
+  let value = Math.max(0, bytes)
+  let unit = 0
+  while (value >= 1024 && unit < units.length - 1) {
+    value /= 1024
+    unit++
+  }
+  const text = unit === 0 || value >= 100 ? String(Math.round(value)) : String(Math.round(value * 10) / 10)
+  return `${text} ${units[unit]}`
+}

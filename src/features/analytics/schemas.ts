@@ -39,7 +39,10 @@ export const MonthAnalyticsSchema = z.object({
     }),
   ),
   daily: z.array(z.object({ date: z.string(), sales: dbMoney, orders: count })),
+  /** Delivered sales split by where the order came from (only the chosen source when filtered). */
+  by_source: z.array(z.object({ source: z.enum(['owner', 'customer']), sales: dbMoney, orders: count })),
 })
+export type SalesSource = 'owner' | 'customer'
 export type MonthAnalytics = z.infer<typeof MonthAnalyticsSchema>
 
 export const AGE_BUCKETS = ['0-7', '8-30', '31-60', '60+'] as const
@@ -54,8 +57,9 @@ export const PendingRowSchema = z.object({
   customer_phone: z.string().nullable(),
   total: dbMoney,
   delivered_at: z.string(),
-  age_days: count,
-  bucket: z.enum(AGE_BUCKETS),
+  /** Ageing is Pro: both are null on other plans. */
+  age_days: count.nullable(),
+  bucket: z.enum(AGE_BUCKETS).nullable(),
 })
 export type PendingRow = z.infer<typeof PendingRowSchema>
 
@@ -76,6 +80,10 @@ export const ExportRowSchema = z.object({
   payment_status: z.enum(['pending', 'paid']),
   payment_mode: z.enum(['online', 'cash']).nullable(),
   paid_at: z.string().nullable(),
+  source: z.enum(['owner', 'customer']),
+  fulfilment: z.enum(['pickup', 'delivery']).nullable(),
+  payment_method: z.enum(['upi', 'cod']).nullable(),
+  delivery_fee: dbMoney,
 })
 export type ExportRow = z.infer<typeof ExportRowSchema>
 
