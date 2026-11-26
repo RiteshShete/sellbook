@@ -1,4 +1,4 @@
-﻿# Builds the app and publishes it to GitHub Pages (https://riteshshete.github.io/sellbook/)
+# Builds the app and publishes it to GitHub Pages (https://riteshshete.github.io/sellbook/)
 # on every push to main. Work happens on branches; merging to main is the release.
 # Needs: repo public (free plan), Pages source = "GitHub Actions", and repository variables
 # VITE_SUPABASE_URL + VITE_SUPABASE_ANON_KEY (the public anon key only; never an admin or secret key).
@@ -22,7 +22,7 @@ jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
       - uses: actions/setup-node@v4
         with:
           node-version: 22
