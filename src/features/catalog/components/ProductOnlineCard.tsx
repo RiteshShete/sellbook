@@ -1,5 +1,5 @@
 import { useState, type FormEvent } from 'react'
-import { Button, ErrorState, Input, Select, Skeleton, Switch, Textarea, toast } from '../../../components/ui'
+import { Button, ErrorState, Input, Select, Skeleton, Switch, Textarea } from '../../../components/ui'
 import { useOnlineDetails, useSaveOnlineDetails } from '../../shop/hooks/useShop'
 import { NUTRITION_FIELDS, parseAllergens, parseNutrition, type NutritionKey, type OnlineDetails } from '../../shop/schemas'
 import { ProductPhotos } from './ProductPhotos'
@@ -15,25 +15,22 @@ function OnlineForm({ productId, d }: { productId: string; d: OnlineDetails }) {
     Object.fromEntries(Object.entries(d.nutrition ?? {}).map(([k, v]) => [k, String(v)])),
   )
   const [nutritionError, setNutritionError] = useState<string | undefined>()
-  const save = useSaveOnlineDetails(productId)
+  const save = useSaveOnlineDetails(productId, 'Online details saved')
 
   function onSubmit(e: FormEvent) {
     e.preventDefault()
     const n = parseNutrition(nutrition)
     if (!n.ok) return setNutritionError(n.error)
     setNutritionError(undefined)
-    save.mutate(
-      {
-        description: description.trim() || null,
-        ingredients: ingredients.trim() || null,
-        allergens: parseAllergens(allergens),
-        veg_type: veg === '' ? null : (veg as OnlineDetails['veg_type']),
-        shelf_life: shelf.trim() || null,
-        is_available: available,
-        nutrition: n.value,
-      },
-      { onSuccess: () => toast.success('Online details saved') },
-    )
+    save.mutate({
+      description: description.trim() || null,
+      ingredients: ingredients.trim() || null,
+      allergens: parseAllergens(allergens),
+      veg_type: veg === '' ? null : (veg as OnlineDetails['veg_type']),
+      shelf_life: shelf.trim() || null,
+      is_available: available,
+      nutrition: n.value,
+    })
   }
 
   return (

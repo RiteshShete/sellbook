@@ -13,9 +13,14 @@ const [P_CHAKLI, P_LADOO, V_SMALL, V_LARGE, V_BOX] = Array.from({ length: 5 }, (
 const customer = { name: 'Asha Patil', phone: `9${Math.floor(100000000 + Math.random() * 899999999)}`, password: 'Cust-pass-1' }
 
 async function accessible(page: Page, what: string) {
+  // Rows fade in for ~0.5 s; on a slow CI runner axe could measure a half-faded colour. "Reduce motion" (honoured by
+  // src/index.css) ends the animations at once, so the colours measured are the final ones.
+  await page.emulateMedia({ reducedMotion: 'reduce' })
   const result = await new AxeBuilder({ page }).withTags(['wcag2a', 'wcag2aa', 'wcag22aa']).analyze()
   const bad = result.violations.filter((v) => v.impact === 'serious' || v.impact === 'critical')
-  expect(bad.map((v) => `${v.id} (${v.nodes.length}): ${v.help}`), `accessibility on ${what}`).toEqual([])
+  // The element and axe's message are in the text, so a failure on a CI runner can be read without a screenshot.
+  const lines = bad.map((v) => `${v.id}: ${v.nodes.map((n) => `${n.target.join(' ')} | ${n.any[0]?.message ?? v.help}`).join('; ')}`)
+  expect(lines, `accessibility on ${what}`).toEqual([])
 }
 
 test('a new visitor browses, orders, and the owner sees it', async ({ page, browser, baseURL }) => {

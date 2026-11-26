@@ -1,5 +1,5 @@
 import { useState, type FormEvent } from 'react'
-import { Button, Input, Select, Switch, toast } from '../../../components/ui'
+import { Button, Input, Select, Switch } from '../../../components/ui'
 import { paiseToDecimalString, parseMoneyInput, type Paise } from '../../../lib/money'
 import { useUpdateShop } from '../hooks/useShop'
 import type { Shop } from '../schemas'
@@ -18,7 +18,7 @@ export function DeliveryForm({ shop, onChange }: { shop: Shop; onChange: (patch:
   const [banner, setBanner] = useState(shop.banner_text ?? '')
   const [note, setNote] = useState(shop.delivery_note ?? '')
   const [errors, setErrors] = useState<Record<string, string>>({})
-  const save = useUpdateShop()
+  const save = useUpdateShop('Saved')
 
   function onSubmit(e: FormEvent) {
     e.preventDefault()
@@ -46,7 +46,6 @@ export function DeliveryForm({ shop, onChange }: { shop: Shop; onChange: (patch:
     }
     save.mutate(patch, {
       onSuccess: () => {
-        toast.success('Saved')
         onChange({ delivery_mode: mode, delivery_fee: feeP, free_delivery_above: freeP, min_order: minP })
       },
     })

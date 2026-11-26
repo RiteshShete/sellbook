@@ -1,6 +1,6 @@
 import { useState, type FormEvent } from 'react'
 import { Link } from 'react-router-dom'
-import { Button, Input, Switch, toast } from '../../../components/ui'
+import { Button, Input, Switch } from '../../../components/ui'
 import { normalizePhone, toNationalPhone } from '../../../lib/phone'
 import { useUpdateShop } from '../hooks/useShop'
 import type { Shop } from '../schemas'
@@ -14,7 +14,7 @@ export function ShopProfileForm({ shop }: { shop: Shop }) {
   const [payUpi, setPayUpi] = useState(shop.pay_upi)
   const [payCod, setPayCod] = useState(shop.pay_cod)
   const [errors, setErrors] = useState<Record<string, string>>({})
-  const save = useUpdateShop()
+  const save = useUpdateShop('Saved')
 
   function onSubmit(e: FormEvent) {
     e.preventDefault()
@@ -24,7 +24,7 @@ export function ShopProfileForm({ shop }: { shop: Shop }) {
     if (!payUpi && !payCod) found.pay = 'Keep at least one way to pay switched on'
     setErrors(found)
     if (Object.keys(found).length > 0) return
-    save.mutate({ tagline, city, fssai_no: fssai, whatsapp: phone, pay_upi: payUpi, pay_cod: payCod }, { onSuccess: () => toast.success('Saved') })
+    save.mutate({ tagline, city, fssai_no: fssai, whatsapp: phone, pay_upi: payUpi, pay_cod: payCod })
   }
 
   return (
