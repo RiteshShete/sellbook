@@ -7,6 +7,7 @@ import { isValidVpa } from '../../lib/upi'
 import { usePlan } from '../plan/hooks/usePlan'
 import { REQUEST_STATUSES, type ConfigKey, type RequestStatus } from './adminApi'
 import { RequestRow } from './components/RequestRow'
+import { ShopsSection } from './components/ShopsSection'
 import { StatsCard } from './components/StatsCard'
 import { useAdminRequests, useIsAdmin, useSetConfig } from './useAdmin'
 
@@ -40,6 +41,8 @@ export function AdminPage() {
         <h2 className="font-display text-xl">Plan payments</h2>
         <SegmentedControl label="Show requests" options={TABS} value={status} onChange={setStatus} />
         <Requests status={status} marked={params.get('req')} />
+        <h2 className="mt-4 font-display text-xl">Shops and plans</h2>
+        <ShopsSection />
         <h2 className="mt-4 font-display text-xl">Where shops pay</h2>
         <PayTo />
       </div>

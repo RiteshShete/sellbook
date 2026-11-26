@@ -23,6 +23,7 @@ export const queryKeys = {
     isAdmin: ['admin', 'is'] as const,
     stats: ['admin', 'stats'] as const,
     requests: (status: string) => ['admin', 'requests', status] as const,
+    shops: (query: string) => ['admin', 'shops', query] as const,
   },
   asset: (path: string) => ['asset', path] as const,
   /** A UPI QR image is a pure function of its link, so it is cached by link. */

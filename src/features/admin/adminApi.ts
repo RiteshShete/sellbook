@@ -25,6 +25,41 @@ export const AdminRequestSchema = z.object({
 })
 export type AdminRequest = z.infer<typeof AdminRequestSchema>
 
+/** One row of admin_list_shops(): a shop, its plan, and whether that plan has no end. */
+export const AdminShopSchema = z.object({
+  owner_id: z.guid(),
+  email: z.string().nullable(),
+  phone: z.string().nullable(),
+  shop_name: z.string(),
+  tier: z.enum(TIERS),
+  status: z.enum(['trial', 'active', 'grace_readonly', 'locked']),
+  ends_at: z.string(),
+  lifetime: z.boolean(),
+  orders_this_month: z.number().int(),
+  created_at: z.string(),
+})
+export type AdminShop = z.infer<typeof AdminShopSchema>
+
+export async function fetchAdminShops(client: SupabaseClient, query: string): Promise<AdminShop[]> {
+  const { data, error } = await client.rpc('admin_list_shops', { p_query: query.trim() || null })
+  throwIfError(error)
+  return z.array(AdminShopSchema).parse(data)
+}
+
+/** lifetime = no end; days = 0 ends the plan now. The server checks the caller is a platform admin. */
+export async function setSubscription(
+  client: SupabaseClient,
+  v: { owner: string; tier: (typeof TIERS)[number]; days: number; lifetime: boolean },
+): Promise<void> {
+  const { error } = await client.rpc('admin_set_subscription', {
+    p_owner: v.owner,
+    p_tier: v.tier,
+    p_days: v.days,
+    p_lifetime: v.lifetime,
+  })
+  throwIfError(error)
+}
+
 /** The free Supabase plan's ceilings (the limits the platform has to stay inside). */
 export const FREE_DB_BYTES = 500 * 1024 * 1024
 export const FREE_STORAGE_BYTES = 1024 * 1024 * 1024

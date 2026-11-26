@@ -1,5 +1,29 @@
 import { describe, expect, it } from 'vitest'
-import { AdminStatsSchema, FREE_DB_BYTES, FREE_STORAGE_BYTES, fillLevel } from './adminApi'
+import { AdminShopSchema, AdminStatsSchema, FREE_DB_BYTES, FREE_STORAGE_BYTES, fillLevel } from './adminApi'
+
+describe('AdminShopSchema', () => {
+  const row = {
+    owner_id: '11111111-1111-4111-8111-111111111111',
+    email: null,
+    phone: '919000000001',
+    shop_name: 'Meera',
+    tier: 'pro',
+    status: 'active',
+    ends_at: '2099-01-01T00:00:00+00:00',
+    lifetime: true,
+    orders_this_month: 4,
+    created_at: '2026-11-01T00:00:00+00:00',
+  }
+
+  it('parses a shop row, with an email or a mobile login', () => {
+    expect(AdminShopSchema.parse(row).lifetime).toBe(true)
+  })
+
+  it('rejects an unknown plan or status', () => {
+    expect(() => AdminShopSchema.parse({ ...row, tier: 'gold' })).toThrow()
+    expect(() => AdminShopSchema.parse({ ...row, status: 'banned' })).toThrow()
+  })
+})
 
 describe('fillLevel', () => {
   it('warns from 70% and says full at 100%', () => {

@@ -5,9 +5,11 @@ import { useAuth } from '../auth/useAuth'
 import {
   decideRequest,
   fetchAdminRequests,
+  fetchAdminShops,
   fetchAdminStats,
   fetchIsAdmin,
   setConfig,
+  setSubscription,
   type ConfigKey,
   type RequestStatus,
 } from './adminApi'
@@ -48,6 +50,24 @@ export function useSetConfig() {
   return useMutation({
     mutationFn: (v: { key: ConfigKey; value: string }) => setConfig(client, v.key, v.value),
     onSuccess: () => toast.success('Saved'),
+  })
+}
+
+export function useAdminShops(query: string) {
+  const { client } = useAuth()
+  return useQuery({
+    queryKey: queryKeys.admin.shops(query),
+    queryFn: () => fetchAdminShops(client, query),
+  })
+}
+
+export function useSetSubscription() {
+  const { client } = useAuth()
+  const queryClient = useQueryClient()
+  return useMutation({
+    mutationFn: (v: Parameters<typeof setSubscription>[1]) => setSubscription(client, v),
+    onSuccess: () => toast.success('Plan updated'),
+    onSettled: () => queryClient.invalidateQueries({ queryKey: queryKeys.admin.all }),
   })
 }
 
