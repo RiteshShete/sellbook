@@ -1,4 +1,4 @@
-﻿# Real-stack browser tests (e2e-local/) + pgTAP + the SQL-vs-contract test, on a LOCAL Supabase stack started inside the runner.
+# Real-stack browser tests (e2e-local/) + pgTAP + the SQL-vs-contract test, on a LOCAL Supabase stack started inside the runner.
 # Never touches a hosted project. Slow (several minutes), so it runs on pull requests and by hand, not on every push.
 # NOTE: written 23 Nov 2026 and not yet run on GitHub; the same steps pass on the owner's machine.
 name: Local stack tests
@@ -23,7 +23,7 @@ jobs:
           node-version: 22
           cache: npm
       - run: npm ci
-      - uses: supabase/setup-cli@v1
+      - uses: supabase/setup-cli@v3
         with:
           version: latest
       - run: supabase start
