@@ -248,13 +248,13 @@ otp_expiry = 600
 # admin_email = "admin@email.com"
 # sender_name = "Admin"
 
-# Storefront: the two emails that carry a 6-digit code (shown with {{ .Token }}, no link).
+# The two emails that carry a 6-digit code. The code is in the subject too: Gmail folds repeated look-alike mails into "quoted text" and hid it.
 [auth.email.template.recovery]
-subject = "Your Sellbook password reset code"
+subject = "{{ .Token }} is your Sellbook reset code"
 content_path = "./supabase/templates/recovery.html"
 
 [auth.email.template.email_change]
-subject = "Your Sellbook email confirmation code"
+subject = "{{ .Token }} is your Sellbook email code"
 content_path = "./supabase/templates/email_change.html"
 
 # Uncomment to customize email template
