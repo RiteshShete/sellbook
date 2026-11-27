@@ -1,8 +1,10 @@
-﻿# Weekly database backup (schema + data) kept as a private workflow artifact for 30 days.
-# Needs ONE repository SECRET: BACKUP_DB_URL = the Supabase "Session pooler" connection string of the project (has the DB password).
-# That is a database password, not an API key. Without the secret the job stops with a clear message.
-# NOTE: the repo is public, so artifacts of a public repo are downloadable only by people with repo access, but a
-# private backup repo or storage is the better home once real customers exist (see docs/GO_LIVE_RUNBOOK.md).
+# Weekly database backup: pg_dump -> encrypted with age -> pushed to the PRIVATE repo RiteshShete/sellbook-backups.
+# Nothing is uploaded as a GitHub artifact and the plain dump never leaves the runner.
+# Repository SECRETS (set by the owner, never in chat):
+#   BACKUP_DB_URL      Supabase "Session pooler" connection string of the live project (has the DB password)
+#   BACKUP_AGE_PUBKEY  age public key (age1...). The private key stays with the owner; without it a backup cannot be read.
+#   BACKUP_DEPLOY_KEY  SSH private key of a write deploy key on sellbook-backups only
+# Restore: age -d -i backup-age-key.txt sellbook-YYYY-MM-DD.dump.age > sellbook.dump ; pg_restore ...
 name: Backup
 
 on:
@@ -17,17 +19,40 @@ jobs:
   dump:
     runs-on: ubuntu-latest
     steps:
-      - name: Dump
+      - name: Dump and encrypt
         env:
           DB_URL: ${{ secrets.BACKUP_DB_URL }}
+          AGE_PUBKEY: ${{ secrets.BACKUP_AGE_PUBKEY }}
         run: |
-          test -n "$DB_URL" || { echo "BACKUP_DB_URL secret is not set: no backup was taken"; exit 1; }
-          sudo apt-get install -y --no-install-recommends postgresql-client >/dev/null
+          for v in DB_URL AGE_PUBKEY; do test -n "${!v}" || { echo "secret for $v is not set: no backup was taken"; exit 1; }; done
+          # The server runs Postgres 17; pg_dump must be the same version or newer.
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq postgresql-common age >/dev/null
+          sudo /usr/share/postgresql-common/pgdg/apt.postgresql.org.sh -y >/dev/null
+          sudo apt-get install -y -qq postgresql-client-17 >/dev/null
           pg_dump "$DB_URL" --no-owner --no-privileges --schema=public --schema=app_private --format=custom --file=sellbook.dump
           test -s sellbook.dump
-          pg_restore --list sellbook.dump | wc -l
-      - uses: actions/upload-artifact@v4
-        with:
-          name: sellbook-db-${{ github.run_id }}
-          path: sellbook.dump
-          retention-days: 30
+          echo "objects in dump: $(pg_restore --list sellbook.dump | wc -l)"
+          age -r "$AGE_PUBKEY" -o "sellbook-$(date -u +%F).dump.age" sellbook.dump
+          rm sellbook.dump
+          ls -l ./*.age
+      - name: Push to the private backup repo
+        env:
+          DEPLOY_KEY: ${{ secrets.BACKUP_DEPLOY_KEY }}
+        run: |
+          test -n "$DEPLOY_KEY" || { echo "BACKUP_DEPLOY_KEY is not set: the backup was not stored"; exit 1; }
+          mkdir -p ~/.ssh && chmod 700 ~/.ssh
+          printf '%s\n' "$DEPLOY_KEY" > ~/.ssh/backup_key && chmod 600 ~/.ssh/backup_key
+          # shortcut: host key fetched on first contact, pin it if GitHub's key ever needs stricter trust
+          ssh-keyscan github.com >> ~/.ssh/known_hosts 2>/dev/null
+          export GIT_SSH_COMMAND='ssh -i ~/.ssh/backup_key -o IdentitiesOnly=yes'
+          git clone --quiet git@github.com:RiteshShete/sellbook-backups.git out
+          mv ./*.age out/
+          cd out
+          git config user.name "sellbook-backup"
+          git config user.email "backup@users.noreply.github.com"
+          git checkout -B main
+          git add -- '*.age'
+          git commit --quiet -m "Backup $(date -u +%F)"
+          git push --quiet origin main
+          echo "stored: $(git log -1 --format=%h)"
