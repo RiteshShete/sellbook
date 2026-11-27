@@ -45,10 +45,16 @@ export function SignupPage() {
   const [password, setPassword] = useState('')
   const [accept, setAccept] = useState(false)
   const [captcha, setCaptcha] = useState<string | null>(null)
+  const [attempt, setAttempt] = useState(0)
   const { errors, setErrors, clear } = useFieldErrors()
   const signup = useMutation({
     mutationFn: (v: { id: LoginId; password: string }) =>
       signUpWithId(client, v.id, v.password, captcha ?? undefined),
+    // A check token works once: get a fresh one after every try.
+    onSettled: () => {
+      setCaptcha(null)
+      setAttempt((n) => n + 1)
+    },
   })
 
   if (signup.isSuccess && signup.data.signedIn) return <Navigate to="/create-shop" replace />
@@ -134,7 +140,7 @@ export function SignupPage() {
           </label>
           {errors.accept && <p className="mt-1 text-sm text-danger">{errors.accept}</p>}
         </div>
-        <Captcha onToken={setCaptcha} />
+        <Captcha key={attempt} onToken={setCaptcha} />
         {errors.captcha && <p role="alert" className="text-sm text-danger">{errors.captcha}</p>}
         <Button type="submit" block disabled={signup.isPending}>
           {signup.isPending ? 'Creating…' : 'Create account'}
