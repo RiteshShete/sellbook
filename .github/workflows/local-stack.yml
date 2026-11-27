@@ -1,4 +1,4 @@
-﻿# Real-stack browser tests (e2e-local/) + pgTAP + the SQL-vs-contract test, on a LOCAL Supabase stack started inside the runner.
+# Real-stack browser tests (e2e-local/) + pgTAP + the SQL-vs-contract test, on a LOCAL Supabase stack started inside the runner.
 # Never touches a hosted project. Slow (several minutes), so it runs on pull requests and by hand, not on every push.
 # NOTE: written 23 Nov 2026 and not yet run on GitHub; the same steps pass on the owner's machine.
 name: Local stack tests
@@ -18,7 +18,7 @@ jobs:
       SUPABASE_AUTH_SMS_TWILIO_AUTH_TOKEN: placeholder # turns phone sign-up on locally; no SMS is ever sent
     steps:
       - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
+      - uses: actions/setup-node@v7
         with:
           node-version: 22
           cache: npm
