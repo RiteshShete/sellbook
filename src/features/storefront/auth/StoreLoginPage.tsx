@@ -3,6 +3,7 @@ import { useState, type FormEvent } from 'react'
 import { Link, Navigate, useLocation, useParams } from 'react-router-dom'
 import { Button, Input, Skeleton } from '../../../components/ui'
 import { signInWithId } from '../../auth/authActions'
+import { Captcha, captchaRequired } from '../../auth/components/Captcha'
 import { GoogleButton } from '../../auth/components/GoogleButton'
 import { parseLoginId, type LoginId } from '../../auth/loginId'
 import { useMyContext } from '../../auth/myContext'
@@ -22,7 +23,16 @@ export function StoreLoginPage() {
   const [id, setId] = useState('')
   const [password, setPassword] = useState('')
   const [errors, setErrors] = useState<Record<string, string>>({})
-  const login = useMutation({ mutationFn: (v: { id: LoginId; password: string }) => signInWithId(client, v.id, v.password) })
+  const [captcha, setCaptcha] = useState<string | null>(null)
+  const [attempt, setAttempt] = useState(0)
+  const login = useMutation({
+    mutationFn: (v: { id: LoginId; password: string }) => signInWithId(client, v.id, v.password, captcha ?? undefined),
+    // A check token works once: get a fresh one after every try.
+    onSettled: () => {
+      setCaptcha(null)
+      setAttempt((n) => n + 1)
+    },
+  })
 
   const from: unknown = (location.state as { from?: unknown } | null)?.from
   if (status === 'signedIn') {
@@ -40,8 +50,9 @@ export function StoreLoginPage() {
     const found: Record<string, string> = {}
     if (!parsed) found.id = t('login.idError')
     if (!password) found.password = t('login.passwordError')
+    if (captchaRequired && !captcha) found.captcha = 'Please complete the check first.'
     setErrors(found)
-    if (parsed && password) login.mutate({ id: parsed, password })
+    if (parsed && password && (!captchaRequired || captcha)) login.mutate({ id: parsed, password })
   }
 
   return (
@@ -72,6 +83,12 @@ export function StoreLoginPage() {
           }}
           error={errors.password}
         />
+        <Captcha key={attempt} onToken={setCaptcha} />
+        {errors.captcha && (
+          <p role="alert" className="text-sm text-danger">
+            {errors.captcha}
+          </p>
+        )}
         <Button type="submit" block disabled={login.isPending}>
           {login.isPending ? t('login.submitting') : t('login.submit')}
         </Button>

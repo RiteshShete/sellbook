@@ -5,6 +5,7 @@ import { Button, Input, Skeleton } from '../../components/ui'
 import loginBg from '../../assets/login/login-bg.png'
 import { RotatingArt } from './components/RotatingArt'
 import { signInWithId } from './authActions'
+import { Captcha, captchaRequired } from './components/Captcha'
 import { GoogleButton } from './components/GoogleButton'
 import { parseLoginId, type LoginId } from './loginId'
 import type { LoginErrors } from './schemas'
@@ -26,9 +27,16 @@ export function LoginPage() {
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [errors, setErrors] = useState<LoginErrors>({})
+  const [captcha, setCaptcha] = useState<string | null>(null)
+  const [attempt, setAttempt] = useState(0)
 
   const login = useMutation({
-    mutationFn: (v: { id: LoginId; password: string }) => signInWithId(client, v.id, v.password),
+    mutationFn: (v: { id: LoginId; password: string }) => signInWithId(client, v.id, v.password, captcha ?? undefined),
+    // A check token works once: get a fresh one after every try.
+    onSettled: () => {
+      setCaptcha(null)
+      setAttempt((n) => n + 1)
+    },
   })
 
   if (status === 'loading') {
@@ -55,8 +63,9 @@ export function LoginPage() {
     const found: LoginErrors = {}
     if (!id) found.email = email.trim() ? 'Enter a valid email or mobile number' : 'Enter your email or mobile number'
     if (!password) found.password = 'Enter your password'
+    if (captchaRequired && !captcha) found.captcha = 'Please complete the check first.'
     setErrors(found)
-    if (id && password) login.mutate({ id, password })
+    if (id && password && (!captchaRequired || captcha)) login.mutate({ id, password })
   }
 
   return (
@@ -99,6 +108,12 @@ export function LoginPage() {
             }}
             error={errors.password}
           />
+          <Captcha key={attempt} onToken={setCaptcha} />
+          {errors.captcha && (
+            <p role="alert" className="text-sm text-white">
+              {errors.captcha}
+            </p>
+          )}
           <Button type="submit" variant="lime" block disabled={login.isPending}>
             {login.isPending ? 'Signing in…' : 'Sign in'}
           </Button>

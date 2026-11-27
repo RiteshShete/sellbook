@@ -14,8 +14,18 @@ function check(error: { message: string; code?: string } | null): void {
 const captcha = (token?: string) => (token ? { captchaToken: token } : {})
 
 /** Email or mobile + password. */
-export async function signInWithId(client: SupabaseClient, id: LoginId, password: string): Promise<void> {
-  const { error } = await client.auth.signInWithPassword({ ...credentialsFor(id), password })
+export async function signInWithId(
+  client: SupabaseClient,
+  id: LoginId,
+  password: string,
+  captchaToken?: string,
+): Promise<void> {
+  // Supabase asks for the check on password sign-in too once CAPTCHA protection is on.
+  const { error } = await client.auth.signInWithPassword({
+    ...credentialsFor(id),
+    password,
+    ...(captchaToken ? { options: { captchaToken } } : {}),
+  })
   check(error)
 }
 

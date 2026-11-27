@@ -43,6 +43,16 @@ describe('signInWithId', () => {
     expect(b.auth.signInWithPassword).toHaveBeenCalledWith({ phone: '+919876543210', password: 'pw' })
   })
 
+  it('sends the captcha token only when there is one', async () => {
+    const a = fakeClient()
+    await signInWithId(a.client, { kind: 'email', email: 'a@b.co' }, 'pw', 'tok')
+    expect(a.auth.signInWithPassword).toHaveBeenCalledWith({
+      email: 'a@b.co',
+      password: 'pw',
+      options: { captchaToken: 'tok' },
+    })
+  })
+
   it('turns a wrong password into a readable error', async () => {
     const { client } = fakeClient({ signInWithPassword: { error: { message: 'Invalid login credentials' } } })
     await expect(signInWithId(client, { kind: 'email', email: 'a@b.co' }, 'x')).rejects.toThrow(

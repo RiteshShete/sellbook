@@ -7,7 +7,7 @@ export const LoginSchema = z.object({
 
 export type LoginInput = z.infer<typeof LoginSchema>
 
-export type LoginErrors = Partial<Record<keyof LoginInput, string>>
+export type LoginErrors = Partial<Record<keyof LoginInput | 'captcha', string>>
 
 export type LoginValidation = { ok: true; value: LoginInput } | { ok: false; errors: LoginErrors }
 
