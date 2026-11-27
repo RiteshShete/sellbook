@@ -33,6 +33,7 @@ export function StoreSignupPage() {
   const [password, setPassword] = useState('')
   const [accept, setAccept] = useState(false)
   const [captcha, setCaptcha] = useState<string | null>(null)
+  const [attempt, setAttempt] = useState(0)
   const [errors, setErrors] = useState<Record<string, string>>({})
   const finishing = status === 'signedIn'
 
@@ -45,7 +46,12 @@ export function StoreSignupPage() {
       await registerCustomer(client, { name: v.name, phone: v.phone })
       await queryClient.invalidateQueries({ queryKey: queryKeys.myContext })
     },
-    onError: (e: Error) => setErrors({ form: e.message }),
+    onError: (e: Error) => {
+      setErrors({ form: e.message })
+      // A check token works once: get a fresh one after a failed try.
+      setCaptcha(null)
+      setAttempt((n) => n + 1)
+    },
   })
 
   const from: unknown = (location.state as { from?: unknown } | null)?.from
@@ -138,7 +144,7 @@ export function StoreSignupPage() {
               </label>
               {errors.accept && <p className="mt-1 text-sm text-danger">{errors.accept}</p>}
             </div>
-            <Captcha onToken={setCaptcha} />
+            <Captcha key={attempt} onToken={setCaptcha} />
             {errors.captcha && <p role="alert" className="text-sm text-danger">{errors.captcha}</p>}
           </>
         )}

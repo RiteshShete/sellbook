@@ -25,6 +25,7 @@ export function ForgotCodeFlow({ doneTo }: { doneTo: string }) {
   const [code, setCode] = useState('')
   const [password, setPassword] = useState('')
   const [captcha, setCaptcha] = useState<string | null>(null)
+  const [attempt, setAttempt] = useState(0)
   const [sentAt, setSentAt] = useState<number | null>(null)
   const [errors, setErrors] = useState<Record<string, string>>({})
   const secondsLeft = useResendCountdown(sentAt)
@@ -32,6 +33,11 @@ export function ForgotCodeFlow({ doneTo }: { doneTo: string }) {
   const send = useMutation({
     mutationFn: (to: string) => sendRecoveryCode(client, to, captcha ?? undefined),
     onSuccess: () => setSentAt(Date.now()),
+    // A check token works once: get a fresh one after every send, for the next send.
+    onSettled: () => {
+      setCaptcha(null)
+      setAttempt((n) => n + 1)
+    },
   })
   const reset = useMutation({
     mutationFn: (v: { code: string; password: string }) => resetPasswordWithCode(client, email.trim(), v.code, v.password),
@@ -84,7 +90,7 @@ export function ForgotCodeFlow({ doneTo }: { doneTo: string }) {
           }}
           error={errors.email}
         />
-        <Captcha onToken={setCaptcha} />
+        <Captcha key={attempt} onToken={setCaptcha} />
         {errors.captcha && <p role="alert" className="text-sm text-danger">{errors.captcha}</p>}
         <Button type="submit" block disabled={send.isPending}>
           {send.isPending ? 'Sending…' : 'Send code'}
@@ -124,7 +130,13 @@ export function ForgotCodeFlow({ doneTo }: { doneTo: string }) {
       <Button type="submit" block disabled={reset.isPending}>
         {reset.isPending ? 'Changing…' : 'Change password'}
       </Button>
-      <Button variant="secondary" block disabled={secondsLeft > 0 || send.isPending} onClick={() => send.mutate(email.trim())}>
+      <Captcha key={attempt} onToken={setCaptcha} />
+      <Button
+        variant="secondary"
+        block
+        disabled={secondsLeft > 0 || send.isPending || (captchaRequired && !captcha)}
+        onClick={() => send.mutate(email.trim())}
+      >
         {secondsLeft > 0 ? `Send the code again in ${secondsLeft}s` : 'Send the code again'}
       </Button>
       <button
