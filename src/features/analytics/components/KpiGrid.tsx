@@ -54,7 +54,7 @@ export function KpiGrid({ current: c, previous: p, previousLabel }: Props) {
         aside={change('sales', (a) => a.sales)}
       />
       <Link
-        to="/pending"
+        to="/analytics"
         aria-label={`Outstanding, all time: ${formatINR(c.outstanding_total)}, ${c.outstanding_count} unpaid. Open pending payments`}
         className="flex min-w-0"
       >

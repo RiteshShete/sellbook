@@ -21,7 +21,7 @@ function useTabs(): Tab[] {
   return [
     { to: '/', label: 'Home', Icon: House, alsoActive: ['/orders'], count: waiting > 0 ? waiting : fresh.data?.length },
     { to: '/delivery', label: 'Delivery', Icon: TruckTrailer, count: ready.data?.length },
-    { to: '/analytics', label: 'Analytics', Icon: ChartBar, alsoActive: ['/pending'] },
+    { to: '/analytics', label: 'Money', Icon: ChartBar },
     { to: '/catalog', label: 'Products', Icon: Package },
     {
       to: '/more',

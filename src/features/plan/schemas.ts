@@ -77,7 +77,7 @@ export const PRO_FEATURES = [
   'Voice ordering',
   'Order history and rollback',
   'Activity log',
-  'Other months and comparison in Analytics',
+  'Other months and comparison in Money reports',
   'To Prepare list',
   'Pending payments by age',
 ]

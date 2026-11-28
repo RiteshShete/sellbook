@@ -62,6 +62,8 @@ const SCREENS: Screen[] = [
   { name: '16-activity-orders', path: '/activity?tab=order', afterOnly: true },
   { name: '17-activity-order-log', path: `/activity/order/${orderId}`, afterOnly: true },
   { name: '18-activity-products', path: '/activity?tab=product', afterOnly: true },
+  { name: '19-money-pending', path: '/analytics', afterOnly: true },
+  { name: '20-money-reports', path: '/analytics?view=reports', afterOnly: true },
 ]
 
 test.describe(`screens (${label})`, () => {
@@ -118,6 +120,16 @@ test.describe(`screens (${label})`, () => {
     await page.goto(`${BASE}/orders/${orderId}`)
     await expect(page.getByRole('heading', { level: 1 })).toHaveText(LONG_NAME)
     await expect(page.getByText(/Order #15 ·/)).toBeVisible()
+  })
+
+  test('the old /pending address opens the Money screen on Pending', async ({ page }) => {
+    test.skip(label !== 'after')
+    await signIn(page)
+    await mockApi(page)
+    await page.goto(`${BASE}/pending`)
+    await expect(page.getByRole('heading', { level: 1, name: 'Money' })).toBeVisible()
+    await expect(page.getByRole('radio', { name: 'Pending' })).toBeChecked()
+    expect(new URL(page.url()).pathname).toBe(`${BASE}/analytics`)
   })
 
   test('a deep link and a refresh both work under the base path', async ({ page }) => {

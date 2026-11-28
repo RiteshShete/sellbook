@@ -12,7 +12,7 @@ const LINKS = [
   { to: '/more/shop', label: 'Online shop' },
   { to: '/pricing', label: 'Prices & offers' },
   { to: '/account', label: 'Account & security' },
-  { to: '/pending', label: 'Pending payments' },
+  { to: '/analytics', label: 'Pending payments' },
   { to: '/settings', label: 'Settings' },
   { to: '/trash', label: 'Trash' },
   { to: '/activity', label: 'Activity' },

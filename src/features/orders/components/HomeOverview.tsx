@@ -46,7 +46,7 @@ export function HomeOverview() {
         value={unpaid}
         format={formatINR}
         failed={pending.isError}
-        to="/pending"
+        to="/analytics"
       />
     </div>
   )
