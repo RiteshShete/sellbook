@@ -1,7 +1,6 @@
 import { ChevronRight } from 'lucide-react'
 import { useState } from 'react'
 import { Link } from 'react-router-dom'
-import { Page } from '../../app/Page'
 import { EmptyState, ErrorState, Skeleton } from '../../components/ui'
 import { formatDate } from '../../lib/dates'
 import { pluralize } from '../../lib/format'
@@ -17,13 +16,13 @@ const BUCKET_FILL: Record<AgeBucket, string> = {
   '60+': 'bg-coral',
 }
 
-/** Delivered but unpaid orders, all time, oldest first, grouped into ageing buckets. */
-export function PendingPage() {
+/** Delivered but unpaid orders, all time, oldest first, grouped into ageing buckets (first view of the Money screen). */
+export function PendingBody() {
   const pending = usePendingPayments()
   const [bucket, setBucket] = useState<AgeBucket | null>(null)
 
   return (
-    <Page title="Pending payments" back="/more">
+    <>
       {pending.isPending ? (
         <div className="flex flex-col gap-3" role="status" aria-label="Loading">
           <Skeleton className="h-20 w-full" />
@@ -43,7 +42,7 @@ export function PendingPage() {
           onBucket={(b) => setBucket((cur) => (cur === b ? null : b))}
         />
       )}
-    </Page>
+    </>
   )
 }
 

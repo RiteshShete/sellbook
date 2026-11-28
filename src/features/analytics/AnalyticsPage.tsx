@@ -1,4 +1,5 @@
 import { Download } from 'lucide-react'
+import type { ReactNode } from 'react'
 import { Link, useSearchParams } from 'react-router-dom'
 import { Page } from '../../app/Page'
 import { EmptyState, ErrorState, SegmentedControl, Skeleton } from '../../components/ui'
@@ -13,8 +14,11 @@ import { PaymentSplit } from './components/PaymentSplit'
 import { useExportCsv, useMonthAnalytics } from './hooks/useAnalytics'
 import { isQuietMonth, type SalesSource } from './schemas'
 
-/** Monthly analytics (IST months). The month lives in the URL: /analytics?month=2026-09. */
-export function AnalyticsPage() {
+/**
+ * Monthly reports (IST months), the second view of the Money screen. The month lives in the URL:
+ * /analytics?view=reports&month=2026-09. `tabs` is the Pending/Reports switch the Money screen puts on top.
+ */
+export function AnalyticsReports({ tabs }: { tabs: ReactNode }) {
   const [params, setParams] = useSearchParams()
   const latest = isoMonth(new Date())
   const asked = params.get('month') ?? ''
@@ -30,10 +34,12 @@ export function AnalyticsPage() {
   const settings = useSettings()
   const exportCsv = useExportCsv()
 
-  const keep = (next: Record<string, string>) => setParams({ ...(source ? { source } : {}), ...next }, { replace: true })
+  // Every change keeps view=reports, or the Money screen would fall back to Pending.
+  const keep = (next: Record<string, string>) =>
+    setParams({ view: 'reports', ...(source ? { source } : {}), ...next }, { replace: true })
   const pick = (m: string) => keep(m === latest ? {} : { month: m })
   const pickSource = (v: 'all' | SalesSource) => {
-    const next: Record<string, string> = month === latest ? {} : { month }
+    const next: Record<string, string> = month === latest ? { view: 'reports' } : { view: 'reports', month }
     setParams(v === 'all' ? next : { ...next, source: v }, { replace: true })
   }
 
@@ -66,8 +72,9 @@ export function AnalyticsPage() {
   )
 
   return (
-    <Page title="Analytics" action={pro ? headerActions : undefined}>
+    <Page title="Money" action={pro ? headerActions : undefined} menu>
       <div className="flex flex-col gap-4">
+        {tabs}
         <SegmentedControl
           label="Where the order came from"
           value={source ?? 'all'}

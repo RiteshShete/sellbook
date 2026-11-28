@@ -1,4 +1,4 @@
-import { ChartBar, House, Package, TruckTrailer, User, type Icon } from '@phosphor-icons/react'
+import { ChartBar, House, Package, TruckTrailer, type Icon } from '@phosphor-icons/react'
 import { NavLink, useLocation } from 'react-router-dom'
 import { useNeedsAction } from '../features/orders/hooks/useCustomerOrders'
 import { useOrders } from '../features/orders/hooks/useOrders'
@@ -21,14 +21,8 @@ function useTabs(): Tab[] {
   return [
     { to: '/', label: 'Home', Icon: House, alsoActive: ['/orders'], count: waiting > 0 ? waiting : fresh.data?.length },
     { to: '/delivery', label: 'Delivery', Icon: TruckTrailer, count: ready.data?.length },
-    { to: '/analytics', label: 'Analytics', Icon: ChartBar, alsoActive: ['/pending'] },
+    { to: '/analytics', label: 'Money', Icon: ChartBar },
     { to: '/catalog', label: 'Products', Icon: Package },
-    {
-      to: '/more',
-      label: 'Profile',
-      Icon: User,
-      alsoActive: ['/settings', '/trash', '/activity'],
-    },
   ]
 }
 

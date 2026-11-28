@@ -276,6 +276,8 @@ export async function mockApi(page: Page, opts: MockOptions = {}): Promise<void>
           usage: { orders: 3, products: 5 },
         })
       }
+      if (fn === 'my_context') return json({ is_owner: true, shop_slug: 'demo-shop', has_customer_profile: false })
+      if (fn === 'is_admin') return json(false)
       if (fn === 'pending_payments') return json(PENDING)
       if (fn === 'analytics_month') return json(ANALYTICS)
       if (fn === 'bill_content_hash') return json('hash')

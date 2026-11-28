@@ -14,7 +14,7 @@ export function DeliveryPage() {
   const orders = useOrders('ready', '')
 
   return (
-    <Page title="Delivery">
+    <Page title="Delivery" menu>
       <div>
         {orders.isPending ? (
           <div className="flex flex-col gap-3" role="status" aria-label="Loading">

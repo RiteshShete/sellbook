@@ -23,7 +23,7 @@ describe('HomeOverview', () => {
     const prepare = screen.getByRole('link', { name: /To prepare/ })
     expect(prepare.getAttribute('href')).toBe('/?view=prep')
     expect(screen.getByRole('link', { name: /To deliver/ }).getAttribute('href')).toBe('/delivery')
-    expect(screen.getByRole('link', { name: /Unpaid/ }).getAttribute('href')).toBe('/pending')
+    expect(screen.getByRole('link', { name: /Unpaid/ }).getAttribute('href')).toBe('/analytics')
   })
 
   it('sums only the pending (delivered, unpaid) orders', () => {

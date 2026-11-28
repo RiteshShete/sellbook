@@ -77,7 +77,7 @@ export const PRO_FEATURES = [
   'Voice ordering',
   'Order history and rollback',
   'Activity log',
-  'Other months and comparison in Analytics',
+  'Other months and comparison in Money reports',
   'To Prepare list',
   'Pending payments by age',
 ]
@@ -101,6 +101,16 @@ export interface PlanNotice {
 /** Whole days until `endsAt` (0 or less = today or past); null when there is no end date. */
 export function daysLeft(endsAt: string | null, now: Date): number | null {
   return endsAt === null ? null : Math.ceil((new Date(endsAt).getTime() - now.getTime()) / 86_400_000)
+}
+
+/** One short line for the profile menu: the plan name and how much of its order limit is used. */
+export function planChip(plan: Plan): string {
+  const name = plan.tier ? TIER_LABEL[plan.tier] : 'No plan'
+  const { orders, orders_scope } = plan.limits
+  const when = orders_scope === 'month' ? ' this month' : ''
+  return orders === null
+    ? `${name} · ${pluralize(plan.usage.orders, 'order')}${when}`
+    : `${name} · ${plan.usage.orders} of ${orders} orders${when}`
 }
 
 /** The one thing worth telling the shop about its plan right now, most urgent first; null = nothing. */

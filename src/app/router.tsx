@@ -1,4 +1,4 @@
-import { createBrowserRouter, Outlet, type RouteObject } from 'react-router-dom'
+import { createBrowserRouter, Navigate, Outlet, type RouteObject } from 'react-router-dom'
 import { RequireAuth } from '../features/auth/RequireAuth'
 import { ProGate } from '../features/plan/components/ProGate'
 import { WriteGate } from '../features/plan/components/WriteGate'
@@ -103,12 +103,10 @@ const routes: RouteObject[] = [
       },
       {
         path: 'analytics',
-        lazy: lazyPage(() => import('../features/analytics/AnalyticsPage'), 'AnalyticsPage'),
+        lazy: lazyPage(() => import('../features/analytics/MoneyPage'), 'MoneyPage'),
       },
-      {
-        path: 'pending',
-        lazy: lazyPage(() => import('../features/analytics/PendingPage'), 'PendingPage'),
-      },
+      // Old address of the pending list: the Money screen opens on it.
+      { path: 'pending', element: <Navigate to="/analytics" replace /> },
       {
         path: 'catalog',
         lazy: lazyPage(() => import('../features/catalog/CatalogPage'), 'CatalogPage'),

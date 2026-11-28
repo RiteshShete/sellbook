@@ -1,6 +1,7 @@
 import { ChevronLeft } from 'lucide-react'
 import type { ReactNode } from 'react'
 import { useLocation, useNavigate } from 'react-router-dom'
+import { ProfileMenu } from '../features/settings/ProfileMenu'
 
 export interface PageProps {
   title: string
@@ -16,10 +17,12 @@ export interface PageProps {
   back?: string
   /** Primary action slot, shown at the right of the sticky header. */
   action?: ReactNode
+  /** Main (tab) screens: show the account menu button at the right of the header. */
+  menu?: boolean
   children: ReactNode
 }
 
-export function Page({ title, subtitle, wrapTitle = false, back, action, children }: PageProps) {
+export function Page({ title, subtitle, wrapTitle = false, back, action, menu = false, children }: PageProps) {
   return (
     <>
       <header className="sticky top-0 z-30 print:hidden border-b border-border bg-surface pt-[env(safe-area-inset-top)]">
@@ -33,7 +36,12 @@ export function Page({ title, subtitle, wrapTitle = false, back, action, childre
             </h1>
             {subtitle && <p className="truncate text-sm text-muted">{subtitle}</p>}
           </div>
-          {action && <div className="shrink-0">{action}</div>}
+          {(action || menu) && (
+            <div className="flex shrink-0 items-center gap-2">
+              {action}
+              {menu && <ProfileMenu />}
+            </div>
+          )}
         </div>
       </header>
       <div className="mx-auto w-full max-w-2xl lg:max-w-[75vw] min-w-0 px-4 py-4">{children}</div>

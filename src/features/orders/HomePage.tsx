@@ -3,6 +3,7 @@ import { Link, useSearchParams } from 'react-router-dom'
 import headerBg from '../../assets/home/header-bg.png'
 import { EmptyArt, EmptyState, ErrorState, Skeleton, UnderlineTabs } from '../../components/ui'
 import { OrderCardList } from './components/OrderCardList'
+import { ProfileMenu } from '../settings/ProfileMenu'
 import { HomeOverview } from './components/HomeOverview'
 import { FAB_CLEARANCE, NewOrderFab } from './components/NewOrderFab'
 import { NeedsActionList } from './components/NeedsActionList'
@@ -35,6 +36,7 @@ export function HomePage() {
         <header className="relative mx-auto flex min-h-14 max-w-2xl lg:max-w-[75vw] items-center justify-between gap-1 px-4">
           <h1 className="font-display min-w-0 flex-1 truncate text-2xl leading-[1.6]">Sellbook</h1>
           <SearchLink />
+          <ProfileMenu />
         </header>
         <div className="relative mx-auto w-full max-w-2xl lg:max-w-[75vw] min-w-0 px-4 pt-4">
           <HomeOverview />

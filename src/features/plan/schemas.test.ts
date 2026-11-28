@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { daysLeft, planNotice, planPayLink, PlanSchema, type Plan, type PlanLimit } from './schemas'
+import { daysLeft, planChip, planNotice, planPayLink, PlanSchema, type Plan, type PlanLimit } from './schemas'
 
 const NOW = new Date('2026-11-20T06:00:00Z')
 const inDays = (d: number) => new Date(NOW.getTime() + d * 86_400_000).toISOString()
@@ -71,6 +71,20 @@ describe('planNotice', () => {
     expect(planNotice(plan({ usage: { orders: 0, products: 24 } }), NOW)?.text).toBe('24 of 30 products used.')
     const pro = plan({ limits: { orders: 500, orders_scope: 'month', products: null }, usage: { orders: 0, products: 900 } })
     expect(planNotice(pro, NOW)).toBeNull()
+  })
+})
+
+describe('planChip', () => {
+  it('names the plan and the order use, per month or in total', () => {
+    expect(planChip(plan())).toBe('Base · 10 of 100 orders this month')
+    expect(planChip(plan({ tier: 'trial', limits: { orders: 10, orders_scope: 'total', products: 5 } }))).toBe(
+      'Free trial · 10 of 10 orders',
+    )
+  })
+
+  it('counts orders without a limit and copes with no plan', () => {
+    expect(planChip(plan({ tier: 'pro', limits: { orders: null, orders_scope: null, products: null } }))).toBe('Pro · 10 orders')
+    expect(planChip(plan({ tier: null }))).toBe('No plan · 10 of 100 orders this month')
   })
 })
 

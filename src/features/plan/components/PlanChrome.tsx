@@ -41,9 +41,14 @@ export function LockedWall() {
       title="Your plan has ended"
       description="Your orders and products are safe. Renew to open the shop again."
       action={
-        <Link to="/plan" className="font-medium underline underline-offset-4">
-          See plans
-        </Link>
+        <div className="flex flex-col items-center gap-2">
+          <Link to="/plan" className="font-medium underline underline-offset-4">
+            See plans
+          </Link>
+          <Link to="/more" className="font-medium underline underline-offset-4">
+            Account and sign out
+          </Link>
+        </div>
       }
     />
   )
