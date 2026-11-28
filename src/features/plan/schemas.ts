@@ -103,6 +103,16 @@ export function daysLeft(endsAt: string | null, now: Date): number | null {
   return endsAt === null ? null : Math.ceil((new Date(endsAt).getTime() - now.getTime()) / 86_400_000)
 }
 
+/** One short line for the profile menu: the plan name and how much of its order limit is used. */
+export function planChip(plan: Plan): string {
+  const name = plan.tier ? TIER_LABEL[plan.tier] : 'No plan'
+  const { orders, orders_scope } = plan.limits
+  const when = orders_scope === 'month' ? ' this month' : ''
+  return orders === null
+    ? `${name} · ${pluralize(plan.usage.orders, 'order')}${when}`
+    : `${name} · ${plan.usage.orders} of ${orders} orders${when}`
+}
+
 /** The one thing worth telling the shop about its plan right now, most urgent first; null = nothing. */
 export function planNotice(plan: Plan, now: Date): PlanNotice | null {
   if (plan.status === 'locked') {

@@ -72,7 +72,7 @@ export function AnalyticsReports({ tabs }: { tabs: ReactNode }) {
   )
 
   return (
-    <Page title="Money" action={pro ? headerActions : undefined}>
+    <Page title="Money" action={pro ? headerActions : undefined} menu>
       <div className="flex flex-col gap-4">
         {tabs}
         <SegmentedControl

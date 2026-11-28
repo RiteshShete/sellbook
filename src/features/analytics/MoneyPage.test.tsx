@@ -5,6 +5,7 @@ import { afterEach, describe, expect, it, vi } from 'vitest'
 import { MoneyPage } from './MoneyPage'
 
 // The two bodies are tested on their own; here only the switch between them matters.
+vi.mock('../settings/ProfileMenu', () => ({ ProfileMenu: () => null }))
 vi.mock('./PendingPage', () => ({ PendingBody: () => <p>pending body</p> }))
 vi.mock('./AnalyticsPage', () => ({
   AnalyticsReports: ({ tabs }: { tabs: ReactNode }) => (

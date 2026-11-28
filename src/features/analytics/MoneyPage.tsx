@@ -27,7 +27,7 @@ export function MoneyPage() {
   // Reports brings its own header actions (month, CSV), so each view owns its Page.
   if (view === 'reports') return <AnalyticsReports tabs={tabs} />
   return (
-    <Page title="Money">
+    <Page title="Money" menu>
       <div className="flex flex-col gap-4">
         {tabs}
         <PendingBody />

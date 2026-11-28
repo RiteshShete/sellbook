@@ -28,7 +28,7 @@ export function CatalogPage() {
   )
 
   return (
-    <Page title="Products" action={canWrite ? addButton : undefined}>
+    <Page title="Products" action={canWrite ? addButton : undefined} menu>
       {b.products.isPending ? (
         <div className="grid grid-cols-2 gap-3" role="status" aria-label="Loading">
           {[0, 1, 2, 3].map((i) => (

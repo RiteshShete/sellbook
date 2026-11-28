@@ -64,6 +64,16 @@ const SCREENS: Screen[] = [
   { name: '18-activity-products', path: '/activity?tab=product', afterOnly: true },
   { name: '19-money-pending', path: '/analytics', afterOnly: true },
   { name: '20-money-reports', path: '/analytics?view=reports', afterOnly: true },
+  {
+    name: '21-account-menu',
+    path: '/',
+    afterOnly: true,
+    act: async (page) => {
+      await page.getByRole('button', { name: 'Account menu' }).click()
+      await expect(page.getByRole('dialog', { name: 'Account' })).toBeVisible()
+      await expect(page.getByRole('button', { name: 'Sign out' })).toBeVisible()
+    },
+  },
 ]
 
 test.describe(`screens (${label})`, () => {
